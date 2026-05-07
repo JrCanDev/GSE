@@ -15,18 +15,21 @@ CREATE TABLE IF NOT EXISTS groupes (
     est_affiche BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE TYPE etat_materiel AS ENUM ('OK', 'En réparation', 'Endommagé', 'Disparu');
+
 CREATE TABLE IF NOT EXISTS materiels (
     id_materiel SERIAL PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
     modele VARCHAR(255) NULL,
     annee INT NULL,
     etiquette_ulco VARCHAR(255) UNIQUE NULL,
-    etat ENUM('OK', 'En réparation', 'Endommagé', 'Disparu') NOT NULL DEFAULT 'OK',
-    -- TODO à voir si la localisation doit être NULL ou pas
-    localisation VARCHAR(255) NULL, 
+    etat etat_materiel NOT NULL DEFAULT 'OK',
+    localisation VARCHAR(255) NOT NULL, 
     descriptif TEXT NULL,
     remarque TEXT NULL
 );
+
+CREATE TYPE emprunt_caution AS ENUM ('Déposée', 'En attente', 'Non demandée');
 
 CREATE TABLE IF NOT EXISTS emprunts (
     id_emprunt SERIAL PRIMARY KEY,
@@ -37,7 +40,7 @@ CREATE TABLE IF NOT EXISTS emprunts (
     date_emprunt DATE NOT NULL,
     date_prevue_restitution DATE NOT NULL,
     date_reelle_restitution DATE NULL,
-    caution ENUM('Déposée', 'En attente', 'Non demandée') NOT NULL DEFAULT 'En attente',
+    caution emprunt_caution NOT NULL DEFAULT 'En attente',
     remarque TEXT NULL,
     FOREIGN KEY (id_groupe) REFERENCES groupes(id_groupe) ON DELETE CASCADE,
     FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel) ON DELETE CASCADE
@@ -50,9 +53,9 @@ INSERT INTO utilisateurs (username, password, admin) VALUES ('adminjrcandev', md
 CREATE VIEW vw_emprunts_materiels AS
 SELECT 
   E.id_emprunt,
-  E.nom,
-  E.prenom,
-  E.annee,
+  E.nom_emprunteur,
+  E.prenom_emprunteur,
+  G.nom_groupe,
   TO_CHAR(E.date_emprunt, 'YYYY-MM-DD') AS date_emprunt,
   E.caution,
   M.id_materiel,
@@ -62,15 +65,16 @@ SELECT
   M.etat,
   E.remarque
 FROM emprunts AS E
-INNER JOIN materiels AS M ON M.id_materiel = E.id_materiel;
+INNER JOIN materiels AS M ON M.id_materiel = E.id_materiel
+INNER JOIN groupes AS G ON G.id_groupe = E.id_groupe;
 
 -- Vue pour afficher les matériels
 CREATE VIEW vw_materiels AS
 SELECT 
-  id,
+  id_materiel,
   nom,
   modele,
-  TO_CHAR(date_achat, 'YYYY-MM-DD') AS annee,
+  TO_CHAR(annee, 'YYYY-MM-DD') AS annee,
   etiquette_ulco,
   localisation,
   etat,
@@ -101,7 +105,7 @@ CREATE OR REPLACE FUNCTION create_materiel(
     annee INT,
     etiquette_ulco VARCHAR,
     localisation VARCHAR,
-    etat ENUM('OK', 'En réparation', 'Endommagé', 'Disparu'),
+    etat etat_materiel,
     descriptif TEXT,
     remarque TEXT
 ) RETURNS INTEGER AS $$
@@ -123,7 +127,7 @@ CREATE OR REPLACE FUNCTION create_emprunt(
     id_materiel INT,
     date_emprunt DATE,
     date_prevue_restitution DATE,
-    caution ENUM('Déposée', 'En attente', 'Non demandée'),
+    caution emprunt_caution,
     remarque TEXT
 ) RETURNS INTEGER AS $$
 DECLARE
