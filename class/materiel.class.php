@@ -60,12 +60,12 @@ class Materiel
     public function create(): void
     {
         try {
-            $fields = array('nom', 'modele', 'annee', 'etiquette_ulco', 'etat', 'localisation', 'descriptif', 'remarque');
-            $sql = 'SELECT create_materiel(: ' . implode(', :', $fields) . ')';
+            $fields = array('nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque');
+            $sql = 'SELECT create_materiel(:' . implode(', :', $fields) . ') AS id_materiel';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':nom', $this->nom, PDO::PARAM_STR);
             $stmt->bindValue(':modele', $this->modele, PDO::PARAM_STR);
-            $stmt->bindValue(':annee', $this->annee, PDO::PARAM_STR);
+            $stmt->bindValue(':annee', $this->annee, PDO::PARAM_INT);
             $stmt->bindValue(':etiquette_ulco', $this->etiquette_ulco, PDO::PARAM_STR);
             $stmt->bindValue(':etat', $this->etat, PDO::PARAM_STR);
             $stmt->bindValue(':localisation', $this->localisation, PDO::PARAM_STR);
@@ -103,12 +103,12 @@ class Materiel
     {
         try {
             $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'etat', 'localisation', 'descriptif', 'remarque');
-            $sql = 'SELECT update_materiel(: ' . implode(', :', $fields) . ')';
+            $sql = 'SELECT update_materiel(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id_materiel', $this->id_materiel, PDO::PARAM_INT);
             $stmt->bindValue(':nom', $this->nom, PDO::PARAM_STR);
             $stmt->bindValue(':modele', $this->modele, PDO::PARAM_STR);
-            $stmt->bindValue(':annee', $this->annee, PDO::PARAM_STR);
+            $stmt->bindValue(':annee', $this->annee, PDO::PARAM_INT);
             $stmt->bindValue(':etiquette_ulco', $this->etiquette_ulco, PDO::PARAM_STR);
             $stmt->bindValue(':etat', $this->etat, PDO::PARAM_STR);
             $stmt->bindValue(':localisation', $this->localisation, PDO::PARAM_STR);
@@ -123,7 +123,7 @@ class Materiel
     public static function fetchAll(PDO $db): array
     {
         try {
-            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'etat', 'localisation', 'descriptif', 'remarque');
+            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque');
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels';
             $stmt = $db->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -140,5 +140,22 @@ class Materiel
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
             return [];
         }
+    }
+
+    public static function estDisponible(PDO $db, int $id_materiel): bool
+    {
+        try {
+            $sql = 'SELECT is_materiel_disponible(:id_materiel) AS disponible';
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':id_materiel', $id_materiel, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($result) {
+                return $result['disponible'];
+            }
+        } catch (PDOException $e) {
+            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+        }
+        return false;
     }
 }

@@ -50,12 +50,11 @@ class Groupe
     public function create(): void
     {
         try {
-            $fields = array('nom_groupe', 'date_restitution', 'est_affiche');
-            $sql = 'SELECT create_groupe(: ' . implode(', :', $fields) . ')';
+            $fields = array('nom_groupe', 'date_restitution');
+            $sql = 'SELECT create_groupe(:' . implode(', :', $fields) . ') AS id_groupe';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':nom_groupe', $this->nom_groupe, PDO::PARAM_STR);
             $stmt->bindValue(':date_restitution', $this->date_restitution, PDO::PARAM_STR);
-            $stmt->bindValue(':est_affiche', $this->est_affiche, PDO::PARAM_BOOL);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($result) {
@@ -87,8 +86,8 @@ class Groupe
     public function update(): void
     {
         try {
-            $fields = array( 'nom_groupe', 'date_restitution', 'est_affiche');
-            $sql = 'SELECT update_groupe(: ' . implode(', :', $fields) . ')';
+            $fields = array('nom_groupe', 'date_restitution', 'est_affiche');
+            $sql = 'SELECT update_groupe(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':nom_groupe', $this->nom_groupe, PDO::PARAM_STR);
             $stmt->bindValue(':date_restitution', $this->date_restitution, PDO::PARAM_STR);

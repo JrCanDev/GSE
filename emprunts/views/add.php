@@ -7,19 +7,22 @@
         <!-- Prénom, Nom et Année BUT -->
         <div class="w3-row-padding">
             <div class="w3-third">
-                <label><b>Nom</b></label>
-                <input placeholder="Nom" class="w3-input w3-border w3-round w3-center" type="text" name="lastname" required>
+                <label><b>Nom<span style="color: red;">*</span></b></label>
+                <input placeholder="Nom" class="w3-input w3-border w3-round w3-center" type="text" name="nom_emprunteur" required>
             </div>
             <div class="w3-third">
-                <label><b>Prénom</b></label>
-                <input placeholder="Prénom" class="w3-input w3-border w3-round w3-center" type="text" name="firstname" required>
+                <label><b>Prénom<span style="color: red;">*</span></b></label>
+                <input placeholder="Prénom" class="w3-input w3-border w3-round w3-center" type="text" name="prenom_emprunteur" required>
             </div>
             <div class="w3-third">
-                <label><b>Année</b></label>
-                <select class="w3-select w3-border w3-round w3-center" name="year" required>
+                <label><b>Année<span style="color: red;">*</span></b></label>
+                <select class="w3-select w3-border w3-round w3-center" name="id_groupe" required>
                     <option value="" disabled selected>Choisir une année</option>
-                    <?php foreach ($years as $year): ?>
-                        <option value="<?= htmlspecialchars($year) ?>"><?= htmlspecialchars($year) ?></option>
+                    <?php
+                    foreach ($years as $year): ?>
+                        <?php if ($year->est_affiche): ?>
+                            <option value="<?= $year->id_groupe ?>"><?= htmlspecialchars($year->nom_groupe) ?></option>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -28,7 +31,7 @@
         <!-- Caution, Date d’emprunt et Date de restitution prévue -->
         <div class="w3-row-padding w3-margin-top">
             <div class="w3-third">
-                <label><b>Caution</b></label>
+                <label><b>Caution<span style="color: red;">*</span></b></label>
                 <select class="w3-select w3-border w3-round w3-center" name="caution" required>
                     <option value="" disabled selected>Choisir une caution</option>
                     <option value="Déposée">Déposée</option>
@@ -37,12 +40,12 @@
                 </select>
             </div>
             <div class="w3-third">
-                <label><b>Date d’emprunt</b></label>
+                <label><b>Date d’emprunt<span style="color: red;">*</span></b></label>
                 <input class="w3-input w3-border w3-round w3-center" type="date" name="date_emprunt" value="<?= date('Y-m-d') ?>" required>
             </div>
             <div class="w3-third">
-                <label><b>Date de restitution prévue</b></label>
-                <input class="w3-input w3-border w3-round w3-center" type="date" name="date_restitution_prevue" required>
+                <label><b>Date de restitution prévue<span style="color: red;">*</span></b></label>
+                <input class="w3-input w3-border w3-round w3-center" type="date" name="date_prevue_restitution" required>
             </div>
         </div>
 
@@ -53,13 +56,14 @@
                 placeholder="C'est certainement une superbe remarque" rows="1"></textarea>
         </div>
 
-        <h3 style="padding-top: 10px;"><b>Sélection du matériel</b></h3>
+        <h3 style="padding-top: 10px;"><b>Sélection du matériel<span style="color: red;">*</span></b></h3>
 
         <input class="w3-input w3-border w3-round-xxlarge w3-center black-border"
             type="search" id="searchBar" onkeyup="filtrerMateriel()"
             placeholder="Rechercher par nom, ID ou modèle...">
 
         <div>
+            <input type="hidden" name="id_materiel" id="id_materiel" value="-1">
             <div class="scroll-container w3-margin-top">
                 <div class="w3-row-padding">
                     <?php foreach ($materiels as $m): ?>
@@ -67,20 +71,18 @@
                             <?php
                             // Si le matériel n'est pas disponible, on grise la carte et on empêche la sélection
                             $classes = "w3-border w3-round-xxlarge w3-center w3-padding-small";
-                            if (!$m['disponible']) {
+                            $estDisponible = Materiel::estDisponible($db, $m->id_materiel);
+                            if (!$estDisponible) {
                                 $classes .= " selection-materiel-indisponible";
                             } else {
                                 $classes .= " selection-materiel";
                             }
                             ?>
-                            <div onclick="toggleSelect(this, 'input_<?= $m['id'] ?>', '<?= $m['disponible'] ? 1 : 0 ?>')"
+                            <div onclick="toggleSelect(this, '<?= $m->id_materiel ?>', '<?= $estDisponible ? 1 : 0 ?>')"
                                 class="<?= $classes ?>">
-
-                                <span class="txt-nom"><b><?= $m['nom'] ?></b></span> |
-                                <span class="txt-id"><b><?= $m['id'] ?></b></span> |
-                                <span class="txt-modele"><b><?= $m['modele'] ?></b></span>
-
-                                <input type="hidden" name="materiel_selectionne[]" id="input_<?= $m['id'] ?>" value="0">
+                                <span class="txt-nom"><b><?= $m->nom ?></b></span> |
+                                <span class="txt-id"><b><?= $m->id_materiel ?></b></span> |
+                                <span class="txt-modele"><b><?= $m->modele ?></b></span>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -123,21 +125,54 @@
             }
 
             function toggleSelect(element, inputId, estDisponible) {
-                const input = document.getElementById(inputId);
-                const idMateriel = inputId.replace('input_', ''); // on récupère l'id du matériel
+                const inputUnique = document.getElementById('id_materiel');
 
-                if (estDisponible == "0" || estDisponible == "") {
+                if (estDisponible == "0" || estDisponible == "") return;
+
+                // si l'élément est déjà sélectionné, on le désélectionne
+                if (element.classList.contains('selection-materiel-selected')) {
+                    element.classList.remove('selection-materiel-selected');
+                    inputUnique.value = "-1";
+                    reinitialiserVisuel(true);
                     return;
                 }
 
-                // changer l'apparence
-                element.classList.toggle('selection-materiel-selected');
+                // on désélectionne l'autre élément sélectionné s'il y en a un
+                document.querySelectorAll('.selection-materiel-selected').forEach(el => {
+                    el.classList.remove('selection-materiel-selected');
+                });
 
-                if (input.value === "0") {
-                    input.value = idMateriel;
-                } else {
-                    input.value = "-1";
-                }
+                // on sélectionne l'élément cliqué
+                element.classList.add('selection-materiel-selected');
+                inputUnique.value = inputId;
+
+                reinitialiserVisuel(false, element);
+            }
+
+            function reinitialiserVisuel(toutActiver, elementActif = null) {
+                let itemsCliquables = document.querySelectorAll('.selection-materiel');
+
+                itemsCliquables.forEach(el => {
+                    // si toutActiver est vrai, on réinitialise tous les éléments
+                    if (toutActiver) {
+                        el.style.opacity = "1";
+                        el.style.filter = "none";
+                        el.style.pointerEvents = "auto";
+                    }
+                    // sinon, on grise les éléments non sélectionnés
+                    else {
+                        // si l'élément est actif, on le laisse normal, sinon on le grise
+                        if (el === elementActif) {
+                            el.style.opacity = "1";
+                            el.style.filter = "none";
+                        }
+                        // sinon, on le grise
+                        else {
+                            el.style.opacity = "0.4";
+                            el.style.filter = "grayscale(100%)";
+                        }
+                    }
+                });
             }
         </script>
     </form>

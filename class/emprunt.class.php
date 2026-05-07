@@ -5,12 +5,15 @@ class Emprunt
     private string $nom_emprunteur;
     private string $prenom_emprunteur;
     private int $id_groupe;
+    private string $nom_groupe;
     private int $id_materiel;
+    private string $nom_materiel;
     private string $date_emprunt;
     private string $date_prevue_restitution;
-    private string $date_reelle_restitution;
-    private float $caution;
-    private string $remarque;
+    private ?string $date_reelle_restitution;
+    private string $caution;
+    private ?string $etat;
+    private ?string $remarque;
 
     private PDO $db;
 
@@ -22,11 +25,13 @@ class Emprunt
         $this->nom_emprunteur = '';
         $this->prenom_emprunteur = '';
         $this->id_groupe = -1;
+        $this->nom_groupe = '';
         $this->id_materiel = -1;
+        $this->nom_materiel = '';
         $this->date_emprunt = '';
         $this->date_prevue_restitution = '';
         $this->date_reelle_restitution = '';
-        $this->caution = 0.0;
+        $this->caution = '';
         $this->remarque = '';
 
         if (!empty($data))
@@ -62,8 +67,8 @@ class Emprunt
     public function create(): void
     {
         try {
-            $fields = array('nom_emprunteur', 'prenom_emprunteur', 'id_groupe', 'id_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
-            $sql = 'SELECT create_emprunt(: ' . implode(', :', $fields) . ')';
+            $fields = array('nom_emprunteur', 'prenom_emprunteur', 'id_groupe', 'id_materiel', 'date_emprunt', 'date_prevue_restitution', 'caution', 'remarque');
+            $sql = 'SELECT create_emprunt(:' . implode(', :', $fields) . ') AS id_emprunt';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':nom_emprunteur', $this->nom_emprunteur, PDO::PARAM_STR);
             $stmt->bindValue(':prenom_emprunteur', $this->prenom_emprunteur, PDO::PARAM_STR);
@@ -71,7 +76,6 @@ class Emprunt
             $stmt->bindValue(':id_materiel', $this->id_materiel, PDO::PARAM_INT);
             $stmt->bindValue(':date_emprunt', $this->date_emprunt, PDO::PARAM_STR);
             $stmt->bindValue(':date_prevue_restitution', $this->date_prevue_restitution, PDO::PARAM_STR);
-            $stmt->bindValue(':date_reelle_restitution', $this->date_reelle_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':caution', $this->caution, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, PDO::PARAM_STR);
             $stmt->execute();
@@ -87,9 +91,9 @@ class Emprunt
     public function fetch(int $identifier): void
     {
         try {
-            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'id_groupe', 'id_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
+            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'id_groupe', 'nom_groupe', 'date_emprunt', 'caution', 'id_materiel', 'nom_materiel', 'date_prevue_restitution', 'date_reelle_restitution', 'etat', 'remarque');
 
-            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts WHERE id_emprunt = :id_emprunt';
+            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels WHERE id_emprunt = :id_emprunt';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id_emprunt', $identifier, PDO::PARAM_INT);
             $stmt->execute();
@@ -105,15 +109,9 @@ class Emprunt
     public function update(): void
     {
         try {
-            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'id_groupe', 'id_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
-            $sql = 'SELECT update_emprunt(: ' . implode(', :', $fields) . ')';
+            $fields = array('date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
+            $sql = 'SELECT update_emprunt(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id_emprunt', $this->id_emprunt, PDO::PARAM_INT);
-            $stmt->bindValue(':nom_emprunteur', $this->nom_emprunteur, PDO::PARAM_STR);
-            $stmt->bindValue(':prenom_emprunteur', $this->prenom_emprunteur, PDO::PARAM_STR);
-            $stmt->bindValue(':id_groupe', $this->id_groupe, PDO::PARAM_INT);
-            $stmt->bindValue(':id_materiel', $this->id_materiel, PDO::PARAM_INT);
-            $stmt->bindValue(':date_emprunt', $this->date_emprunt, PDO::PARAM_STR);
             $stmt->bindValue(':date_prevue_restitution', $this->date_prevue_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':date_reelle_restitution', $this->date_reelle_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':caution', $this->caution, PDO::PARAM_STR);
@@ -127,8 +125,8 @@ class Emprunt
     public static function fetchAll(PDO $db): array
     {
         try {
-            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'id_groupe', 'id_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
-            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts';
+            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'id_materiel', 'nom_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'etat', 'remarque');
+            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels';
             $stmt = $db->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

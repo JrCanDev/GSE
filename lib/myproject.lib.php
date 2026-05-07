@@ -136,3 +136,17 @@ function getInputType($type, $pdo = false): string
     }
   }
 }
+
+function formatDisplayDate(?string $date): string
+{
+    if (empty($date)) {
+        return 'En attente';
+    }
+
+    $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+    if ($dateTime === false) {
+        return $date;
+    }
+
+    return $dateTime->format('d/m/Y');
+}

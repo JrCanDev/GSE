@@ -55,6 +55,7 @@ SELECT
   E.id_emprunt,
   E.nom_emprunteur,
   E.prenom_emprunteur,
+  G.id_groupe,
   G.nom_groupe,
   TO_CHAR(E.date_emprunt, 'YYYY-MM-DD') AS date_emprunt,
   E.caution,
@@ -68,16 +69,32 @@ FROM emprunts AS E
 INNER JOIN materiels AS M ON M.id_materiel = E.id_materiel
 INNER JOIN groupes AS G ON G.id_groupe = E.id_groupe;
 
+-- Fonction pour vérifier la disponibilité d'un matériel
+CREATE OR REPLACE FUNCTION is_materiel_disponible(p_id_materiel INT)
+RETURNS BOOLEAN AS $$
+DECLARE
+    emprunt_count INT;
+BEGIN
+    SELECT COUNT(*) INTO emprunt_count
+    FROM emprunts
+    WHERE id_materiel = p_id_materiel
+      AND date_reelle_restitution IS NULL;
+
+    RETURN emprunt_count = 0;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Vue pour afficher les matériels
 CREATE VIEW vw_materiels AS
 SELECT 
   id_materiel,
   nom,
   modele,
-  TO_CHAR(annee, 'YYYY-MM-DD') AS annee,
+  annee,
   etiquette_ulco,
   localisation,
   etat,
+  descriptif,
   remarque
 FROM materiels;
 
@@ -143,14 +160,12 @@ $$ LANGUAGE plpgsql;
 -- Fonction pour insérer un nouveau groupe
 CREATE OR REPLACE FUNCTION create_groupe(
     nom_groupe VARCHAR,
-    date_restitution DATE,
-    est_affiche BOOLEAN
+    date_restitution DATE
 ) RETURNS INTEGER AS $$
 DECLARE
     new_id INTEGER;
 BEGIN
-    INSERT INTO groupes (nom_groupe, date_restitution, est_affiche)
-    VALUES (nom_groupe, date_restitution, est_affiche)
+    INSERT INTO groupes (nom_groupe, date_restitution) VALUES (nom_groupe, date_restitution)
     RETURNING id_groupe INTO new_id;
     RETURN new_id;
 END;
@@ -200,12 +215,6 @@ $$ LANGUAGE plpgsql;
 
 -- Fonction pour mettre à jour un emprunt
 CREATE OR REPLACE FUNCTION update_emprunt(
-    p_id_emprunt INTEGER,
-    p_nom_emprunteur VARCHAR,
-    p_prenom_emprunteur VARCHAR,
-    p_id_groupe INT,
-    p_id_materiel INT,
-    p_date_emprunt DATE,
     p_date_prevue_restitution DATE,
     p_date_reelle_restitution DATE,
     p_caution emprunt_caution,
@@ -213,12 +222,7 @@ CREATE OR REPLACE FUNCTION update_emprunt(
 ) RETURNS VOID AS $$
 BEGIN
     UPDATE emprunts
-    SET nom_emprunteur = p_nom_emprunteur,
-        prenom_emprunteur = p_prenom_emprunteur,
-        id_groupe = p_id_groupe,
-        id_materiel = p_id_materiel,
-        date_emprunt = p_date_emprunt,
-        date_prevue_restitution = p_date_prevue_restitution,
+    SET date_prevue_restitution = p_date_prevue_restitution,
         date_reelle_restitution = p_date_reelle_restitution,
         caution = p_caution,
         remarque = p_remarque

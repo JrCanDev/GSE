@@ -1,7 +1,9 @@
 <?php
 session_start();
-require_once(dirname(__FILE__) . '/../../lib/mypdo.php');
+$db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
+require_once(dirname(__FILE__) . '/../../class/groupe.class.php');
+require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 
 if (isset($_POST["cancel"])) {
     header("Location: " . $_SERVER['PHP_SELF'] . "?element=emprunts");
@@ -10,28 +12,22 @@ if (isset($_POST["cancel"])) {
 
 if (isset($_POST["submit"])) {
     $data = filter_input_array(INPUT_POST, [
-        "firstname" => FILTER_UNSAFE_RAW,
-        "lastname" => FILTER_UNSAFE_RAW,
-        "year" => FILTER_UNSAFE_RAW,
-        "caution" => FILTER_UNSAFE_RAW,
+        "nom_emprunteur" => FILTER_UNSAFE_RAW,
+        "prenom_emprunteur" => FILTER_UNSAFE_RAW,
+        "id_groupe" => FILTER_VALIDATE_INT,
+        "id_materiel" => FILTER_VALIDATE_INT,
         "date_emprunt" => FILTER_UNSAFE_RAW,
-        "date_restitution_prevue" => FILTER_UNSAFE_RAW,
-        "remarque" => FILTER_UNSAFE_RAW
+        "date_prevue_restitution" => FILTER_UNSAFE_RAW,
+        "caution" => FILTER_UNSAFE_RAW,
+        "remarque" => FILTER_UNSAFE_RAW,
     ]);
-
-    $ids_choisis = array_filter($_POST['materiel_selectionne'], function ($val) {
-        return $val !== "-1";
-    });
-
-    if (!empty($ids_choisis)) {
-        echo "IDs des matériels à traiter : " . implode(", ", $ids_choisis);
-    } else {
-        echo "Rien n'a été sélectionné.";
-    }
 
     foreach ($data as $key => $value) {
         if (is_string($value)) $data[$key] = htmlspecialchars($value);
     }
+
+    $emprunt = new Emprunt($db, $data);
+    $emprunt->create();
 
     $_SESSION['mesgs']['confirm'][] = "Emprunt créé avec succès ! ";
 
@@ -39,36 +35,17 @@ if (isset($_POST["submit"])) {
     exit(1);
 }
 
-$pageTitle = "Ajouter un emprunt";
+$years = Groupe::fetchAll($db);
+$materiels = Materiel::fetchAll($db);
 
-// TODO à remplacer quand BDD sera prête
-$years = array('BUT 1', 'BUT 2 FI', 'BUT 2 APP', 'BUT 3 FI', 'BUT 3 APP', 'Autre');
+// TODO à refaire
+// usort($materiels, function ($a, $b) {
+//     if ($a['disponible'] !== $b['disponible']) {
+//         return $b['disponible'] <=> $a['disponible'];
+//     }
 
-$materiels = [
-    ["id" => 10755, "nom" => "PC Port. DELL", "modele" => "Modèle 2026", "disponible" => true],
-    ["id" => 10756, "nom" => "PC Port. DELL", "modele" => "Modèle 2026", "disponible" => true],
-    ["id" => 10757, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => true],
-    ["id" => 10758, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => true],
-    ["id" => 10759, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => true],
-    ["id" => 10760, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => true],
-    ["id" => 10761, "nom" => "PC Port. DELL", "modele" => "Modèle 2024", "disponible" => true],
-    ["id" => 10762, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-    ["id" => 10763, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-    ["id" => 10764, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-    ["id" => 10765, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-    ["id" => 10766, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-    ["id" => 10767, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-    ["id" => 10768, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-    ["id" => 10769, "nom" => "PC Port. DELL", "modele" => "Modèle 2025", "disponible" => false],
-];
+//     $anneeA = (int) filter_var($a['modele'], FILTER_SANITIZE_NUMBER_INT);
+//     $anneeB = (int) filter_var($b['modele'], FILTER_SANITIZE_NUMBER_INT);
 
-usort($materiels, function($a, $b) {
-    if ($a['disponible'] !== $b['disponible']) {
-        return $b['disponible'] <=> $a['disponible'];
-    }
-
-    $anneeA = (int) filter_var($a['modele'], FILTER_SANITIZE_NUMBER_INT);
-    $anneeB = (int) filter_var($b['modele'], FILTER_SANITIZE_NUMBER_INT);
-
-    return $anneeB <=> $anneeA;
-});
+//     return $anneeB <=> $anneeA;
+// });

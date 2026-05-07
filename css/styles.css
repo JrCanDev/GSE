@@ -101,20 +101,21 @@ footer {
 }
 
 .selection-materiel {
-  cursor: pointer;
-  transition: 0.3s;
-
-  /* empêche de sélectionner le texte au clic */
-  user-select: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
 }
 
 .selection-materiel-selected {
-  background-color: #70D4FF !important;
+    background-color: #008ed6 !important;
+    color: white !important;
+    border-color: #005f8d !important;
+    transform: scale(1.02);
 }
 
 .selection-materiel-indisponible {
-  cursor: not-allowed;
   opacity: 50%;
+  cursor: not-allowed;
   user-select: none;
 }
 
