@@ -171,3 +171,87 @@ BEGIN
     RETURN new_id;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Fonction pour mettre à jour un matériel
+CREATE OR REPLACE FUNCTION update_materiel(
+    p_id_materiel INTEGER,
+    p_nom VARCHAR,
+    p_modele VARCHAR,
+    p_annee INT,
+    p_etiquette_ulco VARCHAR,
+    p_localisation VARCHAR,
+    p_etat etat_materiel,
+    p_descriptif TEXT,
+    p_remarque TEXT
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE materiels
+    SET nom = p_nom,
+        modele = p_modele,
+        annee = p_annee,
+        etiquette_ulco = p_etiquette_ulco,
+        localisation = p_localisation,
+        etat = p_etat,
+        descriptif = p_descriptif,
+        remarque = p_remarque
+    WHERE id_materiel = p_id_materiel;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Fonction pour mettre à jour un emprunt
+CREATE OR REPLACE FUNCTION update_emprunt(
+    p_id_emprunt INTEGER,
+    p_nom_emprunteur VARCHAR,
+    p_prenom_emprunteur VARCHAR,
+    p_id_groupe INT,
+    p_id_materiel INT,
+    p_date_emprunt DATE,
+    p_date_prevue_restitution DATE,
+    p_date_reelle_restitution DATE,
+    p_caution emprunt_caution,
+    p_remarque TEXT
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE emprunts
+    SET nom_emprunteur = p_nom_emprunteur,
+        prenom_emprunteur = p_prenom_emprunteur,
+        id_groupe = p_id_groupe,
+        id_materiel = p_id_materiel,
+        date_emprunt = p_date_emprunt,
+        date_prevue_restitution = p_date_prevue_restitution,
+        date_reelle_restitution = p_date_reelle_restitution,
+        caution = p_caution,
+        remarque = p_remarque
+    WHERE id_emprunt = p_id_emprunt;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Fonction pour mettre à jour un groupe
+CREATE OR REPLACE FUNCTION update_groupe(
+    p_nom_groupe VARCHAR,
+    p_date_restitution DATE,
+    p_est_affiche BOOLEAN
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE groupes
+    SET nom_groupe = p_nom_groupe,
+        date_restitution = p_date_restitution,
+        est_affiche = p_est_affiche
+    WHERE id_groupe = p_id_groupe;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Fonction pour mettre à jour un utilisateur
+CREATE OR REPLACE FUNCTION update_utilisateur(
+    p_username VARCHAR,
+    p_password VARCHAR,
+    p_admin BOOLEAN
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE utilisateurs
+    SET username = p_username,
+        password = md5(p_password),
+        admin = p_admin
+    WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql;
