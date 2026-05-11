@@ -21,7 +21,7 @@ if (isset($_POST["submit"])) {
     ]);
 
     foreach ($data as $key => $value) {
-        if (is_string($value)) $data[$key] = htmlspecialchars($value);
+        if (is_string($value)) $data[$key] = sanitize($value);
     }
 
     $materiel = new Materiel($db, $data);

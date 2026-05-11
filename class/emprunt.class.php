@@ -109,9 +109,10 @@ class Emprunt
     public function update(): void
     {
         try {
-            $fields = array('date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
+            $fields = array('id_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
             $sql = 'SELECT update_emprunt(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id_emprunt', $this->id_emprunt, PDO::PARAM_INT);
             $stmt->bindValue(':date_prevue_restitution', $this->date_prevue_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':date_reelle_restitution', $this->date_reelle_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':caution', $this->caution, PDO::PARAM_STR);

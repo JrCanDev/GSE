@@ -96,7 +96,8 @@ SELECT
   etat,
   descriptif,
   remarque
-FROM materiels;
+FROM materiels
+ORDER BY id_materiel;
 
 -- Vue pour afficher les groupes
 CREATE VIEW vw_groupes AS
@@ -105,7 +106,8 @@ SELECT
     nom_groupe,
     TO_CHAR(date_restitution, 'YYYY-MM-DD') AS date_restitution,
     est_affiche
-FROM groupes;
+FROM groupes
+ORDER BY id_groupe;
 
 -- Vue pour afficher les utilisateurs
 CREATE VIEW vw_utilisateurs AS
@@ -113,7 +115,8 @@ SELECT
     id,
     username,
     admin
-FROM utilisateurs;
+FROM utilisateurs
+ORDER BY id;
 
 -- Fonction pour insérer un nouveau matériel
 CREATE OR REPLACE FUNCTION create_materiel(
@@ -215,6 +218,7 @@ $$ LANGUAGE plpgsql;
 
 -- Fonction pour mettre à jour un emprunt
 CREATE OR REPLACE FUNCTION update_emprunt(
+    p_id_emprunt INTEGER,
     p_date_prevue_restitution DATE,
     p_date_reelle_restitution DATE,
     p_caution emprunt_caution,
@@ -232,6 +236,7 @@ $$ LANGUAGE plpgsql;
 
 -- Fonction pour mettre à jour un groupe
 CREATE OR REPLACE FUNCTION update_groupe(
+    p_id_groupe INTEGER,
     p_nom_groupe VARCHAR,
     p_date_restitution DATE,
     p_est_affiche BOOLEAN
@@ -247,6 +252,7 @@ $$ LANGUAGE plpgsql;
 
 -- Fonction pour mettre à jour un utilisateur
 CREATE OR REPLACE FUNCTION update_utilisateur(
+    p_id INTEGER,
     p_username VARCHAR,
     p_password VARCHAR,
     p_admin BOOLEAN
@@ -257,5 +263,19 @@ BEGIN
         password = md5(p_password),
         admin = p_admin
     WHERE id = p_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION delete_materiel(p_id_materiel INTEGER)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM materiels WHERE id_materiel = p_id_materiel;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION delete_groupe(p_id_groupe INTEGER)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM groupes WHERE id_groupe = p_id_groupe;
 END;
 $$ LANGUAGE plpgsql;

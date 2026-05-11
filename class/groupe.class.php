@@ -86,12 +86,25 @@ class Groupe
     public function update(): void
     {
         try {
-            $fields = array('nom_groupe', 'date_restitution', 'est_affiche');
+            $fields = array('id_groupe', 'nom_groupe', 'date_restitution', 'est_affiche');
             $sql = 'SELECT update_groupe(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id_groupe', $this->id_groupe, PDO::PARAM_INT);
             $stmt->bindValue(':nom_groupe', $this->nom_groupe, PDO::PARAM_STR);
             $stmt->bindValue(':date_restitution', $this->date_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':est_affiche', $this->est_affiche, PDO::PARAM_BOOL);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+        }
+    }
+
+    public function delete(): void
+    {
+        try {
+            $sql = 'SELECT delete_groupe(:id_groupe)';
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id_groupe', $this->id_groupe, PDO::PARAM_INT);
             $stmt->execute();
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();

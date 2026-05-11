@@ -6,10 +6,12 @@ class Materiel
     private string $modele;
     private string $annee;
     private string $etiquette_ulco;
-    private string $etat;
     private string $localisation;
+    private string $etat;
     private string $descriptif;
     private string $remarque;
+
+    public static array $etats = ['OK', 'En réparation', 'Endommagé', 'Disparu'];
 
     private PDO $db;
 
@@ -102,7 +104,7 @@ class Materiel
     public function update(): void
     {
         try {
-            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'etat', 'localisation', 'descriptif', 'remarque');
+            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque');
             $sql = 'SELECT update_materiel(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id_materiel', $this->id_materiel, PDO::PARAM_INT);
@@ -114,6 +116,18 @@ class Materiel
             $stmt->bindValue(':localisation', $this->localisation, PDO::PARAM_STR);
             $stmt->bindValue(':descriptif', $this->descriptif, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, PDO::PARAM_STR);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+        }
+    }
+
+    public function delete(): void
+    {
+        try {
+            $sql = 'SELECT delete_materiel(:id_materiel)';
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id_materiel', $this->id_materiel, PDO::PARAM_INT);
             $stmt->execute();
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();

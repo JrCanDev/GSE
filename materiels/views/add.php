@@ -34,10 +34,11 @@
                 <label><b>État<span style="color: red;">*</span></b></label>
                 <select class="w3-select w3-border w3-round w3-center" name="etat" required>
                     <option value="" disabled selected>Choisir un état</option>
-                    <option value="OK">OK</option>
-                    <option value="En réparation">En réparation</option>
-                    <option value="Endommagé">Endommagé</option>
-                    <option value="Disparu">Disparu</option>
+                    <?php foreach (Materiel::$etats as $etat): ?>
+                        <option value="<?= htmlspecialchars($etat) ?>">
+                            <?= htmlspecialchars($etat) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
         </div>

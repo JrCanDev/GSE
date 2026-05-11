@@ -38,9 +38,16 @@
                     <td class="<?= $etat_class ?>"><?= sanitize($materiel->etat) ?></td>
                     <td><?= sanitize($materiel->remarque ?? '') ?></td>
                     <td>
-                        <a href="?page=materiels&action=modifier&id=<?= $materiel->id ?>" class="w3-button w3-small w3-border">✏️</a>
-                        <!-- mettre modal de confirmation -->
-                        <a href="?page=materiels&action=supprimer&id=<?= $materiel->id ?>" class="w3-button w3-small w3-border">🗑️️</a>
+                        <form action="?element=materiels&action=card" method="post">
+                            <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
+                            <input type="submit" name="submit" class="w3-button w3-small w3-border w3-round" value="✏️">
+                        </form>
+
+                        <form action="?element=materiels" method="post"
+                            onsubmit="return confirm('Voulez-vous vraiment supprimer ce matériel ?');">
+                            <input type="hidden" name="id" value="<?= $materiel->id_materiel ?>">
+                            <input type="submit" name="delete" class="w3-button w3-small w3-border w3-round" value="🗑️">
+                        </form>
                     </td>
                 </tr>
             <?php endforeach; ?>

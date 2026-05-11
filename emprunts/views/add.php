@@ -21,7 +21,7 @@
                     <?php
                     foreach ($years as $year): ?>
                         <?php if ($year->est_affiche): ?>
-                            <option value="<?= $year->id_groupe ?>"><?= htmlspecialchars($year->nom_groupe) ?></option>
+                            <option value="<?= $year->id_groupe ?>"><?= sanitize($year->nom_groupe) ?></option>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
