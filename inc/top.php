@@ -31,6 +31,7 @@
       'materiels' => 'Matériels',
       'groupes' => 'Groupes',
     );
+
     foreach ($list_menus as $key => $menu) {
     ?>
       <a href="index.php?element=<?= $key; ?>" class="w3-bar-item w3-button headButton"><b><?= $menu; ?></b></a>
@@ -38,12 +39,6 @@
 
     <?php if (myAuthClass::checkPriviledgeDatabase($_SESSION['user']['username'])) { ?>
       <a href="index.php?element=database" class="w3-bar-item w3-button headButton"><b>Base de données</b></a>
-      <!-- <form method='GET'>
-        <input type='hidden' name='page' value='bd'>
-        <button type='submit' class="w3-bar-item w3-button headButton">
-          <b>Base de données</b>
-        </button>
-      </form> -->
     <?php } ?>
   </nav>
 </div>
