@@ -21,8 +21,11 @@
                     <td style="<?= $row_style ?>"><?= sanitize($groupe->nom_groupe) ?></td>
                     <td style="<?= $row_style ?>"><?= formatDisplayDate(sanitize($groupe->date_restitution)) ?></td>
                     <td>
-                        <a href="?page=groupes&action=modifier&id=<?= $groupe->id_groupe ?>" class="w3-button w3-small w3-border">✏️</a>
-                        
+                        <form action="?element=groupes&action=card" method="post">
+                            <input type="hidden" name="id_groupe" value="<?= $groupe->id_groupe ?>">
+                            <input type="submit" name="edit" class="w3-button w3-small w3-border" value="✏️">
+                        </form>
+
                         <form action="?element=groupes" method="post">
                             <input type="hidden" name="id" value="<?= $groupe->id_groupe ?>">
                             <input type="submit" name="toggle_state" class="w3-button w3-small w3-border w3-round" value="👁️">

@@ -2,6 +2,14 @@
     <b>Ajouter un nouveau matériel</b>
 </a>
 
+<div class="w3-container w3-margin-bottom">
+    <input class="w3-input w3-border w3-round-xxlarge w3-center" 
+           type="search" 
+           id="searchBarMateriel" 
+           onkeyup="filtrerListeMateriels()" 
+           placeholder="Rechercher par nom, étiquette ULCO, modèle, état...">
+</div>
+
 <table class="w3-table w3-striped w3-bordered w3-small">
     <thead>
         <tr class="w3-light-gray">
@@ -29,14 +37,14 @@
                 }
                 ?>
 
-                <tr>
+                <tr class="item-materiel">
                     <td><?= sanitize($materiel->nom) ?></td>
                     <td><?= sanitize($materiel->modele) ?></td>
                     <td><?= sanitize($materiel->annee) ?></td>
                     <td><?= sanitize($materiel->etiquette_ulco) ?></td>
                     <td><?= sanitize($materiel->localisation) ?></td>
                     <td class="<?= $etat_class ?>"><?= sanitize($materiel->etat) ?></td>
-                    <td><?= sanitize($materiel->remarque ?? '') ?></td>
+                    <td><?= sanitize($materiel->remarque) ?></td>
                     <td>
                         <form action="?element=materiels&action=card" method="post">
                             <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
@@ -58,3 +66,20 @@
         <?php endif ?>
     </tbody>
 </table>
+
+<script>
+    function filtrerListeMateriels() {
+    let input = document.getElementById('searchBarMateriel').value.toLowerCase();
+    let rows = document.getElementsByClassName('item-materiel');
+
+    for (let i = 0; i < rows.length; i++) {
+        let texteLigne = rows[i].textContent || rows[i].innerText;
+
+        if (texteLigne.toLowerCase().indexOf(input) > -1) {
+            rows[i].style.display = "";
+        } else {
+            rows[i].style.display = "none";
+        }
+    }
+}
+</script>

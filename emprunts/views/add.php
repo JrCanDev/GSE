@@ -34,9 +34,9 @@
                 <label><b>Caution<span style="color: red;">*</span></b></label>
                 <select class="w3-select w3-border w3-round w3-center" name="caution" required>
                     <option value="" disabled selected>Choisir une caution</option>
-                    <option value="Déposée">Déposée</option>
-                    <option value="En attente">En attente</option>
-                    <option value="Non demandée">Non demandée</option>
+                    <?php foreach (Emprunt::$cautions as $caution): ?>
+                        <option value="<?= sanitize($caution) ?>"><?= sanitize($caution) ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="w3-third">
@@ -94,6 +94,7 @@
             <!-- Bouton Créer -->
             <div class="w3-half w3-right">
                 <input class="w3-button w3-teal w3-round" type="submit"
+                    onclick="verifierSelectionMateriel(event)"
                     value="Créer l'emprunt" name="submit">
             </div>
 
@@ -106,6 +107,15 @@
 
         <script>
             document.querySelector("input[name='lastname']").focus();
+
+            function verifierSelectionMateriel(event) {
+                const inputUnique = document.getElementById('id_materiel');
+                
+                if (inputUnique.value === "-1") {
+                    event.preventDefault();
+                    alert("Veuillez sélectionner un matériel avant de créer l'emprunt.");
+                }
+            }
 
             function filtrerMateriel() {
                 let input = document.getElementById('searchBar').value.toLowerCase();

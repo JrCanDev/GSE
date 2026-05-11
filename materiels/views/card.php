@@ -1,22 +1,26 @@
-<h3><b>Ajout d'un nouveau matériel</b></h3>
+<h3><b>Fiche Matériel</b></h3>
 
 <div class="col-2 w3-container">
-    <form action="<?= $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ?>"
-        method="post" class="w3-container w3-card-4 w3-padding">
+    <form action="?element=materiels&action=card" method="post" class="w3-container w3-card-4 w3-padding">
+
+        <input type="hidden" name="id_materiel" value="<?= sanitize($materiel->id_materiel) ?>">
 
         <!-- Nom, Modèle et Année -->
         <div class="w3-row-padding">
             <div class="w3-third">
                 <label><b>Nom<span style="color: red;">*</span></b></label>
-                <input placeholder="PC Port. DELL" class="w3-input w3-border w3-round w3-center" type="text" name="nom" required>
+                <input placeholder="PC Port. DELL" class="w3-input w3-border w3-round w3-center"
+                    type="text" name="nom" required value="<?= sanitize($materiel->nom) ?>">
             </div>
             <div class="w3-third">
                 <label><b>Modèle</b></label>
-                <input placeholder="DELL 16" class="w3-input w3-border w3-round w3-center" type="text" name="modele">
+                <input placeholder="DELL 16" class="w3-input w3-border w3-round w3-center"
+                    type="text" name="modele" value="<?= sanitize($materiel->modele) ?>">
             </div>
             <div class="w3-third">
                 <label><b>Année</b></label>
-                <input placeholder="2025" class="w3-input w3-border w3-round w3-center" type="number" name="annee" id="annee" min="1900">
+                <input placeholder="2025" class="w3-input w3-border w3-round w3-center"
+                    type="number" name="annee" id="annee" min="1900" value="<?= sanitize($materiel->annee) ?>">
             </div>
         </div>
 
@@ -24,18 +28,21 @@
         <div class="w3-row-padding w3-margin-top">
             <div class="w3-third">
                 <label><b>Localisation<span style="color: red;">*</span></b></label>
-                <input placeholder="Armoire S126" class="w3-input w3-border w3-round w3-center" type="text" name="localisation" required>
+                <input placeholder="Armoire S126" class="w3-input w3-border w3-round w3-center"
+                    type="text" name="localisation" required value="<?= sanitize($materiel->localisation) ?>">
             </div>
             <div class="w3-third">
                 <label><b>Étiquette ULCO</b></label>
-                <input placeholder="10xxx" class="w3-input w3-border w3-round w3-center" type="text" name="etiquette_ulco" required>
+                <input placeholder="10xxx" class="w3-input w3-border w3-round w3-center"
+                    type="text" name="etiquette_ulco" required value="<?= sanitize($materiel->etiquette_ulco) ?>">
             </div>
             <div class="w3-third">
                 <label><b>État<span style="color: red;">*</span></b></label>
                 <select class="w3-select w3-border w3-round w3-center" name="etat" required>
-                    <option value="" disabled selected>Choisir un état</option>
                     <?php foreach (Materiel::$etats as $etat): ?>
-                        <option value="<?= sanitize($etat) ?>"><?= sanitize($etat) ?></option>
+                        <option value="<?= htmlspecialchars($etat) ?>" <?= $materiel->etat === $etat ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($etat) ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -45,21 +52,21 @@
         <div class="w3-margin-top">
             <label><b>Remarque</b></label>
             <textarea class="w3-input w3-border w3-round w3-center" name="remarque"
-                placeholder="C'est certainement une superbe remarque" rows="1"></textarea>
+                placeholder="C'est certainement une superbe remarque" rows="1"><?= sanitize($materiel->remarque) ?></textarea>
         </div>
 
         <!-- Descriptif -->
         <div class="w3-margin-top">
             <label><b>Descriptif du matériel</b></label>
             <textarea class="w3-input w3-border w3-round w3-center" name="descriptif"
-                placeholder="Processeur : Intel Core i5-9500F" rows="3"></textarea>
+                placeholder="Processeur : Intel Core i5-9500F" rows="3"><?= sanitize($materiel->descriptif) ?></textarea>
         </div>
 
         <div class="w3-row-padding w3-margin-top">
-            <!-- Bouton Créer -->
+            <!-- Bouton Mettre à jour -->
             <div class="w3-half w3-right">
                 <input class="w3-button w3-teal w3-round" type="submit"
-                    value="Ajouter le matériel" name="submit">
+                    value="Mettre à jour le matériel" name="update">
             </div>
 
             <!-- Bouton Annuler -->

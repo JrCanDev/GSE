@@ -2,6 +2,14 @@
     <b>Créer un nouvel emprunt</b>
 </a>
 
+<div class="w3-container w3-margin-bottom">
+    <input class="w3-input w3-border w3-round-xxlarge w3-center"
+        type="search"
+        id="searchBarEmprunt"
+        onkeyup="filtrerEmprunts()"
+        placeholder="Rechercher un nom, un matériel, une date, une date...">
+</div>
+
 <table class="w3-table w3-striped w3-bordered w3-small">
     <thead>
         <tr class="w3-light-gray">
@@ -38,7 +46,7 @@
                 }
                 ?>
 
-                <tr style="<?= $row_style ?>">
+                <tr class="item-emprunt" style="<?= $row_style ?>">
                     <td><?= sanitize($emprunt->nom_emprunteur) ?></td>
                     <td><?= sanitize($emprunt->prenom_emprunteur) ?></td>
                     <td><?= sanitize($emprunt->nom_groupe) ?></td>
@@ -52,10 +60,15 @@
                             <span style="font-weight: bold;">✕</span>
                         <?php endif; ?>
                     </td>
-                    <td><a href="?page=materiels&action=card&id=<?= $emprunt->id_materiel ?>"
+                    <td>
+                        <a href="?page=materiels&action=card&id=<?= $emprunt->id_materiel ?>"
                             style="color: #0093d2;">
                             <?= sanitize($emprunt->nom_materiel) ?>
                         </a>
+                    </td>
+                    <td style="display:none;">
+                        <?= sanitize($emprunt->etiquette_ulco_materiel) ?>
+                        <?= sanitize($emprunt->modele_materiel) ?>
                     </td>
                     <td><?= formatDisplayDate(sanitize($emprunt->date_prevue_restitution)) ?></td>
                     <td style="<?= $is_late ? 'color: red; font-weight: bold;' : '' ?>">
@@ -66,9 +79,16 @@
                     </td>
                     <td><?= sanitize($emprunt->remarque) ?></td>
                     <td>
-                        <a href="?page=emprunts&action=modifier&id=<?= $emprunt->id_emprunt ?>" class="w3-button w3-small w3-border">✏️</a>
+                        <form action="?element=emprunts&action=card" method="post">
+                            <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
+                            <button type="submit" name="submit" class="w3-button w3-small w3-border w3-round">✏️</button>
+                        </form>
+
                         <?php if (!$emprunt->date_reelle_restitution): ?>
-                            <a href="?page=emprunts&action=valider&id=<?= $emprunt->id_emprunt ?>" class="w3-button w3-small w3-border">📥</a>
+                            <form action="?element=emprunts" method="post">
+                                <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
+                                <button type="submit" name="submit_date" class="w3-button w3-small w3-border w3-round">📥</button>
+                            </form>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -80,3 +100,21 @@
         <?php endif ?>
     </tbody>
 </table>
+
+<script>
+    function filtrerEmprunts() {
+        let input = document.getElementById('searchBarEmprunt').value.toLowerCase();
+        let rows = document.getElementsByClassName('item-emprunt');
+
+        for (let i = 0; i < rows.length; i++) {
+            let texteLigne = rows[i].textContent || rows[i].innerText;
+
+            // 3. Comparaison
+            if (texteLigne.toLowerCase().indexOf(input) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+</script>

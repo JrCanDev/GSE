@@ -38,14 +38,13 @@ if (isset($_POST["submit"])) {
 $years = Groupe::fetchAll($db);
 $materiels = Materiel::fetchAll($db);
 
-// TODO à refaire
-// usort($materiels, function ($a, $b) {
-//     if ($a['disponible'] !== $b['disponible']) {
-//         return $b['disponible'] <=> $a['disponible'];
-//     }
+usort($materiels, function($a, $b) use ($db) {
+    $dispoA = Materiel::estDisponible($db, $a->id_materiel) ? 1 : 0;
+    $dispoB = Materiel::estDisponible($db, $b->id_materiel) ? 1 : 0;
 
-//     $anneeA = (int) filter_var($a['modele'], FILTER_SANITIZE_NUMBER_INT);
-//     $anneeB = (int) filter_var($b['modele'], FILTER_SANITIZE_NUMBER_INT);
+    if ($dispoA !== $dispoB) {
+        return $dispoB <=> $dispoA;
+    }
 
-//     return $anneeB <=> $anneeA;
-// });
+    return $a->id_materiel <=> $b->id_materiel;
+});

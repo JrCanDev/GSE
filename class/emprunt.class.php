@@ -8,12 +8,16 @@ class Emprunt
     private string $nom_groupe;
     private int $id_materiel;
     private string $nom_materiel;
+    private string $modele_materiel;
+    private string $etiquette_ulco_materiel;
     private string $date_emprunt;
     private string $date_prevue_restitution;
     private ?string $date_reelle_restitution;
     private string $caution;
-    private ?string $etat;
-    private ?string $remarque;
+    private string $etat;
+    private string $remarque;
+
+    public static array $cautions = array('Déposée', 'En attente', 'Non demandée');
 
     private PDO $db;
 
@@ -28,6 +32,8 @@ class Emprunt
         $this->nom_groupe = '';
         $this->id_materiel = -1;
         $this->nom_materiel = '';
+        $this->modele_materiel = '';
+        $this->etiquette_ulco_materiel = '';
         $this->date_emprunt = '';
         $this->date_prevue_restitution = '';
         $this->date_reelle_restitution = '';
@@ -53,7 +59,8 @@ class Emprunt
 
     public function __toString(): string
     {
-        return $this->nom_emprunteur . ' ' . $this->prenom_emprunteur . ' (ID: ' . $this->id_emprunt . ')';
+        // return $this->nom_emprunteur . ' ' . $this->prenom_emprunteur . ' (ID: ' . $this->id_emprunt . ')';
+        return $this->nom_emprunteur . ' ' . $this->prenom_emprunteur . ' (ID: ' . $this->id_emprunt . ')'  . ' - ' . $this->nom_materiel . ' (ID Matériel: ' . $this->id_materiel . ')' . ' - ' . 'Modèle: ' . $this->modele_materiel . ' - ' . 'Étiquette ULCO: ' . $this->etiquette_ulco_materiel;
     }
 
     public function hydrate(array $data): void
@@ -126,7 +133,7 @@ class Emprunt
     public static function fetchAll(PDO $db): array
     {
         try {
-            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'id_materiel', 'nom_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'etat', 'remarque');
+            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'id_materiel', 'nom_materiel', 'modele_materiel', 'etiquette_ulco_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'etat', 'remarque');
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels';
             $stmt = $db->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
