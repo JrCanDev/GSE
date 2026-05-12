@@ -85,11 +85,28 @@
                             <button type="submit" name="submit" class="w3-button w3-small w3-border w3-round">✏️</button>
                         </form>
 
+                        <dialog class="w3-round-large" id="confirmation-emprunt-dialog">
+                            <p>
+                                L'état du matériel actuel est "<span class="<?= $etat_class ?>"><?= sanitize($emprunt->etat) ?></span>" </br> Êtes-vous sûr de valider maintenant ?
+                            </p>
+
+                            <div class="dialog-buttons">
+                                <button commandfor="confirmation-emprunt-dialog" command="close" class="w3-button w3-small w3-border w3-round">Annuler</button>
+
+                                <form action="?element=materiels&action=card" method="post">
+                                    <input type="hidden" name="id_materiel" value="<?= $emprunt->id_materiel ?>">
+                                    <button type="submit" class="w3-button w3-small w3-border w3-round">Changer l'état</button>
+                                </form>
+
+                                <form action="?element=emprunts" method="post">
+                                    <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
+                                    <button type="submit" name="submit_date" class="w3-button w3-small w3-border w3-round">Valider</button>
+                                </form>
+                            </div>
+                        </dialog>
+
                         <?php if (!$emprunt->date_reelle_restitution): ?>
-                            <form action="?element=emprunts" method="post">
-                                <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
-                                <button type="submit" name="submit_date" class="w3-button w3-small w3-border w3-round">📥</button>
-                            </form>
+                            <button command="show-modal" commandfor="confirmation-emprunt-dialog" name="submit_date" class="w3-button w3-small w3-border w3-round">📥</button>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -119,3 +136,22 @@
         }
     }
 </script>
+
+<style>
+    .dialog-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .dialog-buttons form {
+        margin: 0;
+        display: inline-block;
+    }
+
+    #confirmation-emprunt-dialog:modal {
+        border: 2px solid #0093d2;
+        padding: 25px;
+    }
+</style>

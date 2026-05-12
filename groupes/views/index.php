@@ -23,7 +23,7 @@
                     <td>
                         <form action="?element=groupes&action=card" method="post">
                             <input type="hidden" name="id_groupe" value="<?= $groupe->id_groupe ?>">
-                            <input type="submit" name="edit" class="w3-button w3-small w3-border" value="✏️">
+                            <input type="submit" name="edit" class="w3-button w3-small w3-border w3-round" value="✏️">
                         </form>
 
                         <form action="?element=groupes" method="post">
