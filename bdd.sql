@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS emprunts (
     date_reelle_restitution DATE NULL,
     caution emprunt_caution NOT NULL DEFAULT 'En attente',
     remarque TEXT NULL,
+    etat_restitution etat_materiel NULL,
+    remarque_restitution TEXT NULL,
     FOREIGN KEY (id_groupe) REFERENCES groupes(id_groupe) ON DELETE CASCADE,
     FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel) ON DELETE CASCADE
 );
@@ -66,7 +68,9 @@ SELECT
   TO_CHAR(E.date_prevue_restitution, 'YYYY-MM-DD') AS date_prevue_restitution,
   TO_CHAR(E.date_reelle_restitution, 'YYYY-MM-DD') AS date_reelle_restitution,
   M.etat,
-  E.remarque
+  E.remarque,
+  E.etat_restitution AS etat_restitution,
+  E.remarque_restitution AS remarque_restitution
 FROM emprunts AS E
 INNER JOIN materiels AS M ON M.id_materiel = E.id_materiel
 INNER JOIN groupes AS G ON G.id_groupe = E.id_groupe;
@@ -281,3 +285,25 @@ BEGIN
     DELETE FROM groupes WHERE id_groupe = p_id_groupe;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_emprunt_restitution() RETURNS TRIGGER AS $$
+DECLARE
+    v_etat materiels.etat%TYPE;
+BEGIN
+    IF NEW.date_reelle_restitution IS NOT NULL AND OLD.date_reelle_restitution IS NULL THEN
+        SELECT etat INTO v_etat
+        FROM materiels
+        WHERE id_materiel = NEW.id_materiel;
+
+        NEW.etat_restitution := v_etat;
+        NEW.remarque_restitution := OLD.remarque;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_update_emprunt_restitution
+BEFORE UPDATE ON emprunts
+FOR EACH ROW
+WHEN (NEW.date_reelle_restitution IS NOT NULL AND OLD.date_reelle_restitution IS NULL)
+EXECUTE FUNCTION update_emprunt_restitution();

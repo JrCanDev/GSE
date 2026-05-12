@@ -7,7 +7,7 @@
         type="search"
         id="searchBarEmprunt"
         onkeyup="filtrerEmprunts()"
-        placeholder="Rechercher un nom, un matériel, une date, une date...">
+        placeholder="Rechercher un nom, un matériel, une date...">
 </div>
 
 <table class="w3-table w3-striped w3-bordered w3-small">
@@ -61,10 +61,11 @@
                         <?php endif; ?>
                     </td>
                     <td>
-                        <a href="?page=materiels&action=card&id=<?= $emprunt->id_materiel ?>"
-                            style="color: #0093d2;">
-                            <?= sanitize($emprunt->nom_materiel) ?>
-                        </a>
+                        <form action="?element=materiels&action=card" method="post">
+                            <input type="hidden" name="id_materiel" value="<?= $emprunt->id_materiel ?>">
+                            <input type="hidden" name="old_page" value="emprunts">
+                            <button type="submit" class="w3-button w3-small w3-border w3-round"><?= sanitize($emprunt->nom_materiel) ?></button>
+                        </form>
                     </td>
                     <td style="display:none;">
                         <?= sanitize($emprunt->etiquette_ulco_materiel) ?>

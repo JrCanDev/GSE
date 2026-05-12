@@ -48,6 +48,7 @@
                     <td>
                         <form action="?element=materiels&action=card" method="post">
                             <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
+                            <input type="hidden" name="old_page" value="materiels">
                             <input type="submit" name="submit" class="w3-button w3-small w3-border w3-round" value="✏️">
                         </form>
 

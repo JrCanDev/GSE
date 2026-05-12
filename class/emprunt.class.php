@@ -14,8 +14,10 @@ class Emprunt
     private string $date_prevue_restitution;
     private ?string $date_reelle_restitution;
     private string $caution;
-    private string $etat;
-    private string $remarque;
+    private ?string $etat;
+    private ?string $remarque;
+    private ?string $etat_restitution;
+    private ?string $remarque_restitution;
 
     public static array $cautions = array('Déposée', 'En attente', 'Non demandée');
 
@@ -39,6 +41,9 @@ class Emprunt
         $this->date_reelle_restitution = '';
         $this->caution = '';
         $this->remarque = '';
+        $this->etat = '';
+        $this->etat_restitution = '';
+        $this->remarque_restitution = '';
 
         if (!empty($data))
             $this->hydrate($data);
@@ -136,6 +141,30 @@ class Emprunt
             $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'id_materiel', 'nom_materiel', 'modele_materiel', 'etiquette_ulco_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'etat', 'remarque');
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels';
             $stmt = $db->query($sql);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $emprunts = [];
+            if ($result) {
+                foreach ($result as $data) {
+                    $emprunts[] = new Emprunt($db, $data);
+                }
+            }
+
+            return $emprunts;
+        } catch (PDOException $e) {
+            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            return [];
+        }
+    }
+
+    public static function fetchAllByMaterielId(PDO $db, int $id_materiel): array
+    {
+        try {
+            $fields = array('nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'etat_restitution', 'remarque_restitution');
+            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels WHERE id_materiel = :id_materiel';
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':id_materiel', $id_materiel, PDO::PARAM_INT);
+            $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $emprunts = [];

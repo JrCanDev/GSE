@@ -2,6 +2,7 @@
 session_start();
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
+require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
 
 if (isset($_POST["cancel"])) {
     header("Location: " . $_SERVER['PHP_SELF'] . "?element=materiels");

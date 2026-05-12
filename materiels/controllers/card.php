@@ -1,21 +1,26 @@
 <?php
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
+require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
+
+$old_page = $_POST['old_page'] ?? 'materiels';
 
 if (isset($_POST["cancel"])) {
-    header("Location: index.php?element=materiels");
+    header("Location: index.php?element=" . $old_page);
     exit(1);
 }
 
 if (!isset($_POST['id_materiel']) || empty($_POST['id_materiel'])) {
     $_SESSION['mesgs']['errors'][] = "ID du matériel non spécifié.";
-    header("Location: " . $_SERVER['PHP_SELF'] . "?element=materiels");
+    header("Location: " . $_SERVER['PHP_SELF'] . "?element=" . $old_page);
     exit(-1);
 }
 
 $id_materiel = $_POST['id_materiel'];
 $materiel = new Materiel($db);
 $materiel->fetch($id_materiel);
+
+$emprunts = Emprunt::fetchAllByMaterielId($db, $id_materiel);
 
 if (isset($_POST['update'])) {
     $materiel->nom = sanitize($_POST['nom']) ?? $materiel->nom;
@@ -30,6 +35,6 @@ if (isset($_POST['update'])) {
     $materiel->update();
 
     $_SESSION['mesgs']['confirm'][] = "Matériel mis à jour avec succès.";
-    header("Location: index.php?element=materiels");
+    header("Location: index.php?element=" . $old_page);
     exit;
 }
