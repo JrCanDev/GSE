@@ -103,7 +103,7 @@ class Emprunt
     public function fetch(int $identifier): void
     {
         try {
-            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'id_groupe', 'nom_groupe', 'date_emprunt', 'caution', 'id_materiel', 'nom_materiel', 'date_prevue_restitution', 'date_reelle_restitution', 'etat', 'remarque');
+            $fields = array('nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'etat_restitution', 'remarque_restitution');
 
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels WHERE id_emprunt = :id_emprunt';
             $stmt = $this->db->prepare($sql);

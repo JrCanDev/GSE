@@ -61,6 +61,22 @@
                 placeholder="C'est certainement une superbe remarque" rows="1"><?= sanitize($emprunt->remarque) ?></textarea>
         </div>
 
+        <?php if ($emprunt->date_reelle_restitution): ?>
+            <div class="w3-row-padding w3-margin-top">
+                <div class="w3-half">
+                    <label><b>État de restitution</b></label>
+                    
+                    <input class="w3-input w3-border w3-round w3-center" type="text" name="etat_restitution"
+                        value="<?= sanitize($emprunt->etat_restitution) ?>">
+                </div>
+                <div class="w3-half">
+                    <label><b>Remarque de restitution</b></label>
+                    <input class="w3-input w3-border w3-round w3-center" type="text" name="remarque_restitution"
+                        value="<?= sanitize($emprunt->remarque_restitution) ?>">
+                </div>
+            </div>
+        <?php endif; ?>
+
         <div class="w3-row-padding w3-margin-top">
             <!-- Bouton Mettre à jour -->
             <div class="w3-half w3-right">

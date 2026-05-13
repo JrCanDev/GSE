@@ -29,6 +29,14 @@ if (isset($_POST['update'])) {
     $emprunt->caution = sanitize($_POST['caution']) ?? $emprunt->caution;
     $emprunt->remarque = sanitize($_POST['remarque']) ?? $emprunt->remarque;
 
+    if ($emprunt->date_reelle_restitution) {
+        $emprunt->etat_restitution = sanitize($_POST['etat_restitution']) ?? $emprunt->etat_restitution;
+        $emprunt->remarque_restitution = sanitize($_POST['remarque_restitution']) ?? $emprunt->remarque_restitution;
+    } else {
+        $emprunt->etat_restitution = null;
+        $emprunt->remarque_restitution = null;
+    }
+
     $emprunt->update();
 
     $_SESSION['mesgs']['confirm'][] = "Emprunt mis à jour avec succès.";
