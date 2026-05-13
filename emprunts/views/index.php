@@ -37,11 +37,13 @@
                 $row_style = $date_reelle ? 'opacity: 0.5;' : '';
 
                 $etat_class = '';
-                if ($emprunt->etat === 'OK') {
+                $etat = $emprunt->date_reelle_restitution ? $emprunt->etat_restitution : $emprunt->etat;
+
+                if ($etat === 'OK') {
                     $etat_class = 'w3-text-green';
-                } elseif ($emprunt->etat === 'Endommagé') {
+                } elseif ($etat === 'Endommagé') {
                     $etat_class = 'w3-text-red';
-                } elseif ($emprunt->etat === 'En réparation') {
+                } elseif ($etat === 'En réparation') {
                     $etat_class = 'w3-text-orange';
                 }
                 ?>
@@ -76,9 +78,19 @@
                         <?= formatDisplayDate(sanitize($emprunt->date_reelle_restitution)) ?>
                     </td>
                     <td class="<?= $etat_class ?>" style="font-weight: bold;">
-                        <?= sanitize($emprunt->etat) ?>
+                        <?php if ($emprunt->date_reelle_restitution): ?>
+                            <?= sanitize($emprunt->etat_restitution) ?>
+                        <?php else: ?>
+                            <?= sanitize($emprunt->etat) ?>
+                        <?php endif; ?>
                     </td>
-                    <td><?= sanitize($emprunt->remarque) ?></td>
+                    <td>
+                        <?php if ($emprunt->date_reelle_restitution): ?>
+                            <?= sanitize($emprunt->remarque_restitution) ?>
+                        <?php else: ?>
+                            <?= sanitize($emprunt->remarque) ?>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <form action="?element=emprunts&action=card" method="post">
                             <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">

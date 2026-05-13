@@ -65,9 +65,14 @@
             <div class="w3-row-padding w3-margin-top">
                 <div class="w3-half">
                     <label><b>État de restitution</b></label>
-                    
-                    <input class="w3-input w3-border w3-round w3-center" type="text" name="etat_restitution"
-                        value="<?= sanitize($emprunt->etat_restitution) ?>">
+
+                    <select class="w3-select w3-border w3-round w3-center" name="etat_restitution" required>
+                        <?php foreach (Materiel::$etats as $etat): ?>
+                            <option value="<?= htmlspecialchars($etat) ?>" <?= $emprunt->etat_restitution === $etat ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($etat) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
                 <div class="w3-half">
                     <label><b>Remarque de restitution</b></label>

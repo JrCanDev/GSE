@@ -228,14 +228,18 @@ CREATE OR REPLACE FUNCTION update_emprunt(
     p_date_prevue_restitution DATE,
     p_date_reelle_restitution DATE,
     p_caution emprunt_caution,
-    p_remarque TEXT
+    p_remarque TEXT,
+    p_etat_restitution VARCHAR,
+    p_remarque_restitution TEXT
 ) RETURNS VOID AS $$
 BEGIN
     UPDATE emprunts
     SET date_prevue_restitution = p_date_prevue_restitution,
         date_reelle_restitution = p_date_reelle_restitution,
         caution = p_caution,
-        remarque = p_remarque
+        remarque = p_remarque,
+        etat_restitution = p_etat_restitution::etat_materiel,
+        remarque_restitution = p_remarque_restitution
     WHERE id_emprunt = p_id_emprunt;
 END;
 $$ LANGUAGE plpgsql;

@@ -1,6 +1,7 @@
 <?php
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
+require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 
 if (isset($_POST["cancel"])) {
     header("Location: index.php?element=emprunts");
@@ -39,7 +40,7 @@ if (isset($_POST['update'])) {
 
     $emprunt->update();
 
-    $_SESSION['mesgs']['confirm'][] = "Emprunt mis à jour avec succès.";
+    $_SESSION['mesgs']['confirm'][] = "Emprunt mis à jour avec succès. - " . $emprunt->id_emprunt;
     header("Location: index.php?element=emprunts");
     exit;
 }

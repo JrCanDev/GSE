@@ -103,7 +103,7 @@ class Emprunt
     public function fetch(int $identifier): void
     {
         try {
-            $fields = array('nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'etat_restitution', 'remarque_restitution');
+            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'etat_restitution', 'remarque_restitution');
 
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels WHERE id_emprunt = :id_emprunt';
             $stmt = $this->db->prepare($sql);
@@ -121,14 +121,19 @@ class Emprunt
     public function update(): void
     {
         try {
-            $fields = array('id_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque');
+            $fields = array('id_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'remarque', 'etat_restitution', 'remarque_restitution');
+
             $sql = 'SELECT update_emprunt(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
+
             $stmt->bindValue(':id_emprunt', $this->id_emprunt, PDO::PARAM_INT);
             $stmt->bindValue(':date_prevue_restitution', $this->date_prevue_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':date_reelle_restitution', $this->date_reelle_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':caution', $this->caution, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, PDO::PARAM_STR);
+            $stmt->bindValue(':etat_restitution', $this->etat_restitution ?: null, $this->etat_restitution ? PDO::PARAM_STR : PDO::PARAM_NULL);
+            $stmt->bindValue(':remarque_restitution', $this->remarque_restitution, PDO::PARAM_STR);
+
             $stmt->execute();
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
@@ -138,7 +143,7 @@ class Emprunt
     public static function fetchAll(PDO $db): array
     {
         try {
-            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'id_materiel', 'nom_materiel', 'modele_materiel', 'etiquette_ulco_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'etat', 'remarque');
+            $fields = array('id_emprunt', 'nom_emprunteur', 'prenom_emprunteur', 'nom_groupe', 'id_materiel', 'nom_materiel', 'modele_materiel', 'etiquette_ulco_materiel', 'date_emprunt', 'date_prevue_restitution', 'date_reelle_restitution', 'caution', 'etat', 'remarque', 'etat_restitution', 'remarque_restitution');
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels';
             $stmt = $db->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
