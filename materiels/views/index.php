@@ -10,7 +10,7 @@
            placeholder="Rechercher par nom, étiquette ULCO, modèle, état...">
 </div>
 
-<table class="w3-table w3-striped w3-bordered w3-small">
+<table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
         <tr class="w3-light-gray">
             <th>Nom</th>

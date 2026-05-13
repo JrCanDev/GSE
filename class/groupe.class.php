@@ -99,18 +99,6 @@ class Groupe
         }
     }
 
-    public function delete(): void
-    {
-        try {
-            $sql = 'SELECT delete_groupe(:id_groupe)';
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id_groupe', $this->id_groupe, PDO::PARAM_INT);
-            $stmt->execute();
-        } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
-        }
-    }
-
     public static function fetchAll(PDO $db): array
     {
         try {

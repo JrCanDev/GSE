@@ -1,4 +1,4 @@
-<h3><b>Création d'un nouvel emprunt</b></h3>
+<h3><b>Modification d'un emprunt</b></h3>
 
 <div class="col-2 w3-container">
     <form action="<?= $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ?>"
