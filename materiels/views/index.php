@@ -13,13 +13,13 @@
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
         <tr class="w3-light-gray">
-            <th>Nom</th>
-            <th>Modèle</th>
-            <th>Année</th>
-            <th>Étiquette ULCO</th>
-            <th>Localisation</th>
-            <th>État</th>
-            <th>Remarque</th>
+            <th>Nom <span class="sort-arrow"></span></th>
+            <th>Modèle <span class="sort-arrow"></span></th>
+            <th>Année <span class="sort-arrow"></span></th>
+            <th>Étiquette ULCO <span class="sort-arrow"></span></th>
+            <th>Localisation <span class="sort-arrow"></span></th>
+            <th>État <span class="sort-arrow"></span></th>
+            <th>Remarque <span class="sort-arrow"></span></th>
             <th>Actions</th>
         </tr>
     </thead>

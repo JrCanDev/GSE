@@ -13,16 +13,16 @@
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
         <tr class="w3-light-gray">
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Année</th>
-            <th>Date d'emprunt</th>
-            <th>Caution</th>
-            <th>Matériel</th>
-            <th>Date prévue de restitution</th>
-            <th>Date réelle de restitution</th>
-            <th>État</th>
-            <th>Remarque</th>
+            <th>Nom <span class="sort-arrow"></span></th>
+            <th>Prénom <span class="sort-arrow"></span></th>
+            <th>Année <span class="sort-arrow"></span></th>
+            <th>Date d'emprunt <span class="sort-arrow"></span></th>
+            <th>Caution <span class="sort-arrow"></span></th>
+            <th>Matériel <span class="sort-arrow"></span></th>
+            <th>Date prévue de restitution <span class="sort-arrow"></span></th>
+            <th>Date réelle de restitution <span class="sort-arrow"></span></th>
+            <th>État <span class="sort-arrow"></span></th>
+            <th>Remarque <span class="sort-arrow"></span></th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -148,22 +148,3 @@
         }
     }
 </script>
-
-<style>
-    .dialog-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .dialog-buttons form {
-        margin: 0;
-        display: inline-block;
-    }
-
-    #confirmation-emprunt-dialog:modal {
-        border: 2px solid #0093d2;
-        padding: 25px;
-    }
-</style>

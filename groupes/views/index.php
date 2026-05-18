@@ -6,8 +6,8 @@
 <table class="w3-table w3-striped w3-small w3-bordered w3-border">
     <thead>
         <tr class="w3-light-gray">
-            <th>Nom du groupe</th>
-            <th>Date de restitution</th>
+            <th>Nom du groupe <span class="sort-arrow"></span></th>
+            <th>Date de restitution <span class="sort-arrow"></span></th>
             <th>Actions</th>
         </tr>
     </thead>

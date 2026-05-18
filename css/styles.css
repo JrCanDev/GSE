@@ -32,6 +32,25 @@ th {
   font-weight: bolder;
 }
 
+th {
+  cursor: pointer;
+  user-select: none;
+}
+
+th:last-child {
+  cursor: auto;
+  user-select: text;
+}
+
+th:not(:last-child):hover {
+  background-color: #ddd !important;
+}
+
+.sort-arrow {
+  margin-left: 5px;
+  font-size: 0.8em;
+}
+
 tr {
   background-color: #fff !important;
 }
@@ -101,16 +120,16 @@ footer {
 }
 
 .selection-materiel {
-    transition: all 0.3s ease;
-    cursor: pointer;
-    user-select: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  user-select: none;
 }
 
 .selection-materiel-selected {
-    background-color: #008ed6 !important;
-    color: white !important;
-    border-color: #005f8d !important;
-    transform: scale(1.02);
+  background-color: #008ed6 !important;
+  color: white !important;
+  border-color: #005f8d !important;
+  transform: scale(1.02);
 }
 
 .selection-materiel-indisponible {
@@ -123,4 +142,21 @@ footer {
   height: 155px;
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.dialog-buttons form {
+  margin: 0;
+  display: inline-block;
+}
+
+#confirmation-emprunt-dialog:modal {
+  border: 2px solid #0093d2;
+  padding: 25px;
 }
