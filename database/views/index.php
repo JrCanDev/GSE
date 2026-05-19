@@ -4,6 +4,22 @@
 </div>
 
 <script>
+  function parseJsonResponse(response, tableName, contextLabel) {
+    if (typeof response === 'object' && response !== null) {
+      return response;
+    }
+
+    try {
+      return JSON.parse(response);
+    } catch (e) {
+      const raw = (response || '').toString().trim();
+      const preview = raw.length > 120 ? raw.substring(0, 120) + '...' : raw;
+      temporaryAlert('error', tableName, 'Réponse JSON invalide (' + contextLabel + ').', 10);
+      console.error('Invalid JSON response (' + contextLabel + '):', preview);
+      return null;
+    }
+  }
+
   //Scripts to enable the db manipulations to work
   //Create a new row in the table to prepare for an insert
   function newValue(tableName, metadata) {
@@ -12,7 +28,7 @@
     } else {
 
       $.ajax({
-        url: 'controllers/database/tables/prepareCreateValue.php',
+        url: 'database/controllers/tables/prepareCreateValue.php',
         type: 'GET',
         data: {
           tableName: tableName,
@@ -33,7 +49,7 @@
   //Applies an input to each cell of a chosen row in the table to prepare for a modification
   function modifyValue(tableName, metadata, nbRow, values) {
     $.ajax({
-      url: 'controllers/database/tables/prepareModifyValue.php',
+      url: 'database/controllers/tables/prepareModifyValue.php',
       type: 'GET',
       data: {
         tableName: tableName,
@@ -68,7 +84,7 @@
         });
 
         $.ajax({
-          url: 'controllers/database/tables/verifyValue.php',
+          url: 'database/controllers/tables/verifyValue.php',
           type: 'GET',
           data: {
             tableName: tableName,
@@ -76,7 +92,8 @@
             columnMetadata: metadata,
           },
           success: function(response) {
-            response = JSON.parse(response)
+            response = parseJsonResponse(response, tableName, 'verify create');
+            if (!response) return;
             if (response.error != undefined) {
               temporaryAlert('error', tableName, response.error, 10);
             } else if (response.warning != undefined) {
@@ -86,7 +103,7 @@
             } else {
 
               $.ajax({
-                url: 'controllers/database/tables/createValue.php',
+                url: 'database/controllers/tables/createValue.php',
                 type: 'POST',
                 data: {
                   tableName: tableName,
@@ -94,7 +111,8 @@
                   columnMetadata: metadata,
                 },
                 success: function(response) {
-                  response = JSON.parse(response)
+                  response = parseJsonResponse(response, tableName, 'create value');
+                  if (!response) return;
                   if (response.error != undefined) {
                     temporaryAlert('error', tableName, response.error, 10);
                   } else if (response.warning != undefined) {
@@ -127,7 +145,7 @@
         });
 
         $.ajax({
-          url: 'controllers/database/tables/verifyValue.php',
+          url: 'database/controllers/tables/verifyValue.php',
           type: 'GET',
           data: {
             tableName: tableName,
@@ -136,7 +154,8 @@
             modify: values,
           },
           success: function(response) {
-            response = JSON.parse(response)
+            response = parseJsonResponse(response, tableName, 'verify modify');
+            if (!response) return;
             if (response.error != undefined) {
               temporaryAlert('error', tableName, response.error, 10);
             } else if (response.warning != undefined) {
@@ -147,7 +166,7 @@
               var finalValues = response.success;
 
               $.ajax({
-                url: 'controllers/database/tables/modifyValue.php',
+                url: 'database/controllers/tables/modifyValue.php',
                 type: 'POST',
                 data: {
                   tableName: tableName,
@@ -156,7 +175,8 @@
                   columnMetadata: metadata,
                 },
                 success: function(response) {
-                  response = JSON.parse(response)
+                  response = parseJsonResponse(response, tableName, 'modify value');
+                  if (!response) return;
                   if (response.error != undefined) {
                     temporaryAlert('error', tableName, response.error, 10);
                   } else if (response.warning != undefined) {
@@ -166,7 +186,7 @@
                   } else {
                     temporaryAlert('success', tableName, response.success, 10);
                     $.ajax({
-                      url: 'controllers/database/tables/setValue.php',
+                      url: 'database/controllers/tables/setValue.php',
                       type: 'POST',
                       data: {
                         tableName: tableName,
@@ -210,7 +230,7 @@
       } else {
 
         $.ajax({
-          url: 'controllers/database/tables/setValue.php',
+          url: 'database/controllers/tables/setValue.php',
           type: 'GET',
           data: {
             tableName: tableName,
@@ -244,7 +264,7 @@
       if (choice) {
 
         $.ajax({
-          url: 'controllers/database/tables/deleteValue.php',
+          url: 'database/controllers/tables/deleteValue.php',
           type: 'POST',
           data: {
             tableName: tableName,
@@ -253,7 +273,8 @@
             listFK: listFK
           },
           success: function(response) {
-            response = JSON.parse(response)
+            response = parseJsonResponse(response, tableName, 'delete value');
+            if (!response) return;
             if (response.error != undefined) {
               $('#tr-' + tableName + '-' + nbRow).css({
                 backgroundColor: 'white'
@@ -295,7 +316,7 @@
   //Refresh the values of a chosen table
   function refreshValues(tableName, metadata) {
     $.ajax({
-      url: 'controllers/database/tables/refreshValues.php',
+      url: 'database/controllers/tables/refreshValues.php',
       type: 'GET',
       data: {
         tableName: tableName,
@@ -340,7 +361,7 @@
     }).show().text('Loading...');
 
     $.ajax({
-      url: 'controllers/database/tables/suggestFK.php',
+      url: 'database/controllers/tables/suggestFK.php',
       method: 'GET',
       data: {
         value: query,

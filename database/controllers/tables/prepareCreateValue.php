@@ -1,7 +1,7 @@
 <?php
 $root = dirname(__FILE__) . '/../../..';
 include_once $root . '/vendor/autoload.php';
-require_once $root . '/lib/project.lib.php';
+require_once $root . '/lib/myproject.lib.php';
 
 $tableName = GETPOST('tableName');
 $columnMetadata = GETPOST('columnMetadata');

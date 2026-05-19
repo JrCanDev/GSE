@@ -1,16 +1,26 @@
 <?php
 $root = dirname(__FILE__) . '/../../..';
 include_once $root . '/vendor/autoload.php';
-require_once $root . '/lib/project.lib.php';
+require_once $root . '/lib/myproject.lib.php';
 
 $tableName = GETPOST('tableName');
 $tableValues = GETPOST('values');
 $columnMetadata = GETPOST('columnMetadata');
 $oldId = GETPOSTISSET('modify') ? GETPOST('modify') : false;
 
+if (!is_array($tableValues) || !is_array($columnMetadata) || empty($columnMetadata)) {
+  die(json_encode(['error' => 'Données invalides pour la vérification']));
+}
+
 $error = null;
 $valueList = [];
 $nb_pk = countKeyOccurrences($columnMetadata, 'pk');
+
+try {
+  $db = require $root . '/lib/mypdo.php';
+} catch (Throwable $e) {
+  die(json_encode(['error' => 'Erreur: ' . $e->getMessage() . ' ligne -> ' . $e->getLine() . ' File - ' . $e->getFile()]));
+}
 
 foreach ($columnMetadata as $column) {
   $column_name = $column['name'];
@@ -19,7 +29,7 @@ foreach ($columnMetadata as $column) {
   $is_nullable = $column['nullable'];
   $foreign_key = $column['fk'];
   $primary_key = $column['pk'];
-  $column_value = $tableValues[$column_name];
+  $column_value = array_key_exists($column_name, $tableValues) ? $tableValues[$column_name] : null;
   $validated_value = validateTypeOutbound($column_value, $column_type);
   $valueList[$column_name] = $validated_value;
 
@@ -30,7 +40,7 @@ foreach ($columnMetadata as $column) {
       }
       break;
     case 'char':
-      if (strlen($validated_value) > 1) {
+      if (!is_null($validated_value) && strlen((string)$validated_value) > 1) {
         $error = "$column_name doit être un charactère unique";
       }
       break;
@@ -49,8 +59,8 @@ foreach ($columnMetadata as $column) {
   }
 
   try {
-    $db = require $root . '/lib/pdo.php';
-    if ($foreign_key !== 'false' && !$error) {
+    $hasForeignKey = is_array($foreign_key) && isset($foreign_key['foreign_table_name'], $foreign_key['foreign_column_name']);
+    if ($hasForeignKey && !$error && !is_null($validated_value)) {
       $table_fk = $foreign_key['foreign_table_name'];
       $column_fk = $foreign_key['foreign_column_name'];
 
@@ -69,7 +79,9 @@ foreach ($columnMetadata as $column) {
       $result = null;
     }
 
-    if ($primary_key !== 'false' && !$error && $oldId !== false && $validated_value !== validateTypeOutbound($oldId[$column_name], $column_type) && $nb_pk <= 1) {
+    $hasPrimaryKey = is_array($primary_key) && isset($primary_key['column_name']);
+    $oldValue = (is_array($oldId) && array_key_exists($column_name, $oldId)) ? validateTypeOutbound($oldId[$column_name], $column_type) : null;
+    if ($hasPrimaryKey && !$error && $oldId !== false && $validated_value !== $oldValue && $nb_pk <= 1) {
       $query = "SELECT count($column_name) ";
       $query .= "FROM $tableName ";
       $query .= "WHERE $column_name = :pk";

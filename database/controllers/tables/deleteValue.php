@@ -1,8 +1,8 @@
 <?php
 $root = dirname(__FILE__) . '/../../..';
 include_once $root . '/vendor/autoload.php';
-require_once $root . '/lib/project.lib.php';
-$db = require $root . '/lib/pdo.php';
+require_once $root . '/lib/myproject.lib.php';
+$db = require $root . '/lib/mypdo.php';
 
 $tableName = GETPOST('tableName');
 $values = GETPOST('values');
@@ -70,7 +70,7 @@ try {
   $statement = $db->prepare($query);
 
   foreach ($prepared as $param) {
-    $statement->bindParam($param[0], $param[1], $param[2]);
+    $statement->bindParam(':' . $param[0], $param[1], $param[2]);
   }
 
   $statement->execute();

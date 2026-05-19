@@ -1,8 +1,8 @@
 <?php
 $root = dirname(__FILE__) . '/../../..';
 include_once $root . '/vendor/autoload.php';
-require_once $root . '/lib/project.lib.php';
-$db = require $root . '/lib/pdo.php';
+require_once $root . '/lib/myproject.lib.php';
+$db = require $root . '/lib/mypdo.php';
 
 $value = GETPOST('value');
 $fTable = GETPOST('fk_table');

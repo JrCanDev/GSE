@@ -1,31 +1,32 @@
 <?php
 $root = dirname(__FILE__) . '/../../..';
 include_once $root . '/vendor/autoload.php';
-require_once $root . '/lib/project.lib.php';
-$db = require $root . '/lib/pdo.php';
+require_once $root . '/lib/myproject.lib.php';
+$db = require $root . '/lib/mypdo.php';
 
 $tableName = GETPOST('tableName');
 $values = GETPOST('values');
 $columnMetadata = GETPOST('columnMetadata');
 
 try {
-  $columns = [];
   $columnNames = [];
   $prepared = [];
   $search = [];
   $i = 0;
 
-  foreach ($values as $key => $value) {
-    $validated_value = validateTypeOutbound($value, $columnMetadata[$i]['type']);
+  foreach ($columnMetadata as $column) {
+    $key = $column['name'];
+    $value = isset($values[$key]) ? $values[$key] : null;
+    $validated_value = validateTypeOutbound($value, $column['type']);
     $columnNames[] = $key;
 
     if (is_null($validated_value)) {
       $search[] = 'NULL';
     } else {
       $search[] = ":param$i";
-      $prepared[] = ["param$i", $validated_value, getInputType($columnMetadata[$i]['type'], true)];
-      $i++;
+      $prepared[] = ["param$i", $validated_value, getInputType($column['type'], true)];
     }
+    $i++;
   }
 
   $query = "INSERT INTO $tableName ";
@@ -36,7 +37,7 @@ try {
   $statement = $db->prepare($query);
 
   foreach ($prepared as $param) {
-    $statement->bindParam($param[0], $param[1], $param[2]);
+    $statement->bindValue(':' . $param[0], $param[1], $param[2]);
   }
 
   $statement->execute();
@@ -50,8 +51,10 @@ try {
   $db->commit();
   echo json_encode(['success' => "Valeurs insérées avec succés"]);
 } catch (Throwable $e) {
-  $db->rollBack();
+  if ($db instanceof PDO && $db->inTransaction()) {
+    $db->rollBack();
+  }
   $db = null;
-  die(json_encode(['ERROR' => 'Erreur: ' . $e->getMessage() . ' ligne -> ' . $e->getLine() . ' File - ' . $e->getFile()]));
+  die(json_encode(['error' => 'Erreur: ' . $e->getMessage() . ' ligne -> ' . $e->getLine() . ' File - ' . $e->getFile()]));
 }
 $db = null;
