@@ -9,12 +9,6 @@
   <div class="w3-padding w3-display-topright w3-margin" style="display:flex; flex-direction: row; justify-content: center; align-items: center">
     <?php
     $displayUser = trim(sanitize($_SESSION['user']['username'] ?? ''));
-    if ($displayUser === '') {
-      $displayUser = sanitize($_SESSION['user']['username'] ?? 'Connecte');
-    }
-    if (($_SESSION['user']['username'] ?? '') == 'admin_username') {
-      $displayUser = 'admin';
-    }
     ?>
     <h4 class="title" style="padding-right: 20px"><?= $displayUser ?></h4>
     <img src="img/exit.png" class="clickable" alt="exit" id="disconnectImg" style="height: 50px">
@@ -30,6 +24,7 @@
       'emprunts' => 'Emprunts',
       'materiels' => 'Matériels',
       'groupes' => 'Groupes',
+      'statistiques' => 'Statistiques',
     );
 
     foreach ($list_menus as $key => $menu) {

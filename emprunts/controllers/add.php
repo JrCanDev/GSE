@@ -26,6 +26,12 @@ if (isset($_POST["submit"])) {
         if (is_string($value)) $data[$key] = sanitize($value);
     }
 
+    if (!in_array($data['caution'] ?? null, Emprunt::$cautions, true)) {
+        $_SESSION['mesgs']['errors'][] = "Veuillez choisir une caution valide.";
+        header("Location: " . $_SERVER['PHP_SELF'] . "?element=emprunts&action=add");
+        exit(1);
+    }
+
     $emprunt = new Emprunt($db, $data);
     $emprunt->create();
 

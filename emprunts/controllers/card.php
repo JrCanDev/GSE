@@ -27,7 +27,11 @@ if (isset($_POST['update'])) {
         $emprunt->date_reelle_restitution = null;
     }
 
-    $emprunt->caution = sanitize($_POST['caution']) ?? $emprunt->caution;
+    $caution = sanitize($_POST['caution'] ?? null);
+    if (in_array($caution, Emprunt::$cautions, true)) {
+        $emprunt->caution = $caution;
+    }
+
     $emprunt->remarque = sanitize($_POST['remarque']) ?? $emprunt->remarque;
 
     if ($emprunt->date_reelle_restitution) {

@@ -48,8 +48,7 @@ CREATE TABLE IF NOT EXISTS emprunts (
     FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel) ON DELETE CASCADE
 );
 
-INSERT INTO utilisateurs (username, password, admin) VALUES ('admininfo', md5('admin'), true);
-INSERT INTO utilisateurs (username, password, admin) VALUES ('adminjrcandev', md5('admin'), true);
+INSERT INTO utilisateurs (username, password, admin) VALUES ('admin', md5('admin'), true);
 
 -- Vue pour afficher les emprunts de matériel avec les détails associés
 CREATE VIEW vw_emprunts_materiels AS

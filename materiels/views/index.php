@@ -3,11 +3,11 @@
 </a>
 
 <div class="w3-container w3-margin-bottom">
-    <input class="w3-input w3-border w3-round-xxlarge w3-center" 
-           type="search" 
-           id="searchBarMateriel" 
-           onkeyup="filtrerListeMateriels()" 
-           placeholder="Rechercher par nom, étiquette ULCO, modèle, état...">
+    <input class="w3-input w3-border w3-round-xxlarge w3-center"
+        type="search"
+        id="searchBarMateriel"
+        onkeyup="filtrerListeMateriels()"
+        placeholder="Rechercher par nom, étiquette ULCO, modèle, état... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
 </div>
 
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
@@ -70,17 +70,34 @@
 
 <script>
     function filtrerListeMateriels() {
-    let input = document.getElementById('searchBarMateriel').value.toLowerCase();
-    let rows = document.getElementsByClassName('item-materiel');
+        let input = document.getElementById('searchBarMateriel').value.toLowerCase();
+        let rows = document.getElementsByClassName('item-materiel');
 
-    for (let i = 0; i < rows.length; i++) {
-        let texteLigne = rows[i].textContent || rows[i].innerText;
+        let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
 
-        if (texteLigne.toLowerCase().indexOf(input) > -1) {
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
+        for (let i = 0; i < rows.length; i++) {
+            let cellules = Array.from(rows[i].children);
+
+            // on ignore la dernière cellule (la colonne Actions)
+            let texteUtileLigne = cellules
+                .slice(0, -1)
+                .map(td => td.textContent || td.innerText)
+                .join(" ")
+                .toLowerCase();
+
+            if (motsCles.length === 0) {
+                rows[i].style.display = "";
+                continue;
+            }
+
+            // On vérifie si les mots clés sont dans le texte des colonnes utiles
+            let correspondAtousLesMots = motsCles.every(mot => texteUtileLigne.indexOf(mot) > -1);
+
+            if (correspondAtousLesMots) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
         }
     }
-}
 </script>

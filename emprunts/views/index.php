@@ -7,7 +7,7 @@
         type="search"
         id="searchBarEmprunt"
         onkeyup="filtrerEmprunts()"
-        placeholder="Rechercher un nom, un matériel, une date...">
+        placeholder="Rechercher un nom, un matériel, une date... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
 </div>
 
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
@@ -135,12 +135,27 @@
     function filtrerEmprunts() {
         let input = document.getElementById('searchBarEmprunt').value.toLowerCase();
         let rows = document.getElementsByClassName('item-emprunt');
+        let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
 
         for (let i = 0; i < rows.length; i++) {
-            let texteLigne = rows[i].textContent || rows[i].innerText;
+            let cellules = Array.from(rows[i].children);
 
-            // 3. Comparaison
-            if (texteLigne.toLowerCase().indexOf(input) > -1) {
+            // on ignore la dernière cellule (la colonne Actions)
+            let texteUtileLigne = cellules
+                .slice(0, -1)
+                .map(td => td.textContent || td.innerText)
+                .join(" ")
+                .toLowerCase();
+
+            if (motsCles.length === 0) {
+                rows[i].style.display = "";
+                continue;
+            }
+
+            // On vérifie si les mots clés sont dans le texte des colonnes utiles
+            let correspondAtousLesMots = motsCles.every(mot => texteUtileLigne.indexOf(mot) > -1);
+
+            if (correspondAtousLesMots) {
                 rows[i].style.display = "";
             } else {
                 rows[i].style.display = "none";
