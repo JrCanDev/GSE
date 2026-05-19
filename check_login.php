@@ -14,9 +14,17 @@ if (GETPOST('debug') == true) {
 if (isset($_POST['connect'])) {
     $uname = $_POST['uname'];
     $psw = $_POST['psw'];
+    // Si l'utilisateur existe mais n'a pas de mot de passe défini -> première connexion
+    $userRow = myAuthClass::getUserByUsername($uname);
+    if ($userRow && (is_null($userRow['password']) || $userRow['password'] === '')) {
+        $_SESSION['mesgs']['info'][] = 'Première connexion : définissez votre mot de passe.';
+        header('Location: register.php?uname=' . urlencode($uname));
+        exit;
+    }
+
     $user = myAuthClass::authenticate($uname, $psw);
 
-    if ($user["id"] > 0) {
+    if ($user && isset($user["id"]) && $user["id"] > 0) {
         $_SESSION['mesgs']['confirm'][] = 'Connexion réussie ' . $user['username'];
         $_SESSION['login'] = $user['username'];
         $_SESSION['user'] = $user;

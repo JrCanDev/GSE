@@ -43,4 +43,34 @@ class myAuthClass
             echo $e->getMessage() . ' -> file: ' . $e->getFile() . ' - ligne: ' . $e->getLine();
         }
     }
+
+    public static function getUserByUsername(string $username)
+    {
+        try {
+            $db = require(dirname(__FILE__) . '/../lib/mypdo.php');
+            $sql = 'SELECT * FROM utilisateurs WHERE username = :username LIMIT 1';
+            $statement = $db->prepare($sql);
+            $statement->bindValue(':username', $username, PDO::PARAM_STR);
+            $statement->execute();
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result : null;
+        } catch (Error | Exception $e) {
+            return null;
+        }
+    }
+
+    public static function register(string $username, string $password)
+    {
+        try {
+            $db = require(dirname(__FILE__) . '/../lib/mypdo.php');
+            $sql = 'UPDATE utilisateurs SET password = :passhash WHERE username = :username';
+            $statement = $db->prepare($sql);
+            $statement->bindValue(':passhash', md5($password), PDO::PARAM_STR);
+            $statement->bindValue(':username', $username, PDO::PARAM_STR);
+            $statement->execute();
+            return $statement->rowCount() > 0;
+        } catch (Error | Exception $e) {
+            return false;
+        }
+    }
 }

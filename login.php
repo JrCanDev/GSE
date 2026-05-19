@@ -22,7 +22,7 @@ $db = require(dirname(__FILE__) . '/lib/mypdo.php');
 <body>
     <div class="maincontent w3-display-container w3-center">
         <div class="dtitle w3-container main-background-color">
-            <h1>Authentification</h1>
+            <h1><b>Authentification</b></h1>
         </div>
 
         <div class="w3-center">
@@ -49,6 +49,8 @@ $db = require(dirname(__FILE__) . '/lib/mypdo.php');
                         <?php
                         }
                         ?>
+
+                        <a href="register.php" class="w3-button w3-gray">S'enregister</a>
                     </div>
                 </div>
             </form>
