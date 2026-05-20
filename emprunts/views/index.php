@@ -1,4 +1,4 @@
-<a href="index.php?element=emprunts&action=add" class="w3-margin w3-button w3-border">
+<a href="index.php?element=emprunts&action=add" class="w3-margin w3-button w3-border w3-round">
     <b>Créer un nouvel emprunt</b>
 </a>
 

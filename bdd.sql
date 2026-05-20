@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS emprunts (
     remarque TEXT NULL,
     etat_restitution etat_materiel NULL,
     remarque_restitution TEXT NULL,
-    FOREIGN KEY (id_groupe) REFERENCES groupes(id_groupe) ON DELETE CASCADE,
-    FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel) ON DELETE CASCADE
+    FOREIGN KEY (id_groupe) REFERENCES groupes(id_groupe),
+    FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel)
 );
 
 INSERT INTO utilisateurs (username, password, admin) VALUES ('admin', md5('admin'), true);
@@ -114,15 +114,6 @@ SELECT
 FROM groupes
 ORDER BY id_groupe;
 
--- Vue pour afficher les utilisateurs
-CREATE VIEW vw_utilisateurs AS
-SELECT
-    id,
-    username,
-    admin
-FROM utilisateurs
-ORDER BY id;
-
 -- Fonction pour insérer un nouveau matériel
 CREATE OR REPLACE FUNCTION create_materiel(
     nom VARCHAR,
@@ -175,22 +166,6 @@ DECLARE
 BEGIN
     INSERT INTO groupes (nom_groupe, date_restitution) VALUES (nom_groupe, date_restitution)
     RETURNING id_groupe INTO new_id;
-    RETURN new_id;
-END;
-$$ LANGUAGE plpgsql;
-
--- Fonction pour créer un nouvel utilisateur
-CREATE OR REPLACE FUNCTION create_utilisateur(
-    username VARCHAR,
-    password VARCHAR,
-    admin BOOLEAN
-) RETURNS INTEGER AS $$
-DECLARE
-    new_id INTEGER;
-BEGIN
-    INSERT INTO utilisateurs (username, password, admin)
-    VALUES (username, md5(password), admin)
-    RETURNING id INTO new_id;
     RETURN new_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -256,36 +231,6 @@ BEGIN
         date_restitution = p_date_restitution,
         est_affiche = p_est_affiche
     WHERE id_groupe = p_id_groupe;
-END;
-$$ LANGUAGE plpgsql;
-
--- Fonction pour mettre à jour un utilisateur
-CREATE OR REPLACE FUNCTION update_utilisateur(
-    p_id INTEGER,
-    p_username VARCHAR,
-    p_password VARCHAR,
-    p_admin BOOLEAN
-) RETURNS VOID AS $$
-BEGIN
-    UPDATE utilisateurs
-    SET username = p_username,
-        password = md5(p_password),
-        admin = p_admin
-    WHERE id = p_id;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION delete_materiel(p_id_materiel INTEGER)
-RETURNS VOID AS $$
-BEGIN
-    DELETE FROM materiels WHERE id_materiel = p_id_materiel;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION delete_groupe(p_id_groupe INTEGER)
-RETURNS VOID AS $$
-BEGIN
-    DELETE FROM groupes WHERE id_groupe = p_id_groupe;
 END;
 $$ LANGUAGE plpgsql;
 

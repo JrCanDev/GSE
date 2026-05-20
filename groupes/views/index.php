@@ -1,4 +1,4 @@
-<a href="index.php?element=groupes&action=add" class="w3-margin w3-button w3-border">
+<a href="index.php?element=groupes&action=add" class="w3-margin w3-button w3-border w3-round">
     <b>Ajouter un nouveau groupe</b>
 </a>
 

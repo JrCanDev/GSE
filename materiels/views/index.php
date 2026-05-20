@@ -1,4 +1,4 @@
-<a href="index.php?element=materiels&action=add" class="w3-margin w3-button w3-border">
+<a href="index.php?element=materiels&action=add" class="w3-margin w3-button w3-border w3-round">
     <b>Ajouter un nouveau matériel</b>
 </a>
 
@@ -50,12 +50,6 @@
                             <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
                             <input type="hidden" name="old_page" value="materiels">
                             <input type="submit" name="submit" class="w3-button w3-small w3-border w3-round" value="✏️">
-                        </form>
-
-                        <form action="?element=materiels" method="post"
-                            onsubmit="return confirm('Voulez-vous vraiment supprimer ce matériel ?');">
-                            <input type="hidden" name="id" value="<?= $materiel->id_materiel ?>">
-                            <input type="submit" name="delete" class="w3-button w3-small w3-border w3-round" value="🗑️">
                         </form>
                     </td>
                 </tr>
