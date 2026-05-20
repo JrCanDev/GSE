@@ -44,7 +44,7 @@
                     <td><?= sanitize($materiel->etiquette_ulco) ?></td>
                     <td><?= sanitize($materiel->localisation) ?></td>
                     <td class="<?= $etat_class ?>"><?= sanitize($materiel->etat) ?></td>
-                    <td><?= sanitize($materiel->remarque) ?></td>
+                    <td><?= desanitize($materiel->remarque) ?></td>
                     <td>
                         <form action="?element=materiels&action=card" method="post">
                             <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
@@ -61,6 +61,10 @@
         <?php endif ?>
     </tbody>
 </table>
+
+<?php if ($materiels): ?>
+    <h2><?= count($materiels) ?> matériel(s) trouvé(s)</h2>
+<?php endif ?>
 
 <script>
     function filtrerListeMateriels() {

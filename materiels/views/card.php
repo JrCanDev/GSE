@@ -59,14 +59,14 @@
         <div class="w3-margin-top">
             <label><b>Remarque</b></label>
             <textarea class="w3-input w3-border w3-round w3-center" name="remarque"
-                placeholder="C'est certainement une superbe remarque" rows="1"><?= sanitize($materiel->remarque) ?></textarea>
+                placeholder="C'est certainement une superbe remarque" rows="1"><?= desanitize($materiel->remarque) ?></textarea>
         </div>
 
         <!-- Descriptif -->
         <div class="w3-margin-top">
             <label><b>Descriptif du matériel</b></label>
             <textarea class="w3-input w3-border w3-round w3-center" name="descriptif"
-                placeholder="Processeur : Intel Core i5-9500F" rows="3"><?= sanitize($materiel->descriptif) ?></textarea>
+                placeholder="Processeur : Intel Core i5-9500F" rows="3"><?= desanitize($materiel->descriptif) ?></textarea>
         </div>
 
         <h3 style="padding-top: 10px;"><b>Historique</b></h3>

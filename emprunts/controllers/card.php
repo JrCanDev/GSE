@@ -32,11 +32,11 @@ if (isset($_POST['update'])) {
         $emprunt->caution = $caution;
     }
 
-    $emprunt->remarque = sanitize($_POST['remarque']) ?? $emprunt->remarque;
+    $emprunt->remarque = html_entity_decode($_POST['remarque'], ENT_QUOTES, 'UTF-8') ?? $emprunt->remarque;
 
     if ($emprunt->date_reelle_restitution) {
         $emprunt->etat_restitution = sanitize($_POST['etat_restitution']) ?? $emprunt->etat_restitution;
-        $emprunt->remarque_restitution = sanitize($_POST['remarque_restitution']) ?? $emprunt->remarque_restitution;
+        $emprunt->remarque_restitution = html_entity_decode($_POST['remarque_restitution'], ENT_QUOTES, 'UTF-8') ?? $emprunt->remarque_restitution;
     } else {
         $emprunt->etat_restitution = null;
         $emprunt->remarque_restitution = null;
@@ -44,7 +44,7 @@ if (isset($_POST['update'])) {
 
     $emprunt->update();
 
-    $_SESSION['mesgs']['confirm'][] = "Emprunt mis à jour avec succès. - " . $emprunt->id_emprunt;
+    $_SESSION['mesgs']['confirm'][] = "Emprunt mis à jour avec succès.";
     header("Location: index.php?element=emprunts");
     exit;
 }

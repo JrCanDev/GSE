@@ -58,7 +58,7 @@
         <div class="w3-margin-top">
             <label><b>Remarque</b></label>
             <textarea class="w3-input w3-border w3-round w3-center" name="remarque"
-                placeholder="C'est certainement une superbe remarque" rows="1"><?= sanitize($emprunt->remarque) ?></textarea>
+                placeholder="C'est certainement une superbe remarque" rows="1"><?= html_entity_decode($emprunt->remarque, ENT_QUOTES, 'UTF-8') ?></textarea>
         </div>
 
         <?php if ($emprunt->date_reelle_restitution): ?>
@@ -77,7 +77,7 @@
                 <div class="w3-half">
                     <label><b>Remarque de restitution</b></label>
                     <input class="w3-input w3-border w3-round w3-center" type="text" name="remarque_restitution"
-                        value="<?= sanitize($emprunt->remarque_restitution) ?>">
+                        value="<?= html_entity_decode($emprunt->remarque_restitution, ENT_QUOTES, 'UTF-8') ?>">
                 </div>
             </div>
         <?php endif; ?>

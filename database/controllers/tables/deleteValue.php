@@ -11,28 +11,25 @@ $listFK = GETPOST('listFK');
 
 try {
   $fk_table_names = [];
-  foreach ($columnMetadata as $column) {
-    $column_name = $column['name'];
-    if (!is_null($listFK)) {
+  if (!is_null($listFK)) {
+    foreach ($columnMetadata as $i => $column) {
+      $column_name = $column['name'];
       foreach ($listFK as $table => $fk_columns) {
-        if ($table !== $tableName) {
-          foreach ($fk_columns as $fk_column) {
-            if ($fk_column['foreign_column_name'] === $column_name && array_search('id', array_column(array_column($columnMetadata, 'pk'), 'column_name')) !== false && array_search('id', array_column(array_column($columnMetadata, 'fk'), 'column_name')) === false) {
-              $validatedValue = validateTypeOutbound($values[$column_name], $columnMetadata[$i]['type']);
-              $fk_column_name = $fk_column['column_name'];
-              
-              $query = "SELECT count($fk_column_name) ";
-              $query .= "FROM $table ";
-              $query .= "WHERE $fk_column_name = :fk";
-              
-              $statement = $db->prepare($query);
-              $statement->bindParam(':fk', $validatedValue, PDO::PARAM_STR);
-              $statement->execute();
-              $nb_used = $statement->fetch(PDO::FETCH_ASSOC);
-              $statement->closeCursor();
-              if ($nb_used['count'] > 0) {
-                $fk_table_names[] = $table;
-              }
+        if ($table === $tableName) continue;
+        foreach ($fk_columns as $fk_column) {
+          if ($fk_column['foreign_column_name'] === $column_name && array_search('id', array_column(array_column($columnMetadata, 'pk'), 'column_name')) !== false && array_search('id', array_column(array_column($columnMetadata, 'fk'), 'column_name')) === false) {
+            $validatedValue = validateTypeOutbound($values[$column_name] ?? null, $columnMetadata[$i]['type'] ?? null);
+            $fk_column_name = $fk_column['column_name'];
+
+            $query = "SELECT count(*) AS cnt FROM $table WHERE $fk_column_name = :fk";
+
+            $statement = $db->prepare($query);
+            $statement->bindValue(':fk', $validatedValue, PDO::PARAM_STR);
+            $statement->execute();
+            $nb_used = $statement->fetch(PDO::FETCH_ASSOC);
+            $statement->closeCursor();
+            if (!empty($nb_used) && ($nb_used['cnt'] ?? 0) > 0) {
+              $fk_table_names[] = $table;
             }
           }
         }
@@ -52,15 +49,28 @@ try {
 
   $search = [];
   $prepared = [];
-  $i = 0;
 
+  // build a lookup of metadata by column name to avoid relying on the order
+  $metaByName = [];
+  foreach ($columnMetadata as $meta) {
+    if (isset($meta['name'])) $metaByName[$meta['name']] = $meta;
+  }
+
+  $i = 0;
   foreach ($values as $key => $value) {
-    $validatedValue = validateTypeOutbound($value, $columnMetadata[$i]['type']);
-    if (is_null($validatedValue)) {
+    $colMeta = $metaByName[$key] ?? null;
+    $type = $colMeta['type'] ?? null;
+    $validatedValue = validateTypeOutbound($value, $type);
+
+    // If the original value is an empty string, compare to empty string
+    if ($value === '') {
+      $search[] = "$key = ''";
+    } elseif (is_null($validatedValue)) {
       $search[] = "$key IS NULL";
     } else {
       $search[] = "$key = :param$i";
-      $prepared[] = ["param$i", $validatedValue, getInputType($columnMetadata[$i]['type'], true)];
+      $pdoType = getInputType($type, true);
+      $prepared[] = ["param$i", $validatedValue, $pdoType];
     }
     $i++;
   }
@@ -68,9 +78,8 @@ try {
   $query = "DELETE FROM $tableName ";
   $query .= "WHERE " . implode(' AND ', $search) . " ";
   $statement = $db->prepare($query);
-
   foreach ($prepared as $param) {
-    $statement->bindParam(':' . $param[0], $param[1], $param[2]);
+    $statement->bindValue(':' . $param[0], $param[1], $param[2]);
   }
 
   $statement->execute();

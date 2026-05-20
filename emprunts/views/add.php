@@ -21,7 +21,7 @@
                     <?php
                     foreach ($years as $year): ?>
                         <?php if ($year->est_affiche): ?>
-                            <option value="<?= $year->id_groupe ?>"><?= sanitize($year->nom_groupe) ?></option>
+                            <option value="<?= $year->id_groupe ?>" data-date-restitution="<?= sanitize($year->date_restitution) ?>"><?= sanitize($year->nom_groupe) ?></option>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </select>
@@ -45,7 +45,7 @@
             </div>
             <div class="w3-third">
                 <label><b>Date de restitution prévue<span style="color: red;">*</span></b></label>
-                <input class="w3-input w3-border w3-round w3-center" type="date" name="date_prevue_restitution" required>
+                <input id="date_prevue_restitution" class="w3-input w3-border w3-round w3-center" type="date" name="date_prevue_restitution" required>
             </div>
         </div>
 
@@ -106,7 +106,32 @@
         </div>
 
         <script>
-            document.querySelector("input[name='lastname']").focus();
+            // focus sur champ Nom
+            document.querySelector("input[name='nom_emprunteur']").focus();
+
+            // applique date de restitution prévue selon l'année choisie
+            function appliquerDateSelonAnnee() {
+                const select = document.querySelector("select[name='id_groupe']");
+                const inputDate = document.getElementById('date_prevue_restitution');
+                if (!select || !inputDate) return;
+
+                const setDateFromOption = (opt) => {
+                    if (!opt) { inputDate.value = ''; return; }
+                    const d = opt.dataset.dateRestitution || '';
+                    inputDate.value = d;
+                };
+
+                select.addEventListener('change', function() {
+                    setDateFromOption(this.options[this.selectedIndex]);
+                });
+
+                const initial = select.options[select.selectedIndex];
+                if (initial && initial.value !== '') {
+                    setDateFromOption(initial);
+                }
+            }
+
+            appliquerDateSelonAnnee();
 
             function verifierSelectionMateriel(event) {
                 const inputUnique = document.getElementById('id_materiel');

@@ -86,9 +86,9 @@
                     </td>
                     <td>
                         <?php if ($emprunt->date_reelle_restitution): ?>
-                            <?= sanitize($emprunt->remarque_restitution) ?>
+                            <?= html_entity_decode($emprunt->remarque_restitution, ENT_QUOTES, 'UTF-8') ?>
                         <?php else: ?>
-                            <?= sanitize($emprunt->remarque) ?>
+                            <?= html_entity_decode($emprunt->remarque, ENT_QUOTES, 'UTF-8') ?>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -130,6 +130,10 @@
         <?php endif ?>
     </tbody>
 </table>
+
+<?php if ($emprunts): ?>
+    <h2><?= count($emprunts) ?> emprunt(s) trouvé(s)</h2>
+<?php endif ?>
 
 <script>
     function filtrerEmprunts() {

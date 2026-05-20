@@ -9,7 +9,7 @@ class Materiel
     private string $localisation;
     private string $etat;
     private string $descriptif;
-    private string $remarque;
+    private ?string $remarque;
 
     public static array $etats = ['OK', 'En réparation', 'Endommagé', 'Disparu'];
 
@@ -27,7 +27,7 @@ class Materiel
         $this->etat = '';
         $this->localisation = '';
         $this->descriptif = '';
-        $this->remarque = '';
+        $this->remarque = null;
 
         if (!empty($data))
             $this->hydrate($data);
