@@ -86,9 +86,9 @@
                     </td>
                     <td>
                         <?php if ($emprunt->date_reelle_restitution): ?>
-                            <?= html_entity_decode($emprunt->remarque_restitution, ENT_QUOTES, 'UTF-8') ?>
+                            <?= html_entity_decode(($emprunt->remarque_restitution ?? ''), ENT_QUOTES, 'UTF-8') ?>
                         <?php else: ?>
-                            <?= html_entity_decode($emprunt->remarque, ENT_QUOTES, 'UTF-8') ?>
+                            <?= html_entity_decode(($emprunt->remarque ?? ''), ENT_QUOTES, 'UTF-8') ?>
                         <?php endif; ?>
                     </td>
                     <td>
