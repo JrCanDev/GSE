@@ -181,3 +181,23 @@ option.etat-disparu {
     color: black;
     font-weight: bold;
 }
+
+.card-stat {
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 32px !important;
+}
+
+.row-total {
+    border-top: 2px solid #4CAF50 !important;
+    background-color: #e8f5e9 !important;
+    color: #2e7d32 !important;
+}
+
+.w3-table-all tbody tr:hover {
+    background-color: #f1f1f1 !important;
+}
+
+.bg-gradient-teal i {
+    vertical-align: middle;
+}
