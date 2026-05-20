@@ -39,11 +39,17 @@
             </div>
             <div class="w3-third">
                 <label><b>État<span style="color: red;">*</span></b></label>
-                <select class="w3-select w3-border w3-round w3-center" name="etat" required>
-                    <?php foreach (Materiel::$etats as $etat): ?>
-                        <option value="<?= htmlspecialchars($etat) ?>" <?= $materiel->etat === $etat ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($etat) ?>
-                        </option>
+                <select id="etat" onchange="changerCouleurSelect(this)" class="w3-select w3-border w3-round w3-center" name="etat"
+                    onchange="changerCouleurSelect(this)" required>
+                    <?php foreach (Materiel::$etats as $etat):
+                        $classEtat = '';
+                        if ($etat === 'OK') $classEtat = 'etat-ok';
+                        elseif ($etat === 'En réparation') $classEtat = 'etat-reparation';
+                        elseif ($etat === 'Endommagé') $classEtat = 'etat-endommage';
+                        elseif ($etat === 'Disparu') $classEtat = 'etat-disparu';
+                    ?>
+                        <option <?= $materiel->etat === $etat ? 'selected' : '' ?>
+                            class="<?= $classEtat ?>" value="<?= sanitize($etat) ?>"><?= sanitize($etat) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -135,7 +141,22 @@
         </div>
 
         <script>
-            document.querySelector("input[name='lastname']").focus();
+            document.querySelector("input[name='nom']").focus();
+
+            function changerCouleurSelect(selectElement) {
+                const optionSelectionnee = selectElement.options[selectElement.selectedIndex];
+
+                selectElement.classList.remove('etat-ok', 'etat-reparation', 'etat-endommage', 'etat-disparu');
+
+                if (optionSelectionnee.className) {
+                    selectElement.classList.add(optionSelectionnee.className);
+                }
+            }
+
+            const selectEtat = document.querySelector("select[name='etat']");
+            if (selectEtat) {
+                changerCouleurSelect(selectEtat);
+            }
 
             function filtrerMateriel() {
                 let input = document.getElementById('searchBar').value.toLowerCase();
