@@ -114,23 +114,27 @@ SELECT
 FROM groupes
 ORDER BY id_groupe;
 
--- Création de la vue pour les statistiques
-CREATE VIEW vw_stats_ordinateurs_par_annee AS
-SELECT 
-    -- Calcule l'année universitaire de l'emprunt (ex: '2025-2026')
-    CASE 
-        WHEN EXTRACT(MONTH FROM E.date_emprunt) >= 9 
-        THEN EXTRACT(YEAR FROM E.date_emprunt) || '-' || (EXTRACT(YEAR FROM E.date_emprunt) + 1)
-        ELSE (EXTRACT(YEAR FROM E.date_emprunt) - 1) || '-' || EXTRACT(YEAR FROM E.date_emprunt)
-    END AS annee_universitaire,
-    G.nom_groupe,
-    COUNT(E.id_emprunt) AS nombre_prets
-FROM emprunts AS E
-INNER JOIN groupes AS G ON E.id_groupe = G.id_groupe
-INNER JOIN materiels AS M ON E.id_materiel = M.id_materiel
-WHERE M.nom ILIKE '%PC%' OR M.nom ILIKE '%Ordi%' OR M.modele ILIKE '%PC%'
-GROUP BY annee_universitaire, G.nom_groupe
-ORDER BY annee_universitaire DESC, nombre_prets DESC;
+-- Vue pour afficher les statistiques de prêts par année universitaire et groupe
+CREATE OR REPLACE FUNCTION stats_materiels_filtre(recherche TEXT)
+RETURNS TABLE(annee_universitaire TEXT, nom_groupe VARCHAR, nombre_prets BIGINT) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        CASE 
+            WHEN EXTRACT(MONTH FROM E.date_emprunt) >= 9 
+            THEN EXTRACT(YEAR FROM E.date_emprunt) || '-' || (EXTRACT(YEAR FROM E.date_emprunt) + 1)
+            ELSE (EXTRACT(YEAR FROM E.date_emprunt) - 1) || '-' || EXTRACT(YEAR FROM E.date_emprunt)
+        END AS annee_universitaire,
+        G.nom_groupe,
+        COUNT(E.id_emprunt) AS nombre_prets
+    FROM emprunts AS E
+    INNER JOIN groupes AS G ON E.id_groupe = G.id_groupe
+    INNER JOIN materiels AS M ON E.id_materiel = M.id_materiel
+    WHERE M.nom ILIKE '%' || recherche || '%' OR M.modele ILIKE '%' || recherche || '%'
+    GROUP BY annee_universitaire, G.nom_groupe
+    ORDER BY annee_universitaire DESC, nombre_prets DESC;
+END;
+$$ LANGUAGE plpgsql;
 
 -- Fonction pour insérer un nouveau matériel
 CREATE OR REPLACE FUNCTION create_materiel(

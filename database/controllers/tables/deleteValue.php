@@ -56,15 +56,25 @@ try {
     if (isset($meta['name'])) $metaByName[$meta['name']] = $meta;
   }
 
+  $pkColumns = array_values(array_filter($columnMetadata, function ($column) {
+    return is_array($column['pk'] ?? null) && isset($column['pk']['column_name']);
+  }));
+  $deleteColumns = !empty($pkColumns) ? $pkColumns : $columnMetadata;
+
   $i = 0;
-  foreach ($values as $key => $value) {
-    $colMeta = $metaByName[$key] ?? null;
-    $type = $colMeta['type'] ?? null;
+  foreach ($deleteColumns as $column) {
+    $key = $column['name'];
+    $value = $values[$key] ?? null;
+    $type = $column['type'] ?? ($metaByName[$key]['type'] ?? null);
     $validatedValue = validateTypeOutbound($value, $type);
 
-    // If the original value is an empty string, compare to empty string
+    // Empty string is valid only for text-like columns; other types must use NULL
     if ($value === '') {
-      $search[] = "$key = ''";
+      if (in_array($type, ['text', 'character varying', 'char'], true)) {
+        $search[] = "$key = ''";
+      } else {
+        $search[] = "$key IS NULL";
+      }
     } elseif (is_null($validatedValue)) {
       $search[] = "$key IS NULL";
     } else {

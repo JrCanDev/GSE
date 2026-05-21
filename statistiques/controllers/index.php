@@ -2,7 +2,8 @@
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/statistique.class.php');
 
-$stats = Statistiques::getComputerStatisticsByYear($db);
+$rechercheInitiale = 'PC';
+$stats = Statistique::getStatisticsByYear($db, $rechercheInitiale);
 
 $fluxParAnnee = [];
 foreach ($stats as $ligne) {
@@ -13,7 +14,6 @@ if (empty($fluxParAnnee)) {
     $listeAnnees = [];
     $matriceData = [];
 } else {
-    // on extrait la liste des années universitaires (triée) pour construire l'axe X du graphique
     $listeAnnees = array_keys($fluxParAnnee);
     sort($listeAnnees);
 
@@ -31,6 +31,5 @@ if (empty($fluxParAnnee)) {
             $totalGeneral += $nbPrets;
         }
     }
-
     ksort($matriceData);
 }
