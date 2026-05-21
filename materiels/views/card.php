@@ -35,7 +35,7 @@
             <div class="w3-third">
                 <label><b>Étiquette ULCO</b></label>
                 <input placeholder="10xxx" class="w3-input w3-border w3-round w3-center"
-                    type="text" name="etiquette_ulco" required value="<?= sanitize($materiel->etiquette_ulco) ?>">
+                    type="text" name="etiquette_ulco" value="<?= sanitize($materiel->etiquette_ulco) ?>">
             </div>
             <div class="w3-third">
                 <label><b>État<span style="color: red;">*</span></b></label>
@@ -69,12 +69,13 @@
                 placeholder="Processeur : Intel Core i5-9500F" rows="3"><?= desanitize($materiel->descriptif) ?></textarea>
         </div>
 
+        <!-- Historique -->
         <h3 style="padding-top: 10px;"><b>Historique</b></h3>
 
         <div class="w3-margin-top">
             <table class="w3-table w3-striped w3-bordered w3-small">
                 <thead>
-                    <tr class="w3-light-gray">
+                    <tr class="w3-blue">
                         <th>Nom</th>
                         <th>Prénom</th>
                         <th>Année</th>
@@ -129,7 +130,7 @@
         <div class="w3-row-padding w3-margin-top">
             <!-- Bouton Mettre à jour -->
             <div class="w3-half w3-right">
-                <input class="w3-button w3-teal w3-round" type="submit"
+                <input class="w3-button w3-blue w3-round" type="submit"
                     value="Mettre à jour le matériel" name="update">
             </div>
 

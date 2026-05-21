@@ -1,6 +1,6 @@
 <div class="w3-container w3-margin-top w3-padding-large">
     <div class="w3-center w3-margin-bottom">
-        <h2><i class="fa fa-bar-chart w3-margin-right"></i><b>Statistiques d'Emprunts de Matériel</b></h2>
+        <h2><i class="w3-margin-right"></i><b>Statistiques d'Emprunts de Matériel</b></h2>
         <p class="w3-text-grey">Évolution du volume de prêts d'ordinateurs par groupe et année universitaire</p>
     </div>
 
@@ -15,11 +15,11 @@
     else:
     ?>
 
-        <div class="w3-card-4 w3-white w3-margin-bottom w3-round card-stat">
+        <div class="w3-card-4 w3-margin-bottom w3-round card-stat">
             <div class="w3-container w3-padding-16" style="overflow-x: auto;">
-                <table class="w3-table-all w3-hoverable w3-centered w3-card">
+                <table class="w3-table-all w3-centered w3-card">
                     <thead>
-                        <tr class="w3-teal bg-gradient-teal w3-text-white">
+                        <tr class="w3-blue bg-gradient-teal w3-text-white">
                             <th style="text-align: left;" class="w3-padding-large"><i class="fa fa-users w3-margin-right"></i>Groupe / Promotion</th>
 
                             <?php foreach ($listeAnnees as $annee): ?>
@@ -46,7 +46,7 @@
                                         <?php if ($nbPrets > 0): ?>
                                             <?= $nbPrets ?>
                                         <?php else: ?>
-                                            <span class="w3-text-light-grey">-</span> 
+                                            <span>0</span> 
                                         <?php endif; ?>
                                     </td>
                                 <?php endforeach; ?>

@@ -5,7 +5,7 @@
 <h2><b>Groupes actifs</b></h2>
 <table class="w3-table w3-striped w3-small w3-bordered w3-border">
     <thead>
-        <tr class="w3-light-gray">
+        <tr class="w3-blue  ">
             <th>Nom du groupe <span class="sort-arrow"></span></th>
             <th>Date de restitution <span class="sort-arrow"></span></th>
             <th>Actions</th>
@@ -41,7 +41,7 @@
 <h2 style="padding-top: 30px;"><b>Groupes inactifs</b></h2>
 <table class="w3-table w3-striped w3-small w3-bordered w3-border">
     <thead>
-        <tr class="w3-light-gray">
+        <tr class="w3-blue">
             <th>Nom du groupe</th>
             <th>Date de restitution</th>
             <th>Actions</th>

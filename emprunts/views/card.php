@@ -85,7 +85,7 @@
         <div class="w3-row-padding w3-margin-top">
             <!-- Bouton Mettre à jour -->
             <div class="w3-half w3-right">
-                <input class="w3-button w3-teal w3-round" type="submit"
+                <input class="w3-button w3-blue w3-round" type="submit"
                     value="Mettre à jour l'emprunt" name="update">
             </div>
 

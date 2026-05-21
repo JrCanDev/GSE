@@ -12,7 +12,7 @@
 
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
-        <tr class="w3-light-gray">
+        <tr class="w3-blue">
             <th>Nom <span class="sort-arrow"></span></th>
             <th>Prénom <span class="sort-arrow"></span></th>
             <th>Année <span class="sort-arrow"></span></th>

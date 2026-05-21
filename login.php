@@ -41,11 +41,11 @@ $db = require(dirname(__FILE__) . '/lib/mypdo.php');
                     <div class="w3-margin">
                         <?php if (is_null($db)) {
                         ?>
-                            <input type="submit" name="connect" value="Impossible de se connecter" disabled class="w3-light-green w3-button"/>
+                            <input type="submit" name="connect" value="Impossible de se connecter" disabled class="w3-red w3-button"/>
                         <?php
                         } else {
                         ?>
-                            <input type="submit" name="connect" value="Se connecter" class="w3-light-green w3-button"/>
+                            <input type="submit" name="connect" value="Se connecter" class="w3-blue w3-button"/>
                         <?php
                         }
                         ?>

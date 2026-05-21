@@ -57,7 +57,7 @@ if (isset($_GET['uname'])) {
                         </div>
                     </div>
                     <div class="w3-margin w3-container">
-                        <input type="submit" name="register" value="Définir le mot de passe" class="w3-right w3-button w3-light-green"/>
+                        <input type="submit" name="register" value="Définir le mot de passe" class="w3-right w3-button w3-blue"/>
                         <a href="index.php" class="w3-button w3-red w3-left">Annuler</a>
                     </div>
                 </div>

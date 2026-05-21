@@ -28,7 +28,7 @@
             </div>
             <div class="w3-third">
                 <label><b>Étiquette ULCO</b></label>
-                <input placeholder="10xxx" class="w3-input w3-border w3-round w3-center" type="text" name="etiquette_ulco" required>
+                <input placeholder="10xxx" class="w3-input w3-border w3-round w3-center" type="text" name="etiquette_ulco">
             </div>
             <div class="w3-third">
                 <label><b>État<span style="color: red;">*</span></b></label>
@@ -65,7 +65,7 @@
         <div class="w3-row-padding w3-margin-top">
             <!-- Bouton Créer -->
             <div class="w3-half w3-right">
-                <input class="w3-button w3-teal w3-round" type="submit"
+                <input class="w3-button w3-blue w3-round" type="submit"
                     value="Ajouter le matériel" name="submit">
             </div>
 
