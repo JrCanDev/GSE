@@ -15,7 +15,6 @@ if (isset($_POST["submit"])) {
         "nom_emprunteur" => FILTER_UNSAFE_RAW,
         "prenom_emprunteur" => FILTER_UNSAFE_RAW,
         "id_groupe" => FILTER_VALIDATE_INT,
-        "id_materiel" => FILTER_VALIDATE_INT,
         "date_emprunt" => FILTER_UNSAFE_RAW,
         "date_prevue_restitution" => FILTER_UNSAFE_RAW,
         "caution" => FILTER_UNSAFE_RAW,
@@ -32,10 +31,33 @@ if (isset($_POST["submit"])) {
         exit(1);
     }
 
+    $ids_materiels = $_POST['ids_materiels'] ?? [];
+    if (!is_array($ids_materiels)) {
+        $ids_materiels = [$ids_materiels];
+    }
+
+    $ids_materiels = array_values(array_unique(array_filter(array_map('intval', $ids_materiels), function ($id_materiel) {
+        return $id_materiel > 0;
+    })));
+
+    if (empty($ids_materiels)) {
+        $_SESSION['mesgs']['errors'][] = "Veuillez sélectionner au moins un matériel.";
+        header("Location: " . $_SERVER['PHP_SELF'] . "?element=emprunts&action=add");
+        exit(1);
+    }
+
+    foreach ($ids_materiels as $id_materiel) {
+        if (!Materiel::estDisponible($db, $id_materiel)) {
+            $_SESSION['mesgs']['errors'][] = "Le matériel #" . $id_materiel . " n'est plus disponible.";
+            header("Location: " . $_SERVER['PHP_SELF'] . "?element=emprunts&action=add");
+            exit(1);
+        }
+    }
+
+    $data['ids_materiels'] = $ids_materiels;
+
     $emprunt = new Emprunt($db, $data);
     $emprunt->create();
-
-    $_SESSION['mesgs']['confirm'][] = "Emprunt créé avec succès ! ";
 
     header("Location: " . $_SERVER['PHP_SELF'] . "?element=emprunts");
     exit(1);

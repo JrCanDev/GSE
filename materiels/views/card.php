@@ -109,7 +109,7 @@
                                 }
                                 ?>
 
-                                <td style="<?= $is_late ? 'color: red; font-weight: bold;' : '' ?>">
+                                <td class="<?= $is_late ? 'w3-text-red' : '' ?>">
                                     <?= formatDisplayDate(sanitize($emprunt->date_reelle_restitution)) ?>
                                 </td>
                                 <td><?= sanitize($emprunt->remarque_restitution) ?></td>

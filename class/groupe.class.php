@@ -60,6 +60,7 @@ class Groupe
             if ($result) {
                 $this->id_groupe = $result['id_groupe'];
             }
+            $_SESSION['mesgs']['confirm'][] = "Groupe créé avec succès ! ";
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
         }
@@ -94,6 +95,7 @@ class Groupe
             $stmt->bindValue(':date_restitution', $this->date_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':est_affiche', $this->est_affiche, PDO::PARAM_BOOL);
             $stmt->execute();
+            $_SESSION['mesgs']['confirm'][] = "Groupe mis à jour avec succès.";
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
         }

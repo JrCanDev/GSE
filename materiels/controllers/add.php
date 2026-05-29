@@ -24,8 +24,6 @@ if (isset($_POST["submit"])) {
     $materiel = new Materiel($db, $data);
     $materiel->create();
 
-    $_SESSION['mesgs']['confirm'][] = "Matériel créé avec succès ! ";
-
     header("Location: " . $_SERVER['PHP_SELF'] . "?element=materiels");
     exit(1);
 }

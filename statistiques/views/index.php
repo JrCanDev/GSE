@@ -62,7 +62,7 @@
         </div>
 
         <div class="w3-card-4 w3-round" style="max-width: 900px; margin: 20px auto;">
-            <canvas id="myChart"></canvas>
+            <canvas id="chart"></canvas>
         </div>
     </div>
 </div>
@@ -72,7 +72,7 @@
     const paletteCouleurs = ['#ffeb3b', '#f44336', '#03a9f4', '#4caf50', '#ff9800', '#009688'];
 
     // Initialisation Chart.js avec les données initiales de PHP
-    const ctx = document.getElementById('myChart');
+    const ctx = document.getElementById('chart');
     let myChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -249,6 +249,7 @@
         chargerStats(e.target.value.trim());
     }));
 
+    // par défaut, on affiche les stats pour les "PC" à l'ouverture de la page
     document.getElementById('searchBarStats').value = 'PC';
     chargerStats('PC');
 </script>

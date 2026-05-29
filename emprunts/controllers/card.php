@@ -17,15 +17,34 @@ if (!isset($_POST['id_emprunt']) || empty($_POST['id_emprunt'])) {
 $id_emprunt = $_POST['id_emprunt'];
 $emprunt = new Emprunt($db);
 $emprunt->fetch($id_emprunt);
+$materiels = $emprunt->fetchMateriels();
+
+if (isset($_POST['return_material'])) {
+    $id_materiel = filter_input(INPUT_POST, 'id_materiel', FILTER_VALIDATE_INT);
+    if (!$id_materiel) {
+        $_SESSION['mesgs']['errors'][] = "ID du matériel non spécifié.";
+        header("Location: index.php?element=emprunts");
+        exit(-1);
+    }
+
+    $etat_restitution = sanitize($_POST['etat_restitution'] ?? '');
+    if (!in_array($etat_restitution, Materiel::$etats, true)) {
+        $etat_restitution = null;
+    }
+
+    $remarque_restitution = html_entity_decode($_POST['remarque_restitution'] ?? '', ENT_QUOTES, 'UTF-8');
+    if ($remarque_restitution === '') {
+        $remarque_restitution = null;
+    }
+
+    $emprunt->rendreMateriel($id_materiel, $etat_restitution, $remarque_restitution, date('Y-m-d'));
+
+    header("Location: index.php?element=emprunts");
+    exit;
+}
 
 if (isset($_POST['update'])) {
     $emprunt->date_prevue_restitution = sanitize($_POST['date_prevue_restitution']) ?? $emprunt->date_prevue_restitution;
-
-    if (isset($_POST['date_reelle_restitution']) && !empty($_POST['date_reelle_restitution'])) {
-        $emprunt->date_reelle_restitution = sanitize($_POST['date_reelle_restitution']);
-    } else {
-        $emprunt->date_reelle_restitution = null;
-    }
 
     $caution = sanitize($_POST['caution'] ?? null);
     if (in_array($caution, Emprunt::$cautions, true)) {
@@ -34,17 +53,8 @@ if (isset($_POST['update'])) {
 
     $emprunt->remarque = html_entity_decode($_POST['remarque'], ENT_QUOTES, 'UTF-8') ?? $emprunt->remarque;
 
-    if ($emprunt->date_reelle_restitution) {
-        $emprunt->etat_restitution = sanitize($_POST['etat_restitution']) ?? $emprunt->etat_restitution;
-        $emprunt->remarque_restitution = html_entity_decode($_POST['remarque_restitution'], ENT_QUOTES, 'UTF-8') ?? $emprunt->remarque_restitution;
-    } else {
-        $emprunt->etat_restitution = null;
-        $emprunt->remarque_restitution = null;
-    }
-
     $emprunt->update();
-
-    $_SESSION['mesgs']['confirm'][] = "Emprunt mis à jour avec succès.";
+    
     header("Location: index.php?element=emprunts");
     exit;
 }

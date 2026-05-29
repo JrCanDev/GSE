@@ -23,7 +23,22 @@ foreach ($emprunts as $e) {
         
         if ($date_prevue && $date_prevue->format('Y-m-d') < $now->format('Y-m-d')) {
             $retards++;
-            $overdues[] = $e;
+            // Construire un objet léger pour la vue contenant le nom du matériel
+            $materielsLot = $e->fetchMateriels();
+            $nomMateriel = '';
+            if ($materielsLot && isset($materielsLot[0]['nom_materiel'])) {
+                $nomMateriel = $materielsLot[0]['nom_materiel'];
+            } elseif (!empty($e->materiels_resume)) {
+                $nomMateriel = $e->materiels_resume;
+            }
+
+            $obj = new stdClass();
+            $obj->nom_emprunteur = $e->nom_emprunteur;
+            $obj->prenom_emprunteur = $e->prenom_emprunteur;
+            $obj->date_prevue_restitution = $e->date_prevue_restitution;
+            $obj->nom_materiel = $nomMateriel;
+
+            $overdues[] = $obj;
         }
     }
 }

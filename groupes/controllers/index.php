@@ -23,8 +23,6 @@ if (isset($_POST["toggle_state"]) && isset($_POST["id"]) && !empty($_POST["id"])
     $groupe->est_affiche = !$groupe->est_affiche;
     $groupe->update();
 
-    $_SESSION['mesgs']['confirm'][] = "État du groupe mis à jour avec succès.";
-
     header("Location: index.php?element=groupes");
     exit(1);
 }

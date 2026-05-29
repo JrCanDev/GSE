@@ -30,14 +30,16 @@
         <?php if ($emprunts): ?>
             <?php foreach ($emprunts as $emprunt): ?>
                 <?php
+                $materielsLot = $emprunt->fetchMateriels();
                 $today = new DateTime();
                 $date_prevue = new DateTime($emprunt->date_prevue_restitution);
                 $date_reelle = $emprunt->date_reelle_restitution ? new DateTime($emprunt->date_reelle_restitution) : null;
                 $is_late = ($today > $date_prevue && !$date_reelle) || ($date_reelle && $date_reelle > $date_prevue);
                 $row_style = $date_reelle ? 'opacity: 0.5;' : '';
+                $afficherCompteurLot = ((int) $emprunt->nombre_materiels) > 1;
 
+                $etat = $emprunt->date_reelle_restitution ? $emprunt->etat_restitution : 'En cours';
                 $etat_class = '';
-                $etat = $emprunt->date_reelle_restitution ? $emprunt->etat_restitution : $emprunt->etat;
 
                 if ($etat === 'OK') {
                     $etat_class = 'w3-text-green';
@@ -45,6 +47,8 @@
                     $etat_class = 'w3-text-red';
                 } elseif ($etat === 'En réparation') {
                     $etat_class = 'w3-text-orange';
+                } elseif ($etat === 'En cours') {
+                    $etat_class = 'w3-text-blue';
                 }
                 ?>
 
@@ -63,26 +67,19 @@
                         <?php endif; ?>
                     </td>
                     <td>
-                        <form action="?element=materiels&action=card" method="post">
-                            <input type="hidden" name="id_materiel" value="<?= $emprunt->id_materiel ?>">
-                            <input type="hidden" name="old_page" value="emprunts">
-                            <button type="submit" class="w3-button w3-small w3-border w3-round"><?= sanitize($emprunt->nom_materiel) ?></button>
-                        </form>
-                    </td>
-                    <td style="display:none;">
-                        <?= sanitize($emprunt->etiquette_ulco_materiel) ?>
-                        <?= sanitize($emprunt->modele_materiel) ?>
+                        <?php if ($afficherCompteurLot): ?>
+                            <div>
+                                <b><?= (int) $emprunt->nombre_materiels_rendus ?> / <?= (int) $emprunt->nombre_materiels ?></b>
+                            </div>
+                        <?php endif; ?>
+                        <div><?= sanitize($emprunt->materiels_resume) ?></div>
                     </td>
                     <td><?= formatDisplayDate(sanitize($emprunt->date_prevue_restitution)) ?></td>
                     <td style="<?= $is_late ? 'color: red; font-weight: bold;' : '' ?>">
                         <?= formatDisplayDate(sanitize($emprunt->date_reelle_restitution)) ?>
                     </td>
                     <td class="<?= $etat_class ?>" style="font-weight: bold;">
-                        <?php if ($emprunt->date_reelle_restitution): ?>
-                            <?= sanitize($emprunt->etat_restitution) ?>
-                        <?php else: ?>
-                            <?= sanitize($emprunt->etat) ?>
-                        <?php endif; ?>
+                        <?= sanitize($etat) ?>
                     </td>
                     <td>
                         <?php if ($emprunt->date_reelle_restitution): ?>
@@ -97,29 +94,94 @@
                             <button type="submit" name="submit" class="w3-button w3-small w3-border w3-round">✏️</button>
                         </form>
 
-                        <dialog class="w3-round-large" id="confirmation-emprunt-dialog">
-                            <p>
-                                L'état du matériel actuel est "<span class="<?= $etat_class ?>"><?= sanitize($emprunt->etat) ?></span>" </br> Êtes-vous sûr de valider maintenant ?
-                            </p>
+                        <?php if (!$emprunt->date_reelle_restitution): ?>
+                            <button command="show-modal" commandfor="confirmation-emprunt-dialog-<?= $emprunt->id_emprunt ?>" class="w3-button w3-small w3-border w3-round">📥</button>
+                        <?php endif; ?>
 
-                            <div class="dialog-buttons">
-                                <button commandfor="confirmation-emprunt-dialog" command="close" class="w3-button w3-small w3-border w3-round">Annuler</button>
+                        <dialog class="w3-round-large" id="confirmation-emprunt-dialog-<?= $emprunt->id_emprunt ?>">
+                            <div style="min-width: 700px; max-width: 900px;">
+                                <h3>Rendu du lot</h3>
+                                <p>
+                                    Emprunt de <b><?= sanitize($emprunt->nom_emprunteur) ?> <?= sanitize($emprunt->prenom_emprunteur) ?></b>
+                                    pour <b><?= sanitize($emprunt->nom_groupe) ?></b>.
+                                </p>
+                                <p>
+                                    <?php if ($afficherCompteurLot): ?>
+                                        <b><?= (int) $emprunt->nombre_materiels_rendus ?> / <?= (int) $emprunt->nombre_materiels ?></b> matériel(s) rendu(s)
+                                    <?php else: ?>
+                                        <b>Lot unique</b>
+                                    <?php endif; ?>
+                                </p>
 
-                                <form action="?element=materiels&action=card" method="post">
-                                    <input type="hidden" name="id_materiel" value="<?= $emprunt->id_materiel ?>">
-                                    <button type="submit" class="w3-button w3-small w3-border w3-round">Changer l'état</button>
-                                </form>
+                                <table class="w3-table w3-bordered w3-small w3-margin-bottom">
+                                    <thead>
+                                        <tr class="w3-blue">
+                                            <th>Matériel</th>
+                                            <th>État actuel</th>
+                                            <th>Rendu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if ($materielsLot): ?>
+                                            <?php foreach ($materielsLot as $materiel): ?>
+                                                <tr>
+                                                    <td>
+                                                        <b><?= sanitize($materiel['nom_materiel']) ?></b><br>
+                                                        <?= sanitize($materiel['modele_materiel']) ?><br>
+                                                        <?= sanitize($materiel['etiquette_ulco_materiel']) ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php if (!empty($materiel['date_reelle_restitution'])): ?>
+                                                            <span class="w3-text-green"><b>Déjà rendu</b></span><br>
+                                                            <?= sanitize($materiel['etat_restitution']) ?>
+                                                        <?php else: ?>
+                                                            <span class="w3-text-blue">En cours</span><br>
+                                                            <?php
+                                                            if ($materiel['etat_materiel'] === 'OK') {
+                                                                echo '<span class="w3-text-green">OK</span>';
+                                                            } elseif ($materiel['etat_materiel'] === 'Endommagé') {
+                                                                echo '<span class="w3-text-red">Endommagé</span>';
+                                                            } elseif ($materiel['etat_materiel'] === 'En réparation') {
+                                                                echo '<span class="w3-text-orange">En réparation</span>';
+                                                            } elseif ($materiel['etat_materiel'] === 'En cours') {
+                                                                echo '<span class="w3-text-blue">En cours</span>';
+                                                            }
+                                                            ?>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php if (empty($materiel['date_reelle_restitution'])): ?>
+                                                            <form action="?element=emprunts&action=card" method="post" class="w3-container w3-padding-0">
+                                                                <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
+                                                                <input type="hidden" name="id_materiel" value="<?= $materiel['id_materiel'] ?>">
+                                                                <select class="w3-select w3-border w3-round w3-margin-bottom" name="etat_restitution" required>
+                                                                    <option value="" disabled selected>État</option>
+                                                                    <?php foreach (Materiel::$etats as $etatMateriel): ?>
+                                                                        <option value="<?= sanitize($etatMateriel) ?>"><?= sanitize($etatMateriel) ?></option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                                <input class="w3-input w3-border w3-round w3-margin-bottom" type="text" name="remarque_restitution" placeholder="Remarque de restitution">
+                                                                <button type="submit" name="return_material" class="w3-button w3-small w3-blue w3-round">Rendre</button>
+                                                            </form>
+                                                        <?php else: ?>
+                                                            <span class="w3-text-green">Terminé</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="3">Aucun matériel associé à cet emprunt.</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
 
-                                <form action="?element=emprunts" method="post">
-                                    <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
-                                    <button type="submit" name="submit_date" class="w3-button w3-small w3-border w3-round">Valider</button>
-                                </form>
+                                <div class="dialog-buttons">
+                                    <button commandfor="confirmation-emprunt-dialog-<?= $emprunt->id_emprunt ?>" command="close" class="w3-button w3-small w3-border w3-round">Fermer</button>
+                                </div>
                             </div>
                         </dialog>
-
-                        <?php if (!$emprunt->date_reelle_restitution): ?>
-                            <button command="show-modal" commandfor="confirmation-emprunt-dialog" name="submit_date" class="w3-button w3-small w3-border w3-round">📥</button>
-                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

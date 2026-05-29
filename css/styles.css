@@ -120,9 +120,21 @@ footer {
 }
 
 .selection-materiel {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   transition: all 0.3s ease;
   cursor: pointer;
   user-select: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.selection-materiel span {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .selection-materiel-selected {
@@ -136,6 +148,10 @@ footer {
   opacity: 50%;
   cursor: not-allowed;
   user-select: none;
+}
+
+.item-materiel {
+  overflow: hidden;
 }
 
 .scroll-container {

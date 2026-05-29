@@ -23,19 +23,18 @@ $materiel->fetch($id_materiel);
 $emprunts = Emprunt::fetchAllByMaterielId($db, $id_materiel);
 
 if (isset($_POST['update'])) {
-    $materiel->nom              = isset($_POST['nom']) ? trim($_POST['nom']) : $materiel->nom;
-    $materiel->modele           = isset($_POST['modele']) ? trim($_POST['modele']) : $materiel->modele;
-    $materiel->annee            = (!empty($_POST['annee'])) ? intval($_POST['annee']) : null;
-    $materiel->etiquette_ulco   = isset($_POST['etiquette_ulco']) ? trim($_POST['etiquette_ulco']) : $materiel->etiquette_ulco;
-    $materiel->etat             = isset($_POST['etat']) ? trim($_POST['etat']) : $materiel->etat;
-    $materiel->localisation     = isset($_POST['localisation']) ? trim($_POST['localisation']) : $materiel->localisation;
-    $materiel->descriptif       = isset($_POST['descriptif']) ? trim($_POST['descriptif']) : $materiel->descriptif;
-    
-    $materiel->remarque         = (!empty($_POST['remarque'])) ? trim($_POST['remarque']) : null;
+    $materiel->nom = isset($_POST['nom']) ? trim($_POST['nom']) : $materiel->nom;
+    $materiel->modele = isset($_POST['modele']) ? trim($_POST['modele']) : $materiel->modele;
+    $materiel->annee = (!empty($_POST['annee'])) ? intval($_POST['annee']) : null;
+    $materiel->etiquette_ulco = isset($_POST['etiquette_ulco']) ? trim($_POST['etiquette_ulco']) : $materiel->etiquette_ulco;
+    $materiel->etat = isset($_POST['etat']) ? trim($_POST['etat']) : $materiel->etat;
+    $materiel->localisation = isset($_POST['localisation']) ? trim($_POST['localisation']) : $materiel->localisation;
+    $materiel->descriptif = isset($_POST['descriptif']) ? trim($_POST['descriptif']) : $materiel->descriptif;
+
+    $materiel->remarque = (!empty($_POST['remarque'])) ? trim($_POST['remarque']) : null;
 
     $materiel->update();
 
-    $_SESSION['mesgs']['confirm'][] = "Matériel mis à jour avec succès.";
     header("Location: index.php?element=" . $old_page);
     exit;
 }

@@ -21,8 +21,6 @@ if (isset($_POST["submit"])) {
     $groupe = new Groupe($db, $data);
     $groupe->create();
 
-    $_SESSION['mesgs']['confirm'][] = "Groupe créé avec succès ! ";
-
     header("Location: " . $_SERVER['PHP_SELF'] . "?element=groupes");
     exit(1);
 }

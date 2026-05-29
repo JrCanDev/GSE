@@ -63,27 +63,39 @@
             placeholder="Rechercher par nom, ID ou modèle...">
 
         <div>
-            <input type="hidden" name="id_materiel" id="id_materiel" value="-1">
             <div class="scroll-container w3-margin-top">
                 <div class="w3-row-padding">
                     <?php foreach ($materiels as $m): ?>
                         <div class="w3-third w3-margin-bottom item-materiel">
                             <?php
                             // Si le matériel n'est pas disponible, on grise la carte et on empêche la sélection
-                            $classes = "w3-border w3-round-xxlarge w3-center w3-padding-small";
+                            $classes = "w3-border w3-round-xxlarge w3-center w3-padding-small selection-materiel";
                             $estDisponible = Materiel::estDisponible($db, $m->id_materiel);
+                            $etiquetteUlco = trim((string) ($m->etiquette_ulco ?? ''));
+                            $modele = trim((string) ($m->modele ?? ''));
+                            $infosMateriel = [$m->nom];
+                            if ($etiquetteUlco !== '') {
+                                $infosMateriel[] = $etiquetteUlco;
+                            }
+                            if ($modele !== '') {
+                                $infosMateriel[] = $modele;
+                            }
                             if (!$estDisponible) {
                                 $classes .= " selection-materiel-indisponible";
-                            } else {
-                                $classes .= " selection-materiel";
                             }
                             ?>
-                            <div onclick="toggleSelect(this, '<?= $m->id_materiel ?>', '<?= $estDisponible ? 1 : 0 ?>')"
-                                class="<?= $classes ?>">
-                                <span class="txt-nom"><b><?= $m->nom ?></b></span> |
-                                <span class="txt-id"><b><?= $m->id_materiel ?></b></span> |
-                                <span class="txt-modele"><b><?= $m->modele ?></b></span>
-                            </div>
+                            <label class="<?= $classes ?>" for="materiel-<?= $m->id_materiel ?>">
+                                <input
+                                    class="materiel-checkbox"
+                                    type="checkbox"
+                                    id="materiel-<?= $m->id_materiel ?>"
+                                    name="ids_materiels[]"
+                                    value="<?= $m->id_materiel ?>"
+                                    style="display:none;"
+                                    <?= $estDisponible ? '' : 'disabled' ?>
+                                    onchange="toggleMaterielSelection(this)">
+                                <span class="txt-materiel"><b><?= sanitize(implode(' | ', $infosMateriel)) ?></b></span>
+                            </label>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -116,7 +128,11 @@
                 if (!select || !inputDate) return;
 
                 const setDateFromOption = (opt) => {
-                    if (!opt) { inputDate.value = ''; return; }
+                    if (!opt) {
+                        inputDate.value = '';
+                        return;
+                    }
+                    
                     const d = opt.dataset.dateRestitution || '';
                     inputDate.value = d;
                 };
@@ -134,11 +150,11 @@
             appliquerDateSelonAnnee();
 
             function verifierSelectionMateriel(event) {
-                const inputUnique = document.getElementById('id_materiel');
+                const selection = document.querySelectorAll('.materiel-checkbox:checked');
                 
-                if (inputUnique.value === "-1") {
+                if (selection.length === 0) {
                     event.preventDefault();
-                    alert("Veuillez sélectionner un matériel avant de créer l'emprunt.");
+                    alert("Veuillez sélectionner au moins un matériel avant de créer l'emprunt.");
                 }
             }
 
@@ -159,55 +175,16 @@
                 }
             }
 
-            function toggleSelect(element, inputId, estDisponible) {
-                const inputUnique = document.getElementById('id_materiel');
+            function toggleMaterielSelection(input) {
+                const card = input.closest('.selection-materiel');
 
-                if (estDisponible == "0" || estDisponible == "") return;
+                if (!card) return;
 
-                // si l'élément est déjà sélectionné, on le désélectionne
-                if (element.classList.contains('selection-materiel-selected')) {
-                    element.classList.remove('selection-materiel-selected');
-                    inputUnique.value = "-1";
-                    reinitialiserVisuel(true);
-                    return;
+                if (input.checked) {
+                    card.classList.add('selection-materiel-selected');
+                } else {
+                    card.classList.remove('selection-materiel-selected');
                 }
-
-                // on désélectionne l'autre élément sélectionné s'il y en a un
-                document.querySelectorAll('.selection-materiel-selected').forEach(el => {
-                    el.classList.remove('selection-materiel-selected');
-                });
-
-                // on sélectionne l'élément cliqué
-                element.classList.add('selection-materiel-selected');
-                inputUnique.value = inputId;
-
-                reinitialiserVisuel(false, element);
-            }
-
-            function reinitialiserVisuel(toutActiver, elementActif = null) {
-                let itemsCliquables = document.querySelectorAll('.selection-materiel');
-
-                itemsCliquables.forEach(el => {
-                    // si toutActiver est vrai, on réinitialise tous les éléments
-                    if (toutActiver) {
-                        el.style.opacity = "1";
-                        el.style.filter = "none";
-                        el.style.pointerEvents = "auto";
-                    }
-                    // sinon, on grise les éléments non sélectionnés
-                    else {
-                        // si l'élément est actif, on le laisse normal, sinon on le grise
-                        if (el === elementActif) {
-                            el.style.opacity = "1";
-                            el.style.filter = "none";
-                        }
-                        // sinon, on le grise
-                        else {
-                            el.style.opacity = "0.4";
-                            el.style.filter = "grayscale(100%)";
-                        }
-                    }
-                });
             }
         </script>
     </form>

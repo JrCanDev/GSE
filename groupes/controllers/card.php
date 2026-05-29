@@ -22,8 +22,7 @@ if (isset($_POST['update'])) {
     $groupe->date_restitution = sanitize($_POST['date_restitution']) ?? $groupe->date_restitution;
 
     $groupe->update();
-
-    $_SESSION['mesgs']['confirm'][] = "Groupe mis à jour avec succès.";
+    
     header("Location: index.php?element=groupes");
     exit;
 }

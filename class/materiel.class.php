@@ -78,6 +78,7 @@ class Materiel
             if ($result) {
                 $this->id_materiel = $result['id_materiel'];
             }
+            $_SESSION['mesgs']['confirm'][] = "Matériel créé avec succès ! ";
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
         }
@@ -117,6 +118,7 @@ class Materiel
             $stmt->bindValue(':descriptif', $this->descriptif, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, PDO::PARAM_STR);
             $stmt->execute();
+            $_SESSION['mesgs']['confirm'][] = "Matériel mis à jour avec succès.";
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
         }
@@ -153,7 +155,8 @@ class Materiel
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($result) {
-                return $result['disponible'];
+                $disponible = $result['disponible'];
+                return $disponible === true || $disponible === 1 || $disponible === '1' || $disponible === 't' || $disponible === 'true';
             }
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
