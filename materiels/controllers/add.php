@@ -21,6 +21,37 @@ if (isset($_POST["submit"])) {
         "descriptif" => FILTER_UNSAFE_RAW,
     ]);
 
+    foreach ($data as $key => $value) {
+        if (is_string($value)) {
+            $data[$key] = trim($value);
+        }
+    }
+
+    if ($data['annee'] === false || $data['annee'] === null || $data['annee'] === '') {
+        $data['annee'] = null;
+    }
+
+    if (empty($data['etiquette_ulco'])) {
+        $data['etiquette_ulco'] = null;
+    }
+
+    if (!empty($data['etiquette_ulco'])) {
+        $existing = Materiel::fetchByEtiquetteUlco($db, $data['etiquette_ulco']);
+        if ($existing) {
+            $label = $existing['nom'] ?? 'Matériel';
+            $modele = trim((string)($existing['modele'] ?? ''));
+            if ($modele !== '') {
+                $label .= ' | ' . $modele;
+            }
+            $id = $existing['id_materiel'] ?? null;
+            $_SESSION['mesgs']['errors'][] = $id
+                ? "Cette étiquette ULCO est déjà utilisée par le matériel #$id ($label)."
+                : "Cette étiquette ULCO est déjà utilisée par un autre matériel.";
+            header("Location: " . $_SERVER['PHP_SELF'] . "?element=materiels&action=add");
+            exit(1);
+        }
+    }
+
     $materiel = new Materiel($db, $data);
     $materiel->create();
 

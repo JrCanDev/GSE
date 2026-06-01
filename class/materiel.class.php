@@ -84,6 +84,22 @@ class Materiel
         }
     }
 
+    public static function fetchByEtiquetteUlco(PDO $db, string $etiquette): ?array
+    {
+        try {
+            $sql = 'SELECT id_materiel, nom, modele, etiquette_ulco FROM materiels WHERE etiquette_ulco = :etiquette LIMIT 1';
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':etiquette', $etiquette, PDO::PARAM_STR);
+            $stmt->execute();
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $data ?: null;
+        } catch (PDOException $e) {
+            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            return null;
+        }
+    }
+
     public function fetch(int $identifier): void
     {
         try {

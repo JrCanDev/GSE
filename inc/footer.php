@@ -12,6 +12,10 @@ if (session_status() === PHP_SESSION_ACTIVE) {
     unset($_SESSION['mesgs']['confirm']);
 }
 
+if (function_exists('formatUserError')) {
+    $errors = array_map('formatUserError', $errors);
+}
+
 $errors = json_encode($errors);
 $confirms = json_encode($confirms);
 

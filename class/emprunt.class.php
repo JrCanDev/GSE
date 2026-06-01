@@ -105,8 +105,8 @@ class Emprunt
 
             $this->db->beginTransaction();
 
-            $sql = 'SELECT create_emprunt(:nom_emprunteur, :prenom_emprunteur,
-                 :id_groupe, :ids_materiels, :date_emprunt, :date_prevue_restitution, :caution, :remarque) AS id_emprunt';
+              $sql = 'SELECT create_emprunt(:nom_emprunteur, :prenom_emprunteur,
+                  :id_groupe, :ids_materiels::int[], :date_emprunt, :date_prevue_restitution, :caution, :remarque) AS id_emprunt';
             $stmt = $this->db->prepare($sql);
 
             $stmt->bindValue(':nom_emprunteur', $this->nom_emprunteur, PDO::PARAM_STR);

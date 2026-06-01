@@ -150,3 +150,56 @@ function formatDisplayDate(?string $date): string
 
     return $dateTime->format('d/m/Y');
 }
+
+function isDebugEnabled(): bool
+{
+  if (GETPOST('debug') == true) {
+    return true;
+  }
+
+  return !empty($_SESSION['user']['admin']);
+}
+
+function formatUserError(string $message): string
+{
+  $message = trim($message);
+
+  // if (isDebugEnabled()) {
+  //   return $message;
+  // }
+
+  $dbMessage = formatDatabaseError($message);
+  if ($dbMessage !== null) {
+    return $dbMessage;
+  }
+
+  if (stripos($message, 'ERREUR Base de données') === 0) {
+    return 'Une erreur est survenue. Merci de réessayer ou contacter un administrateur.';
+  }
+
+  if (stripos($message, 'ERREUR Configuration') === 0) {
+    return 'Configuration incomplète. Merci de contacter un administrateur.';
+  }
+
+  return $message;
+}
+
+function formatDatabaseError(string $message): ?string
+{
+  $lower = strtolower($message);
+
+  $isUniqueViolation = strpos($lower, '23505') !== false
+    || strpos($lower, 'duplicate key value violates unique constraint') !== false
+    || strpos($lower, 'contrainte unique') !== false
+    || strpos($lower, 'violates unique constraint') !== false;
+
+  if ($isUniqueViolation) {
+    if (strpos($lower, 'materiels_etiquette_ulco_key') !== false || strpos($lower, 'etiquette_ulco') !== false) {
+      return 'Un matériel possède déjà cette étiquette ULCO.';
+    }
+
+    return 'Une valeur existe déjà et doit être unique.';
+  }
+
+  return null;
+}
