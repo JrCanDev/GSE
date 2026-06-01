@@ -151,17 +151,19 @@
                                                     </td>
                                                     <td>
                                                         <?php if (empty($materiel['date_reelle_restitution'])): ?>
-                                                            <form action="?element=emprunts&action=card" method="post" class="w3-container w3-padding-0">
+                                                            <form action="?element=emprunts&action=card" method="post" class="w3-container w3-padding-0 form-rendre-ajax">
                                                                 <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
                                                                 <input type="hidden" name="id_materiel" value="<?= $materiel['id_materiel'] ?>">
                                                                 <select class="w3-select w3-border w3-round w3-margin-bottom" name="etat_restitution" required>
-                                                                    <option value="" disabled selected>État</option>
                                                                     <?php foreach (Materiel::$etats as $etatMateriel): ?>
-                                                                        <option value="<?= sanitize($etatMateriel) ?>"><?= sanitize($etatMateriel) ?></option>
+                                                                        <option value="<?= sanitize($etatMateriel) ?>" <?= $etatMateriel === 'OK' ? 'selected' : '' ?>>
+                                                                            <?= sanitize($etatMateriel) ?>
+                                                                        </option>
                                                                     <?php endforeach; ?>
                                                                 </select>
                                                                 <input class="w3-input w3-border w3-round w3-margin-bottom" type="text" name="remarque_restitution" placeholder="Remarque de restitution">
-                                                                <button type="submit" name="return_material" class="w3-button w3-small w3-blue w3-round">Rendre</button>
+                                                                <input type="hidden" name="return_material" value="1">
+                                                                <button type="submit" class="w3-button w3-small w3-blue w3-round">Rendre</button>
                                                             </form>
                                                         <?php else: ?>
                                                             <span class="w3-text-green">Terminé</span>
@@ -228,4 +230,94 @@
             }
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let forms = document.querySelectorAll('.form-rendre-ajax');
+
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                let formData = new FormData(form);
+                let idEmprunt = formData.get('id_emprunt'); // on récupère l'ID de l'emprunt
+
+                let tdAction = form.closest('td');
+                let tdEtatActuel = tdAction.previousElementSibling;
+                let selectEtat = form.querySelector('select[name="etat_restitution"]');
+                let etatSelectionne = selectEtat.value;
+
+                let dialog = document.getElementById('confirmation-emprunt-dialog-' + idEmprunt);
+                let rowPrincipale = dialog ? dialog.closest('tr.item-emprunt') : null;
+
+                fetch('emprunts/controllers/card.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Réponse serveur incorrecte");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // mise à jour du Dialog
+                            tdEtatActuel.innerHTML = '<span class="w3-text-green"><b>Déjà rendu</b></span><br>' + etatSelectionne;
+                            tdAction.innerHTML = '<span class="w3-text-green">Terminé</span>';
+
+                            // mise à jour de la ligne du tableau
+                            if (rowPrincipale) {
+                                let cellules = rowPrincipale.cells;
+
+                                // colonne Matériel (Compteur + Résumé)
+                                let divCompteur = cellules[5].querySelector('b');
+                                if (divCompteur) {
+                                    divCompteur.textContent = data.nombre_materiels_rendus + ' / ' + data.nombre_materiels;
+                                }
+
+                                // colonne Date réelle de restitution
+                                if (data.date_reelle_restitution) {
+                                    cellules[7].textContent = data.date_reelle_restitution;
+                                    cellules[7].style.color = "";
+                                    cellules[7].style.fontWeight = "normal";
+                                }
+
+                                // colonne État global
+                                let cellEtatGlobal = cellules[8];
+                                cellEtatGlobal.textContent = data.etat_global;
+
+                                // réapplication des classes w3.css
+                                cellEtatGlobal.classList.remove('w3-text-blue', 'w3-text-green', 'w3-text-red', 'w3-text-orange');
+
+                                if (data.etat_global === 'OK') {
+                                    cellEtatGlobal.classList.add('w3-text-green');
+                                    rowPrincipale.style.opacity = "0.5";
+                                } else if (data.etat_global === 'Endommagé') {
+                                    cellEtatGlobal.classList.add('w3-text-red');
+                                    rowPrincipale.style.opacity = "0.5";
+                                } else if (data.etat_global === 'En réparation') {
+                                    cellEtatGlobal.classList.add('w3-text-orange');
+                                    rowPrincipale.style.opacity = "0.5";
+                                } else {
+                                    cellEtatGlobal.classList.add('w3-text-blue');
+                                    rowPrincipale.style.opacity = "1";
+                                }
+
+                                // colonne Remarque de restitution
+                                if (data.remarque_restitution) {
+                                    cellules[9].textContent = data.remarque_restitution;
+                                }
+                            }
+
+                        } else {
+                            alert("Erreur: " + (data.error || "Inconnue"));
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erreur AJAX :", error);
+                        alert("Impossible de joindre le serveur ou erreur de traitement.");
+                    });
+            });
+        });
+    });
 </script>

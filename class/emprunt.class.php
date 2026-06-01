@@ -105,7 +105,7 @@ class Emprunt
 
             $this->db->beginTransaction();
 
-              $sql = 'SELECT create_emprunt(:nom_emprunteur, :prenom_emprunteur,
+            $sql = 'SELECT create_emprunt(:nom_emprunteur, :prenom_emprunteur,
                   :id_groupe, :ids_materiels::int[], :date_emprunt, :date_prevue_restitution, :caution, :remarque) AS id_emprunt';
             $stmt = $this->db->prepare($sql);
 
@@ -191,7 +191,7 @@ class Emprunt
         }
     }
 
-    public function rendreMateriel(int $id_materiel, ?string $etat_restitution = null, ?string $remarque_restitution = null, ?string $date_reelle_restitution = null): void
+    public function rendreMateriel(int $id_materiel, ?string $etat_restitution = null, ?string $remarque_restitution = null, ?string $date_reelle_restitution = null, bool $isAjax = false): void
     {
         try {
             $this->db->beginTransaction();
@@ -210,18 +210,24 @@ class Emprunt
 
             $this->db->commit();
 
-            if ($result && $result['a_ete_rendu']) {
-                $_SESSION['mesgs']['confirm'][] = "Matériel rendu avec succès.";
-            } else {
-                $_SESSION['mesgs']['errors'][] = "Le matériel a déjà été rendu ou n'appartient pas à cet emprunt.";
-            }
-
             $this->fetch($this->id_emprunt);
+
+            if (!$isAjax) {
+                if ($result && $result['a_ete_rendu']) {
+                    $_SESSION['mesgs']['confirm'][] = "Matériel rendu avec succès.";
+                } else {
+                    $_SESSION['mesgs']['errors'][] = "Le matériel a déjà été rendu ou n'appartient pas à cet emprunt.";
+                }
+            }
         } catch (PDOException $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();
             }
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            if (!$isAjax) {
+                $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            } else {
+                throw $e;
+            }
         }
     }
 
