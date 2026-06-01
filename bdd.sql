@@ -58,6 +58,17 @@ CREATE TABLE IF NOT EXISTS emprunt_materiels (
     FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel)
 );
 
+CREATE TABLE lots(
+    id_lot SERIAL PRIMARY KEY,
+    nom_lot VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE lot_materiels(
+    id_lot INT REFERENCES lots(id_lot) ON DELETE CASCADE,
+    id_materiel INT REFERENCES materiels(id_materiel) ON DELETE CASCADE,
+    PRIMARY KEY (id_lot, id_materiel)
+);
+
 INSERT INTO utilisateurs (username, password, admin) VALUES ('admin', md5('admin'), true);
 
 -- Vue pour afficher les emprunts avec un résumé de leurs matériels

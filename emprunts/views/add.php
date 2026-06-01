@@ -4,7 +4,6 @@
     <form action="<?= $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ?>"
         method="post" class="w3-container w3-card-4 w3-padding">
 
-        <!-- Prénom, Nom et Année BUT -->
         <div class="w3-row-padding">
             <div class="w3-third">
                 <label><b>Nom<span style="color: red;">*</span></b></label>
@@ -28,7 +27,6 @@
             </div>
         </div>
 
-        <!-- Caution, Date d’emprunt et Date de restitution prévue -->
         <div class="w3-row-padding w3-margin-top">
             <div class="w3-third">
                 <label><b>Caution<span style="color: red;">*</span></b></label>
@@ -49,11 +47,22 @@
             </div>
         </div>
 
-        <!-- Remarque -->
         <div class="w3-margin-top">
             <label><b>Remarque</b></label>
             <textarea class="w3-input w3-border w3-round w3-center" name="remarque"
                 placeholder="C'est certainement une superbe remarque" rows="1"></textarea>
+        </div>
+
+        <div class="w3-margin-top w3-border w3-padding w3-round w3-light-grey">
+            <label><b><i class="fa fa-boxes"></i> Remplissage rapide par lot :</b></label>
+            <select id="selectLotTemplate" class="w3-select w3-border w3-round" onchange="appliquerLotMateriels(this)">
+                <option value="" selected>-- Sélectionner un lot prédéfini (Optionnel) --</option>
+                <?php foreach ($lotsData as $lot): ?>
+                    <option value="<?= $lot['id_lot'] ?>" data-materiels="<?= htmlspecialchars(json_encode($lot['ids_materiels'])) ?>">
+                        <?= sanitize($lot['nom_lot']) ?> (<?= count($lot['ids_materiels']) ?> matériels)
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <h3 style="padding-top: 10px;"><b>Sélection du matériel<span style="color: red;">*</span></b></h3>
@@ -68,7 +77,6 @@
                     <?php foreach ($materiels as $m): ?>
                         <div class="w3-third w3-margin-bottom item-materiel">
                             <?php
-                            // Si le matériel n'est pas disponible, on grise la carte et on empêche la sélection
                             $classes = "w3-border w3-round-xxlarge w3-center w3-padding-small selection-materiel";
                             $estDisponible = Materiel::estDisponible($db, $m->id_materiel);
                             $etiquetteUlco = trim((string) ($m->etiquette_ulco ?? ''));
@@ -103,14 +111,12 @@
         </div>
 
         <div class="w3-row-padding w3-margin-top">
-            <!-- Bouton Créer -->
             <div class="w3-half w3-right">
                 <input class="w3-button w3-blue w3-round" type="submit"
                     onclick="verifierSelectionMateriel(event)"
                     value="Créer l'emprunt" name="submit">
             </div>
 
-            <!-- Bouton Annuler -->
             <div class="w3-half">
                 <input class="w3-button w3-red w3-round" type="submit"
                     value="Annuler" name="cancel" formnovalidate>
@@ -132,7 +138,7 @@
                         inputDate.value = '';
                         return;
                     }
-                    
+
                     const d = opt.dataset.dateRestitution || '';
                     inputDate.value = d;
                 };
@@ -149,9 +155,50 @@
 
             appliquerDateSelonAnnee();
 
+            // Coche automatiquement les matériels du lot sélectionné
+            function appliquerLotMateriels(selectElement) {
+                const optionSelectionnee = selectElement.options[selectElement.selectedIndex];
+                if (!optionSelectionnee || !optionSelectionnee.value) return;
+
+                try {
+                    // On extrait le tableau d'IDs JSON stocké dans le data attribute de l'option
+                    const idsMateriels = JSON.parse(optionSelectionnee.dataset.materiels || '[]');
+
+                    // 1. On décoche tout avant d'appliquer le lot pour partir sur une base propre
+                    document.querySelectorAll('.materiel-checkbox').forEach(cb => {
+                        if (!cb.disabled && cb.checked) {
+                            cb.checked = false;
+                            toggleMaterielSelection(cb);
+                        }
+                    });
+
+                    // 2. On coche chaque matériel présent dans le lot s'il est disponible
+                    let nombreMaterielsIndisponibles = 0;
+                    idsMateriels.forEach(id => {
+                        const checkbox = document.getElementById('materiel-' + id);
+                        if (checkbox) {
+                            if (!checkbox.disabled) {
+                                checkbox.checked = true;
+                                toggleMaterielSelection(checkbox);
+                            } else {
+                                nombreMaterielsIndisponibles++;
+                            }
+                        }
+                    });
+
+                    // Petit avertissement si un ou plusieurs éléments du lot sont déjà loués ailleurs
+                    if (nombreMaterielsIndisponibles > 0) {
+                        alert("Attention : " + nombreMaterielsIndisponibles + " matériel(s) de ce lot sont actuellement indisponibles et n'ont pas pu être sélectionnés.");
+                    }
+
+                } catch (e) {
+                    console.error("Erreur lors du traitement du lot :", e);
+                }
+            }
+
             function verifierSelectionMateriel(event) {
                 const selection = document.querySelectorAll('.materiel-checkbox:checked');
-                
+
                 if (selection.length === 0) {
                     event.preventDefault();
                     alert("Veuillez sélectionner au moins un matériel avant de créer l'emprunt.");
@@ -163,10 +210,8 @@
                 let items = document.getElementsByClassName('item-materiel');
 
                 for (let i = 0; i < items.length; i++) {
-                    // on récupère le texte (nom, id et modèle)
                     let texteComplet = items[i].textContent || items[i].innerText;
 
-                    // si le texte contient la recherche, on affiche
                     if (texteComplet.toLowerCase().indexOf(input) > -1) {
                         items[i].style.display = "";
                     } else {

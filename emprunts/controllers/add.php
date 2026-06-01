@@ -3,6 +3,7 @@ session_start();
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
 require_once(dirname(__FILE__) . '/../../class/groupe.class.php');
+require_once(dirname(__FILE__) . '/../../class/lot.class.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 
 if (isset($_POST["cancel"])) {
@@ -66,7 +67,23 @@ if (isset($_POST["submit"])) {
 $years = Groupe::fetchAll($db);
 $materiels = Materiel::fetchAll($db);
 
-usort($materiels, function($a, $b) use ($db) {
+$lots = Lot::fetchAll($db);
+$lotsData = [];
+
+foreach ($lots as $lotObj) {
+    $materielsObjets = $lotObj->fetchMaterielsIds();
+    $idsUniquement = array_map(function ($m) {
+        return (int) $m->id_materiel;
+    }, $materielsObjets);
+
+    $lotsData[] = [
+        'id_lot' => $lotObj->id_lot,
+        'nom_lot' => $lotObj->nom_lot,
+        'ids_materiels' => $idsUniquement
+    ];
+}
+
+usort($materiels, function ($a, $b) use ($db) {
     $dispoA = Materiel::estDisponible($db, $a->id_materiel) ? 1 : 0;
     $dispoB = Materiel::estDisponible($db, $b->id_materiel) ? 1 : 0;
 

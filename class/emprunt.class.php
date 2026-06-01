@@ -167,7 +167,7 @@ class Emprunt
             if ($data)
                 $this->hydrate($data);
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération de l'emprunt : " . $e->getMessage();
         }
     }
 
@@ -187,7 +187,7 @@ class Emprunt
             $stmt->execute();
             $_SESSION['mesgs']['confirm'][] = "Emprunt mis à jour avec succès.";
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la mise à jour de l'emprunt : " . $e->getMessage();
         }
     }
 
@@ -224,7 +224,7 @@ class Emprunt
                 $this->db->rollBack();
             }
             if (!$isAjax) {
-                $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+                $_SESSION['mesgs']['errors'][] = "ERREUR lors du rendu du matériel : " . $e->getMessage();
             } else {
                 throw $e;
             }
@@ -242,7 +242,7 @@ class Emprunt
 
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération des matériaux de l'emprunt " . $this->id_emprunt . " : " . $e->getMessage();
             return [];
         }
     }
@@ -281,7 +281,7 @@ class Emprunt
 
             return $emprunts;
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération des emprunts : " . $e->getMessage();
             return [];
         }
     }
@@ -314,7 +314,7 @@ class Emprunt
 
             return $emprunts;
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération des emprunts par matériel " . $id_materiel . " : " . $e->getMessage();
             return [];
         }
     }

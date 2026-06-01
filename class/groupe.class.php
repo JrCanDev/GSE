@@ -62,7 +62,7 @@ class Groupe
             }
             $_SESSION['mesgs']['confirm'][] = "Groupe créé avec succès ! ";
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la création du groupe : " . $e->getMessage();
         }
     }
 
@@ -80,7 +80,7 @@ class Groupe
             if ($data)
                 $this->hydrate($data);
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération du groupe : " . $e->getMessage();
         }
     }
 
@@ -97,7 +97,7 @@ class Groupe
             $stmt->execute();
             $_SESSION['mesgs']['confirm'][] = "Groupe mis à jour avec succès.";
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la mise à jour du groupe : " . $e->getMessage();
         }
     }
 
@@ -118,7 +118,7 @@ class Groupe
 
             return $groupes;
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération des groupes : " . $e->getMessage();
             return [];
         }
     }

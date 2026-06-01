@@ -80,7 +80,7 @@ class Materiel
             }
             $_SESSION['mesgs']['confirm'][] = "Matériel créé avec succès ! ";
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la création du matériel : " . $e->getMessage();
         }
     }
 
@@ -95,7 +95,7 @@ class Materiel
 
             return $data ?: null;
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération du matériel : " . $e->getMessage();
             return null;
         }
     }
@@ -114,7 +114,7 @@ class Materiel
             if ($data)
                 $this->hydrate($data);
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération du matériel : " . $e->getMessage();
         }
     }
 
@@ -136,7 +136,7 @@ class Materiel
             $stmt->execute();
             $_SESSION['mesgs']['confirm'][] = "Matériel mis à jour avec succès.";
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la mise à jour du matériel : " . $e->getMessage();
         }
     }
 
@@ -157,7 +157,7 @@ class Materiel
 
             return $materiels;
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération des matériaux : " . $e->getMessage();
             return [];
         }
     }
@@ -175,7 +175,7 @@ class Materiel
                 return $disponible === true || $disponible === 1 || $disponible === '1' || $disponible === 't' || $disponible === 'true';
             }
         } catch (PDOException $e) {
-            $_SESSION['mesgs']['errors'][] = "ERREUR Base de données : " . $e->getMessage();
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la vérification de la disponibilité du matériel : " . $e->getMessage();
         }
         return false;
     }

@@ -23,6 +23,7 @@
     $list_menus = array(
       'emprunts' => 'Emprunts',
       'materiels' => 'Matériels',
+      'lots' => 'Lots',
       'groupes' => 'Groupes',
       'statistiques' => 'Statistiques',
     );
