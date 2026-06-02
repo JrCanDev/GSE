@@ -45,8 +45,8 @@ if (isset($_POST["submit"])) {
             }
             $id = $existing['id_materiel'] ?? null;
             $_SESSION['mesgs']['errors'][] = $id
-                ? "Cette étiquette ULCO est déjà utilisée par le matériel #$id ($label)."
-                : "Cette étiquette ULCO est déjà utilisée par un autre matériel.";
+                ? "Cet identifiant est déjà utilisé par le matériel #$id ($label)."
+                : "Cet identifiant est déjà utilisé par un autre matériel.";
             header("Location: " . $_SERVER['PHP_SELF'] . "?element=materiels&action=add");
             exit(1);
         }

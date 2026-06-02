@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <!-- Localisation, Étiquette ULCO et État -->
+        <!-- Localisation, identifiant et État -->
         <div class="w3-row-padding w3-margin-top">
             <div class="w3-third">
                 <label><b>Localisation<span style="color: red;">*</span></b></label>
@@ -33,7 +33,7 @@
                     type="text" name="localisation" required value="<?= sanitize($materiel->localisation) ?>">
             </div>
             <div class="w3-third">
-                <label><b>Étiquette ULCO</b></label>
+                <label><b>Identifiant</b></label>
                 <input placeholder="10xxx" class="w3-input w3-border w3-round w3-center"
                     type="text" name="etiquette_ulco" value="<?= sanitize($materiel->etiquette_ulco) ?>">
             </div>

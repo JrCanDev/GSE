@@ -195,7 +195,7 @@ function formatDatabaseError(string $message): ?string
 
   if ($isUniqueViolation) {
     if (strpos($lower, 'materiels_etiquette_ulco_key') !== false || strpos($lower, 'etiquette_ulco') !== false) {
-      return 'Un matériel possède déjà cette étiquette ULCO.';
+      return 'Un matériel possède déjà cet identifiant.';
     }
 
     return 'Une valeur existe déjà et doit être unique.';

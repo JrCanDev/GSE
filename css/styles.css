@@ -145,9 +145,19 @@ footer {
 }
 
 .selection-materiel-indisponible {
-  opacity: 50%;
   cursor: not-allowed;
   user-select: none;
+  background-color: #6b6b6b;
+  color: #ffffff;
+  border-color: #6b6b6b;
+}
+
+.selection-materiel-indisponible .txt-materiel {
+  color: #ffffff;
+}
+
+.selection-materiel-indisponible .materiel-checkbox+.txt-materiel {
+  color: #ffffff;
 }
 
 .item-materiel {
@@ -179,41 +189,44 @@ footer {
 
 select.etat-ok,
 option.etat-ok {
-    color: green;
-    font-weight: bold;
+  color: green;
+  font-weight: bold;
 }
+
 select.etat-reparation,
 option.etat-reparation {
-    color: orange;
-    font-weight: bold;
+  color: orange;
+  font-weight: bold;
 }
+
 select.etat-endommage,
 option.etat-endommage {
-    color: red;
-    font-weight: bold;
+  color: red;
+  font-weight: bold;
 }
+
 select.etat-disparu,
 option.etat-disparu {
-    color: black;
-    font-weight: bold;
+  color: black;
+  font-weight: bold;
 }
 
 .card-stat {
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 32px !important;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 32px !important;
 }
 
 .row-total {
-    border-top: 2px solid #4CAF50 !important;
-    background-color: #e8f5e9 !important;
-    color: #2e7d32 !important;
+  border-top: 2px solid #4CAF50 !important;
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
 }
 
 .w3-table-all tbody tr:hover {
-    background-color: #f1f1f1 !important;
+  background-color: #f1f1f1 !important;
 }
 
 .bg-gradient-teal i {
-    vertical-align: middle;
+  vertical-align: middle;
 }

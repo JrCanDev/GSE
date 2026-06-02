@@ -83,7 +83,7 @@
             <tr class="w3-blue">
                 <th>Nom</th>
                 <th>Modèle</th>
-                <th>Étiquette ULCO</th>
+                <th>identifiant</th>
                 <th>Statut</th>
                 <th>Date de rendu</th>
                 <th>État de restitution</th>

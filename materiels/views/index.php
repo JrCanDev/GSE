@@ -7,7 +7,7 @@
         type="search"
         id="searchBarMateriel"
         onkeyup="filtrerListeMateriels()"
-        placeholder="Rechercher par nom, étiquette ULCO, modèle, état... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
+        placeholder="Rechercher par nom, identifiant, modèle, état... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
 </div>
 
 <?php $totalMateriels = $materiels ? count($materiels) : 0; ?>
@@ -18,7 +18,7 @@
             <th>Nom <span class="sort-arrow"></span></th>
             <th>Modèle <span class="sort-arrow"></span></th>
             <th>Année <span class="sort-arrow"></span></th>
-            <th>Étiquette ULCO <span class="sort-arrow"></span></th>
+            <th>Identifiant <span class="sort-arrow"></span></th>
             <th>Localisation <span class="sort-arrow"></span></th>
             <th>État <span class="sort-arrow"></span></th>
             <th>Remarque <span class="sort-arrow"></span></th>
