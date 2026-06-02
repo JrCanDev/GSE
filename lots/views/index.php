@@ -4,6 +4,14 @@
 
 <?php $totalLots = $lots ? count($lots) : 0; ?>
 
+<div class="w3-container w3-margin-bottom">
+    <input class="w3-input w3-border w3-round-xxlarge w3-center"
+        type="search"
+        id="searchBarLot"
+        onkeyup="filtrerLots()"
+        placeholder="Rechercher par nom de lot ou matériel... (plusieurs filtres: virgule ou point-virgule)">
+</div>
+
 <h2><b>Lots</b></h2>
 <table class="w3-table w3-striped w3-small w3-bordered w3-border">
     <thead>
@@ -16,7 +24,7 @@
     <tbody>
         <?php if ($lots): ?>
             <?php foreach ($lots as $lot): ?>
-                <tr>
+                <tr class="item-lot">
                     <td><?= sanitize($lot->nom_lot) ?></td>
                     <td>
                         <?php $materiels = $lot->fetchMaterielsIds(); ?>
@@ -54,4 +62,45 @@
     </tbody>
 </table>
 
-<h2><?= $totalLots ?> / <?= $totalLots ?> lot(s) trouvé(s)</h2>
+<h2 id="compteurLots"><?= $totalLots ?> / <?= $totalLots ?> lot(s) trouvé(s)</h2>
+
+<script>
+    function filtrerLots() {
+        let input = document.getElementById('searchBarLot').value.toLowerCase();
+        let rows = document.getElementsByClassName('item-lot');
+        let compteurLots = document.getElementById('compteurLots');
+        let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
+        let lotsVisibles = 0;
+
+        for (let i = 0; i < rows.length; i++) {
+            let cellules = Array.from(rows[i].children);
+
+            let texteUtileLigne = cellules
+                .slice(0, -1)
+                .map(td => td.textContent || td.innerText)
+                .join(' ')
+                .toLowerCase();
+
+            if (motsCles.length === 0) {
+                rows[i].style.display = '';
+                lotsVisibles++;
+                continue;
+            }
+
+            let correspondATousLesMots = motsCles.every(mot => texteUtileLigne.indexOf(mot) > -1);
+
+            if (correspondATousLesMots) {
+                rows[i].style.display = '';
+                lotsVisibles++;
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+
+        if (compteurLots) {
+            compteurLots.textContent = lotsVisibles + ' / <?= $totalLots ?> lot(s) trouvé(s)';
+        }
+    }
+
+    filtrerLots();
+</script>
