@@ -4,7 +4,7 @@
     </a>
 <?php endif; ?>
 
-<div class="w3-container w3-margin-bottom">
+<div class="w3-container w3-margin-bottom w3-margin-top">
     <input class="w3-input w3-border w3-round-xxlarge w3-center"
         type="search"
         id="searchBarMateriel"

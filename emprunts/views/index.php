@@ -4,12 +4,12 @@
     </a>
 <?php endif; ?>
 
-<div class="w3-container w3-margin-bottom">
+<div class="w3-container w3-margin-bottom w3-margin-top">
     <input class="w3-input w3-border w3-round-xxlarge w3-center"
         type="search"
         id="searchBarEmprunt"
         onkeyup="filtrerEmprunts()"
-        placeholder="Rechercher un nom, un matériel, une date... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
+        placeholder="Rechercher par nom, par matériel, par date... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
 </div>
 
 <?php $totalEmprunts = $emprunts ? count($emprunts) : 0; ?>
