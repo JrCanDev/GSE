@@ -25,10 +25,7 @@ if (!isset($authorized)) {
 <body>
     <div class="fullHead">
         <div class="menutop">
-            <?php
-            if ($authorized)
-                include dirname(__FILE__) . '/top.php';
-            ?>
+            <?php include dirname(__FILE__) . '/top.php'; ?>
         </div>
     </div>
     <div class="maincontent w3-display-container w3-center">

@@ -1,6 +1,8 @@
-<a href="index.php?element=materiels&action=add" class="w3-margin w3-button w3-border w3-round">
-    <b>Ajouter un nouveau matériel</b>
-</a>
+<?php if ($isAdmin): ?>
+    <a href="index.php?element=materiels&action=add" class="w3-margin w3-button w3-border w3-round">
+        <b>Ajouter un nouveau matériel</b>
+    </a>
+<?php endif; ?>
 
 <div class="w3-container w3-margin-bottom">
     <input class="w3-input w3-border w3-round-xxlarge w3-center"
@@ -19,10 +21,14 @@
             <th>Modèle <span class="sort-arrow"></span></th>
             <th>Année <span class="sort-arrow"></span></th>
             <th>Identifiant <span class="sort-arrow"></span></th>
-            <th>Localisation <span class="sort-arrow"></span></th>
+            <?php if ($isAdmin): ?>
+                <th>Localisation <span class="sort-arrow"></span></th>
+            <?php endif; ?>
             <th>État <span class="sort-arrow"></span></th>
             <th>Remarque <span class="sort-arrow"></span></th>
-            <th>Actions</th>
+            <?php if ($isAdmin): ?>
+                <th>Actions</th>
+            <?php endif; ?>
         </tr>
     </thead>
     <tbody>
@@ -44,21 +50,25 @@
                     <td><?= sanitize($materiel->modele) ?></td>
                     <td><?= sanitize($materiel->annee) ?></td>
                     <td><?= sanitize($materiel->etiquette_ulco) ?></td>
-                    <td><?= sanitize($materiel->localisation) ?></td>
+                    <?php if ($isAdmin): ?>
+                        <td><?= sanitize($materiel->localisation) ?></td>
+                    <?php endif; ?>
                     <td class="<?= $etat_class ?>"><?= sanitize($materiel->etat) ?></td>
                     <td><?= desanitize($materiel->remarque) ?></td>
-                    <td>
-                        <form action="?element=materiels&action=card" method="post">
-                            <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
-                            <input type="hidden" name="old_page" value="materiels">
-                            <input type="submit" name="submit" class="w3-button w3-small w3-border w3-round" value="✏️">
-                        </form>
-                    </td>
+                    <?php if ($isAdmin): ?>
+                        <td>
+                            <form action="?element=materiels&action=card" method="post">
+                                <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
+                                <input type="hidden" name="old_page" value="materiels">
+                                <input type="submit" name="submit" class="w3-button w3-small w3-border w3-round" value="✏️">
+                            </form>
+                        </td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="8">Aucun matériel trouvé.</td>
+                <td colspan="<?= $isAdmin ? 8 : 6 ?>">Aucun matériel trouvé.</td>
             </tr>
         <?php endif ?>
     </tbody>
@@ -71,16 +81,17 @@
         let input = document.getElementById('searchBarMateriel').value.toLowerCase();
         let rows = document.getElementsByClassName('item-materiel');
         let compteurMateriels = document.getElementById('compteurMateriels');
+        let actionColumns = <?= $isAdmin ? 1 : 0 ?>;
 
         let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
         let materielsVisibles = 0;
 
         for (let i = 0; i < rows.length; i++) {
             let cellules = Array.from(rows[i].children);
+            let cellulesUtiles = actionColumns > 0 ? cellules.slice(0, -actionColumns) : cellules;
 
             // on ignore la dernière cellule (la colonne Actions)
-            let texteUtileLigne = cellules
-                .slice(0, -1)
+            let texteUtileLigne = cellulesUtiles
                 .map(td => td.textContent || td.innerText)
                 .join(" ")
                 .toLowerCase();

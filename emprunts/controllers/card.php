@@ -4,6 +4,11 @@ require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 
+if (!isUserAdmin()) {
+    include dirname(__FILE__) . '/../../login.php';
+    exit(1);
+}
+
 if (isset($_POST["cancel"])) {
     header("Location: index.php?element=emprunts");
     exit(1);

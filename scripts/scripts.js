@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     const table = document.querySelector(".w3-table");
+    if (!table) return;
 
     // on sélectionne TOUS les th sauf le dernier (Actions)
-    const headers = table.querySelectorAll("th:not(:last-child)");
     const tbody = table.querySelector("tbody");
+    const headers = table.querySelectorAll("thead th");
     let currentColumn = -1;
     let isAsc = true;
 
@@ -16,6 +17,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     headers.forEach((header, columnIndex) => {
+        if (header.textContent.trim() === "Actions") {
+            return;
+        }
+
+        header.style.cursor = "pointer";    
+
         header.addEventListener("click", () => {
             if (currentColumn === columnIndex) {
                 isAsc = !isAsc;
@@ -32,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 arrowSpan.textContent = isAsc ? " ▲" : " ▼";
             }
 
-            const rows = Array.from(tbody.querySelectorAll("tr")).filter(row => row.querySelector("td"));
+            const rows = Array.from(tbody.querySelectorAll("tr.item-emprunt"));
 
             rows.sort((rowA, rowB) => {
                 if (!rowA.children[columnIndex] || !rowB.children[columnIndex]) return 0;

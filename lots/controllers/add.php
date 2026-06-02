@@ -2,6 +2,10 @@
 session_start();
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
+if (!isUserAdmin()) {
+    include dirname(__FILE__) . '/../../login.php';
+    exit(1);
+}
 require_once(dirname(__FILE__) . '/../../class/lot.class.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 

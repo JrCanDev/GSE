@@ -2,6 +2,11 @@
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/groupe.class.php');
 
+if (!isUserAdmin()) {
+    include dirname(__FILE__) . '/../../login.php';
+    exit(1);
+}
+
 if (isset($_POST["cancel"])) {
     header("Location: index.php?element=groupes");
     exit(1);

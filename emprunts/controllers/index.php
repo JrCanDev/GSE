@@ -3,6 +3,7 @@ $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 
+$isAdmin = isUserAdmin();
 $emprunts = Emprunt::fetchAll($db);
 
 usort($emprunts, function($a, $b) {

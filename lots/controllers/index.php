@@ -3,6 +3,7 @@ $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 require_once(dirname(__FILE__) . '/../../class/lot.class.php');
 
+$isAdmin = isUserAdmin();
 $lots = Lot::fetchAll($db);
 
 if (isset($_POST["delete"]) && isset($_POST["id"]) && !empty($_POST["id"])) {

@@ -1,6 +1,8 @@
-<a href="index.php?element=lots&action=add" class="w3-margin w3-button w3-border w3-round">
-    <b>Ajouter un nouveau lot</b>
-</a>
+<?php if ($isAdmin): ?>
+    <a href="index.php?element=lots&action=add" class="w3-margin w3-button w3-border w3-round">
+        <b>Ajouter un nouveau lot</b>
+    </a>
+<?php endif; ?>
 
 <?php $totalLots = $lots ? count($lots) : 0; ?>
 
@@ -18,7 +20,9 @@
         <tr class="w3-blue  ">
             <th>Nom du lot <span class="sort-arrow"></span></th>
             <th>Matériels <span class="sort-arrow"></span></th>
-            <th>Actions</th>
+            <?php if ($isAdmin): ?>
+                <th>Actions</th>
+            <?php endif; ?>
         </tr>
     </thead>
     <tbody>
@@ -40,23 +44,25 @@
                             Aucun matériel associé.
                         <?php endif; ?>
                     </td>
-                    <td>
-                        <form action="?element=lots&action=card" method="post">
-                            <input type="hidden" name="id_lot" value="<?= $lot->id_lot ?>">
-                            <input type="submit" name="edit" class="w3-button w3-small w3-border w3-round" value="✏️">
-                        </form>
+                    <?php if ($isAdmin): ?>
+                        <td>
+                            <form action="?element=lots&action=card" method="post">
+                                <input type="hidden" name="id_lot" value="<?= $lot->id_lot ?>">
+                                <input type="submit" name="edit" class="w3-button w3-small w3-border w3-round" value="✏️">
+                            </form>
 
-                        <form action="?element=lots" method="post"
-                            onsubmit="return confirm('Voulez-vous vraiment supprimer ce lot ?');">
-                            <input type="hidden" name="id" value="<?= $lot->id_lot ?>">
-                            <input type="submit" name="delete" class="w3-button w3-small w3-border w3-round" value="🗑️">
-                        </form>
-                    </td>
+                            <form action="?element=lots" method="post"
+                                onsubmit="return confirm('Voulez-vous vraiment supprimer ce lot ?');">
+                                <input type="hidden" name="id" value="<?= $lot->id_lot ?>">
+                                <input type="submit" name="delete" class="w3-button w3-small w3-border w3-round" value="🗑️">
+                            </form>
+                        </td>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="11">Aucun lot trouvé.</td>
+                <td colspan="<?= $isAdmin ? 3 : 2 ?>">Aucun lot trouvé.</td>
             </tr>
         <?php endif ?>
     </tbody>
@@ -69,14 +75,15 @@
         let input = document.getElementById('searchBarLot').value.toLowerCase();
         let rows = document.getElementsByClassName('item-lot');
         let compteurLots = document.getElementById('compteurLots');
+        let actionColumns = <?= $isAdmin ? 1 : 0 ?>;
         let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
         let lotsVisibles = 0;
 
         for (let i = 0; i < rows.length; i++) {
             let cellules = Array.from(rows[i].children);
+            let cellulesUtiles = actionColumns > 0 ? cellules.slice(0, -actionColumns) : cellules;
 
-            let texteUtileLigne = cellules
-                .slice(0, -1)
+            let texteUtileLigne = cellulesUtiles
                 .map(td => td.textContent || td.innerText)
                 .join(' ')
                 .toLowerCase();

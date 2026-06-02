@@ -160,6 +160,16 @@ function isDebugEnabled(): bool
   return !empty($_SESSION['user']['admin']);
 }
 
+function isUserLoggedIn(): bool
+{
+  return !empty($_SESSION['user']);
+}
+
+function isUserAdmin(): bool
+{
+  return !empty($_SESSION['user']['admin']);
+}
+
 function formatUserError(string $message): string
 {
   $message = trim($message);
