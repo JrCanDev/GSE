@@ -48,7 +48,7 @@ class myAuthClass
     {
         try {
             $db = require(dirname(__FILE__) . '/../lib/mypdo.php');
-            $sql = 'SELECT id, username, admin FROM utilisateurs WHERE username = :username LIMIT 1';
+            $sql = 'SELECT id, username, admin, password FROM utilisateurs WHERE username = :username LIMIT 1';
             $statement = $db->prepare($sql);
             $statement->bindValue(':username', $username, PDO::PARAM_STR);
             $statement->execute();

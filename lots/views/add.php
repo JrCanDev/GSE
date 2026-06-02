@@ -30,7 +30,7 @@
                             if ($etiquetteUlco !== '') {
                                 $infosMateriel[] = $etiquetteUlco;
                             }
-                            
+
                             if ($modele !== '') {
                                 $infosMateriel[] = $modele;
                             }
@@ -56,7 +56,7 @@
             <!-- Bouton Créer -->
             <div class="w3-half w3-right">
                 <input class="w3-button w3-blue w3-round" type="submit"
-                    value="Ajouter le groupe" name="submit">
+                    value="Ajouter le lot" name="submit">
             </div>
 
             <!-- Bouton Annuler -->
@@ -66,16 +66,16 @@
             </div>
         </div>
 
-<script>
+        <script>
             // focus sur champ Nom
             document.querySelector("input[name='nom_lot']").focus();
 
             function verifierSelectionMateriel(event) {
                 const selection = document.querySelectorAll('.materiel-checkbox:checked');
-                
+
                 if (selection.length === 0) {
                     event.preventDefault();
-                    alert("Veuillez sélectionner au moins un matériel avant de créer l'emprunt.");
+                    alert("Veuillez sélectionner au moins un matériel avant de créer le lot.");
                 }
             }
 

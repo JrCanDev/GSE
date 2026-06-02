@@ -2,6 +2,8 @@
     <b>Ajouter un nouveau lot</b>
 </a>
 
+<?php $totalLots = $lots ? count($lots) : 0; ?>
+
 <h2><b>Lots</b></h2>
 <table class="w3-table w3-striped w3-small w3-bordered w3-border">
     <thead>
@@ -51,3 +53,5 @@
         <?php endif ?>
     </tbody>
 </table>
+
+<h2><?= $totalLots ?> / <?= $totalLots ?> lot(s) trouvé(s)</h2>

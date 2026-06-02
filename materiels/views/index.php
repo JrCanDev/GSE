@@ -10,6 +10,8 @@
         placeholder="Rechercher par nom, étiquette ULCO, modèle, état... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
 </div>
 
+<?php $totalMateriels = $materiels ? count($materiels) : 0; ?>
+
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
         <tr class="w3-blue">
@@ -62,16 +64,16 @@
     </tbody>
 </table>
 
-<?php if ($materiels): ?>
-    <h2><?= count($materiels) ?> matériel(s) trouvé(s)</h2>
-<?php endif ?>
+<h2 id="compteurMateriels"><?= $totalMateriels ?> / <?= $totalMateriels ?> matériel(s) trouvé(s)</h2>
 
 <script>
     function filtrerListeMateriels() {
         let input = document.getElementById('searchBarMateriel').value.toLowerCase();
         let rows = document.getElementsByClassName('item-materiel');
+        let compteurMateriels = document.getElementById('compteurMateriels');
 
         let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
+        let materielsVisibles = 0;
 
         for (let i = 0; i < rows.length; i++) {
             let cellules = Array.from(rows[i].children);
@@ -85,6 +87,7 @@
 
             if (motsCles.length === 0) {
                 rows[i].style.display = "";
+                materielsVisibles++;
                 continue;
             }
 
@@ -93,9 +96,16 @@
 
             if (correspondAtousLesMots) {
                 rows[i].style.display = "";
+                materielsVisibles++;
             } else {
                 rows[i].style.display = "none";
             }
         }
+
+        if (compteurMateriels) {
+            compteurMateriels.textContent = materielsVisibles + ' / <?= $totalMateriels ?> matériel(s) trouvé(s)';
+        }
     }
+
+    filtrerListeMateriels();
 </script>

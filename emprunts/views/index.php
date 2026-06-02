@@ -10,6 +10,8 @@
         placeholder="Rechercher un nom, un matériel, une date... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
 </div>
 
+<?php $totalEmprunts = $emprunts ? count($emprunts) : 0; ?>
+
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
         <tr class="w3-blue">
@@ -195,15 +197,15 @@
     </tbody>
 </table>
 
-<?php if ($emprunts): ?>
-    <h2><?= count($emprunts) ?> emprunt(s) trouvé(s)</h2>
-<?php endif ?>
+<h2 id="compteurEmprunts"><?= $totalEmprunts ?> / <?= $totalEmprunts ?> emprunt(s) trouvé(s)</h2>
 
 <script>
     function filtrerEmprunts() {
         let input = document.getElementById('searchBarEmprunt').value.toLowerCase();
         let rows = document.getElementsByClassName('item-emprunt');
+        let compteurEmprunts = document.getElementById('compteurEmprunts');
         let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
+        let empruntsVisibles = 0;
 
         for (let i = 0; i < rows.length; i++) {
             let cellules = Array.from(rows[i].children);
@@ -217,6 +219,7 @@
 
             if (motsCles.length === 0) {
                 rows[i].style.display = "";
+                empruntsVisibles++;
                 continue;
             }
 
@@ -225,11 +228,18 @@
 
             if (correspondAtousLesMots) {
                 rows[i].style.display = "";
+                empruntsVisibles++;
             } else {
                 rows[i].style.display = "none";
             }
         }
+
+        if (compteurEmprunts) {
+            compteurEmprunts.textContent = empruntsVisibles + ' / <?= $totalEmprunts ?> emprunt(s) trouvé(s)';
+        }
     }
+
+    filtrerEmprunts();
 
     document.addEventListener("DOMContentLoaded", function() {
         let forms = document.querySelectorAll('.form-rendre-ajax');
