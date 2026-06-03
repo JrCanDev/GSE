@@ -158,7 +158,8 @@ SELECT
   localisation,
   etat,
   descriptif,
-  remarque
+  remarque,
+  is_materiel_disponible(id_materiel) AS disponible
 FROM materiels
 ORDER BY id_materiel;
 

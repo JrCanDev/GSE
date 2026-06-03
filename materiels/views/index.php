@@ -24,6 +24,7 @@
             <?php if ($isAdmin): ?>
                 <th>Localisation <span class="sort-arrow"></span></th>
             <?php endif; ?>
+            <th>Emprunt <span class="sort-arrow"></span></th>
             <th>État <span class="sort-arrow"></span></th>
             <th>Remarque <span class="sort-arrow"></span></th>
             <?php if ($isAdmin): ?>
@@ -43,6 +44,8 @@
                 } elseif ($materiel->etat === 'En réparation') {
                     $etat_class = 'w3-text-orange';
                 }
+                $emprunt_label = $materiel->disponible ? 'Non emprunté' : 'Emprunté';
+                $emprunt_class = $materiel->disponible ? 'w3-text-green' : 'w3-text-red';
                 ?>
 
                 <tr class="item-materiel">
@@ -53,6 +56,7 @@
                     <?php if ($isAdmin): ?>
                         <td><?= sanitize($materiel->localisation) ?></td>
                     <?php endif; ?>
+                    <td class="<?= $emprunt_class ?>"><b><?= $emprunt_label ?></b></td>
                     <td class="<?= $etat_class ?>"><?= sanitize($materiel->etat) ?></td>
                     <td><?= desanitize($materiel->remarque) ?></td>
                     <?php if ($isAdmin): ?>
@@ -68,7 +72,7 @@
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="<?= $isAdmin ? 8 : 6 ?>">Aucun matériel trouvé.</td>
+                <td colspan="<?= $isAdmin ? 9 : 7 ?>">Aucun matériel trouvé.</td>
             </tr>
         <?php endif ?>
     </tbody>

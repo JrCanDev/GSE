@@ -10,6 +10,7 @@ class Materiel
     private string $etat;
     private string $descriptif;
     private ?string $remarque;
+    private bool $disponible;
 
     public static array $etats = ['OK', 'En réparation', 'Endommagé', 'Disparu'];
 
@@ -28,6 +29,7 @@ class Materiel
         $this->localisation = '';
         $this->descriptif = '';
         $this->remarque = null;
+        $this->disponible = true;
 
         if (!empty($data))
             $this->hydrate($data);
@@ -103,7 +105,7 @@ class Materiel
     public function fetch(int $identifier): void
     {
         try {
-            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'etat', 'localisation', 'descriptif', 'remarque');
+            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'etat', 'localisation', 'descriptif', 'remarque', 'is_materiel_disponible(id_materiel) AS disponible');
 
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels WHERE id_materiel = :id_materiel';
             $stmt = $this->db->prepare($sql);
@@ -143,7 +145,7 @@ class Materiel
     public static function fetchAll(PDO $db): array
     {
         try {
-            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque');
+            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque', 'is_materiel_disponible(id_materiel) AS disponible');
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels';
             $stmt = $db->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);

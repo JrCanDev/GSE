@@ -1,13 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const table = document.querySelector(".w3-table");
-    if (!table) return;
-
-    // on sélectionne TOUS les th sauf le dernier (Actions)
-    const tbody = table.querySelector("tbody");
-    const headers = table.querySelectorAll("thead th");
-    let currentColumn = -1;
-    let isAsc = true;
-
     function parseDate(text) {
         const parts = text.trim().split('/');
         if (parts.length === 3) {
@@ -16,53 +7,61 @@ document.addEventListener('DOMContentLoaded', function () {
         return new Date(0);
     }
 
-    headers.forEach((header, columnIndex) => {
-        if (header.textContent.trim() === "Actions") {
-            return;
-        }
+    document.querySelectorAll(".w3-table").forEach((table) => {
+        const tbody = table.tBodies[0];
+        const headers = table.tHead ? table.tHead.querySelectorAll("th") : [];
+        if (!tbody || !headers.length || !table.querySelector(".sort-arrow")) return;
 
-        header.style.cursor = "pointer";    
+        let currentColumn = -1;
+        let isAsc = true;
 
-        header.addEventListener("click", () => {
-            if (currentColumn === columnIndex) {
-                isAsc = !isAsc;
-            } else {
-                isAsc = true;
-                currentColumn = columnIndex;
+        headers.forEach((header, columnIndex) => {
+            if (header.textContent.trim() === "Actions") {
+                return;
             }
 
-            table.querySelectorAll(".sort-arrow").forEach(el => el.textContent = "");
+            header.style.cursor = "pointer";
 
-            // on ajoute de la flèche sur la colonne cliquée
-            const arrowSpan = header.querySelector(".sort-arrow");
-            if (arrowSpan) {
-                arrowSpan.textContent = isAsc ? " ▲" : " ▼";
-            }
-
-            const rows = Array.from(tbody.querySelectorAll("tr.item-emprunt"));
-
-            rows.sort((rowA, rowB) => {
-                if (!rowA.children[columnIndex] || !rowB.children[columnIndex]) return 0;
-
-                let cellA = rowA.children[columnIndex].textContent.trim();
-                let cellB = rowB.children[columnIndex].textContent.trim();
-
-                if (cellA.includes('/') || cellB.includes('/')) {
-                    return isAsc ? parseDate(cellA) - parseDate(cellB) : parseDate(cellB) - parseDate(cellA);
+            header.addEventListener("click", () => {
+                if (currentColumn === columnIndex) {
+                    isAsc = !isAsc;
+                } else {
+                    isAsc = true;
+                    currentColumn = columnIndex;
                 }
 
-                return isAsc ?
-                    cellA.localeCompare(cellB, undefined, {
-                        numeric: true,
-                        sensitivity: 'base'
-                    }) :
-                    cellB.localeCompare(cellA, undefined, {
-                        numeric: true,
-                        sensitivity: 'base'
-                    });
-            });
+                table.querySelectorAll(".sort-arrow").forEach(el => el.textContent = "");
 
-            rows.forEach(row => tbody.appendChild(row));
+                const arrowSpan = header.querySelector(".sort-arrow");
+                if (arrowSpan) {
+                    arrowSpan.textContent = isAsc ? " ▲" : " ▼";
+                }
+
+                const rows = Array.from(tbody.rows);
+
+                rows.sort((rowA, rowB) => {
+                    if (!rowA.children[columnIndex] || !rowB.children[columnIndex]) return 0;
+
+                    let cellA = rowA.children[columnIndex].textContent.trim();
+                    let cellB = rowB.children[columnIndex].textContent.trim();
+
+                    if (cellA.includes('/') || cellB.includes('/')) {
+                        return isAsc ? parseDate(cellA) - parseDate(cellB) : parseDate(cellB) - parseDate(cellA);
+                    }
+
+                    return isAsc ?
+                        cellA.localeCompare(cellB, undefined, {
+                            numeric: true,
+                            sensitivity: 'base'
+                        }) :
+                        cellB.localeCompare(cellA, undefined, {
+                            numeric: true,
+                            sensitivity: 'base'
+                        });
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+            });
         });
     });
 });
