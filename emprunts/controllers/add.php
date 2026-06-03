@@ -89,9 +89,9 @@ foreach ($lots as $lotObj) {
     ];
 }
 
-usort($materiels, function ($a, $b) use ($db) {
-    $dispoA = Materiel::estDisponible($db, $a->id_materiel) ? 1 : 0;
-    $dispoB = Materiel::estDisponible($db, $b->id_materiel) ? 1 : 0;
+usort($materiels, function ($a, $b) {
+    $dispoA = $a->disponible ? 1 : 0;
+    $dispoB = $b->disponible ? 1 : 0;
 
     if ($dispoA !== $dispoB) {
         return $dispoB <=> $dispoA;

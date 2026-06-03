@@ -11,8 +11,9 @@ class Materiel
     private string $descriptif;
     private ?string $remarque;
     private bool $disponible;
+    private ?string $date_retour_prevue;
 
-    public static array $etats = ['OK', 'En réparation', 'Endommagé', 'Disparu'];
+    public static array $etats = ['OK', 'Réservé', 'En réparation', 'Endommagé', 'Disparu'];
 
     private PDO $db;
 
@@ -30,6 +31,7 @@ class Materiel
         $this->descriptif = '';
         $this->remarque = null;
         $this->disponible = true;
+        $this->date_retour_prevue = null;
 
         if (!empty($data))
             $this->hydrate($data);
@@ -59,6 +61,28 @@ class Materiel
             if (property_exists($this, $key))
                 $this->$key = $value;
         }
+    }
+
+    private static function fields(): array
+    {
+        return array(
+            'M.id_materiel',
+            'M.nom',
+            'M.modele',
+            'M.annee',
+            'M.etiquette_ulco',
+            'M.localisation',
+            'M.etat',
+            'M.descriptif',
+            'M.remarque',
+            "(M.etat::text <> 'Réservé' AND is_materiel_disponible(M.id_materiel)) AS disponible",
+            "(SELECT TO_CHAR(MIN(E.date_prevue_restitution), 'YYYY-MM-DD')
+              FROM emprunt_materiels EM
+              INNER JOIN emprunts E ON E.id_emprunt = EM.id_emprunt
+              WHERE EM.id_materiel = M.id_materiel
+                AND E.date_reelle_restitution IS NULL
+                AND EM.date_reelle_restitution IS NULL) AS date_retour_prevue"
+        );
     }
 
     public function create(): void
@@ -105,9 +129,9 @@ class Materiel
     public function fetch(int $identifier): void
     {
         try {
-            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'etat', 'localisation', 'descriptif', 'remarque', 'is_materiel_disponible(id_materiel) AS disponible');
+            $fields = Materiel::fields();
 
-            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels WHERE id_materiel = :id_materiel';
+            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels M WHERE M.id_materiel = :id_materiel';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id_materiel', $identifier, PDO::PARAM_INT);
             $stmt->execute();
@@ -145,8 +169,8 @@ class Materiel
     public static function fetchAll(PDO $db): array
     {
         try {
-            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque', 'is_materiel_disponible(id_materiel) AS disponible');
-            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels';
+            $fields = Materiel::fields();
+            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels M';
             $stmt = $db->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -167,14 +191,13 @@ class Materiel
     public static function estDisponible(PDO $db, int $id_materiel): bool
     {
         try {
-            $sql = 'SELECT is_materiel_disponible(:id_materiel) AS disponible';
+            $sql = "SELECT (etat::text <> 'Réservé' AND is_materiel_disponible(:id_materiel)) AS disponible FROM materiels WHERE id_materiel = :id_materiel";
             $stmt = $db->prepare($sql);
             $stmt->bindValue(':id_materiel', $id_materiel, PDO::PARAM_INT);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($result) {
-                $disponible = $result['disponible'];
-                return $disponible === true || $disponible === 1 || $disponible === '1' || $disponible === 't' || $disponible === 'true';
+                return $result['disponible'];
             }
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR lors de la vérification de la disponibilité du matériel : " . $e->getMessage();

@@ -43,8 +43,19 @@
                     $etat_class = 'w3-text-red';
                 } elseif ($materiel->etat === 'En réparation') {
                     $etat_class = 'w3-text-orange';
+                } elseif ($materiel->etat === 'Réservé') {
+                    $etat_class = 'w3-text-blue';
                 }
-                $emprunt_label = $materiel->disponible ? 'Non emprunté' : 'Emprunté';
+                $date_retour_prevue = $materiel->date_retour_prevue ? formatDisplayDate(sanitize($materiel->date_retour_prevue)) : '';
+                if ($materiel->disponible) {
+                    $emprunt_label = 'Non emprunté';
+                } elseif ($date_retour_prevue !== '') {
+                    $emprunt_label = 'Emprunté jusqu’au ' . $date_retour_prevue;
+                } elseif ($materiel->etat === 'Réservé') {
+                    $emprunt_label = 'Réservé';
+                } else {
+                    $emprunt_label = 'Emprunté';
+                }
                 $emprunt_class = $materiel->disponible ? 'w3-text-green' : 'w3-text-red';
                 ?>
 

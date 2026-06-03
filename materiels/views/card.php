@@ -44,6 +44,7 @@
                     <?php foreach (Materiel::$etats as $etat):
                         $classEtat = '';
                         if ($etat === 'OK') $classEtat = 'etat-ok';
+                        elseif ($etat === 'Réservé') $classEtat = 'etat-reserve';
                         elseif ($etat === 'En réparation') $classEtat = 'etat-reparation';
                         elseif ($etat === 'Endommagé') $classEtat = 'etat-endommage';
                         elseif ($etat === 'Disparu') $classEtat = 'etat-disparu';
@@ -147,7 +148,7 @@
             function changerCouleurSelect(selectElement) {
                 const optionSelectionnee = selectElement.options[selectElement.selectedIndex];
 
-                selectElement.classList.remove('etat-ok', 'etat-reparation', 'etat-endommage', 'etat-disparu');
+                selectElement.classList.remove('etat-ok', 'etat-reserve', 'etat-reparation', 'etat-endommage', 'etat-disparu');
 
                 if (optionSelectionnee.className) {
                     selectElement.classList.add(optionSelectionnee.className);

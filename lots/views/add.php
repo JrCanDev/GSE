@@ -15,17 +15,27 @@
             type="search" id="searchBar" onkeyup="filtrerMateriel()"
             placeholder="Rechercher par nom, ID ou modèle...">
 
+        <label class="w3-margin-top w3-left-align" style="display:block;">
+            <input type="checkbox" id="afficherMaterielsUtilises" onchange="filtrerMateriel()">
+            Afficher les matériels déjà utilisés
+        </label>
+
         <div>
             <div class="scroll-container w3-margin-top">
                 <div class="w3-row-padding">
                     <?php foreach ($materiels as $m): ?>
-                        <div class="w3-third w3-margin-bottom item-materiel">
                             <?php
-                            // Si le matériel n'est pas disponible, on grise la carte et on empêche la sélection
                             $classes = "w3-border w3-round-xxlarge w3-center w3-padding-small selection-materiel";
+                            $estDisponible = (bool) $m->disponible;
                             $etiquetteUlco = trim((string) ($m->etiquette_ulco ?? ''));
                             $modele = trim((string) ($m->modele ?? ''));
+                            $dateRetourPrevue = $m->date_retour_prevue ? formatDisplayDate(sanitize($m->date_retour_prevue)) : '';
+                            $statutMateriel = $estDisponible ? 'Disponible' : ($dateRetourPrevue !== '' ? 'Emprunté jusqu’au ' . $dateRetourPrevue : ($m->etat === 'Réservé' ? 'Réservé' : 'Indisponible'));
                             $infosMateriel = [$m->nom];
+
+                            if (!$estDisponible) {
+                                $classes .= " selection-materiel-utilise";
+                            }
 
                             if ($etiquetteUlco !== '') {
                                 $infosMateriel[] = $etiquetteUlco;
@@ -35,6 +45,7 @@
                                 $infosMateriel[] = $modele;
                             }
                             ?>
+                        <div class="w3-third w3-margin-bottom item-materiel" data-utilise="<?= $estDisponible ? '0' : '1' ?>">
                             <label class="<?= $classes ?>" for="materiel-<?= $m->id_materiel ?>">
                                 <input
                                     class="materiel-checkbox"
@@ -44,7 +55,7 @@
                                     value="<?= $m->id_materiel ?>"
                                     style="display:none;"
                                     onchange="toggleMaterielSelection(this)">
-                                <span class="txt-materiel"><b><?= sanitize(implode(' | ', $infosMateriel)) ?></b></span>
+                                <span class="txt-materiel"><b><?= sanitize(implode(' | ', $infosMateriel)) ?></b><br><?= sanitize($statutMateriel) ?></span>
                             </label>
                         </div>
                     <?php endforeach; ?>
@@ -81,20 +92,22 @@
 
             function filtrerMateriel() {
                 let input = document.getElementById('searchBar').value.toLowerCase();
+                let afficherUtilises = document.getElementById('afficherMaterielsUtilises').checked;
                 let items = document.getElementsByClassName('item-materiel');
 
                 for (let i = 0; i < items.length; i++) {
-                    // on récupère le texte (nom, id et modèle)
                     let texteComplet = items[i].textContent || items[i].innerText;
+                    let estUtilise = items[i].dataset.utilise === '1';
 
-                    // si le texte contient la recherche, on affiche
-                    if (texteComplet.toLowerCase().indexOf(input) > -1) {
+                    if ((!estUtilise || afficherUtilises) && texteComplet.toLowerCase().indexOf(input) > -1) {
                         items[i].style.display = "";
                     } else {
                         items[i].style.display = "none";
                     }
                 }
             }
+
+            filtrerMateriel();
 
             function toggleMaterielSelection(input) {
                 const card = input.closest('.selection-materiel');

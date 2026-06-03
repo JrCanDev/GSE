@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS groupes (
     est_affiche BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-CREATE TYPE etat_materiel AS ENUM ('OK', 'En réparation', 'Endommagé', 'Disparu');
+CREATE TYPE etat_materiel AS ENUM ('OK', 'Réservé', 'En réparation', 'Endommagé', 'Disparu');
 
 CREATE TABLE IF NOT EXISTS materiels (
     id_materiel SERIAL PRIMARY KEY,
@@ -143,7 +143,13 @@ BEGIN
       AND E.date_reelle_restitution IS NULL
       AND EM.date_reelle_restitution IS NULL;
 
-    RETURN emprunt_count = 0;
+    RETURN emprunt_count = 0
+       AND NOT EXISTS (
+           SELECT 1
+           FROM materiels M
+           WHERE M.id_materiel = p_id_materiel
+             AND M.etat = 'Réservé'
+       );
 END;
 $$ LANGUAGE plpgsql;
 
@@ -159,7 +165,15 @@ SELECT
   etat,
   descriptif,
   remarque,
-  is_materiel_disponible(id_materiel) AS disponible
+  (etat::text <> 'Réservé' AND is_materiel_disponible(id_materiel)) AS disponible,
+  (
+    SELECT TO_CHAR(MIN(E.date_prevue_restitution), 'YYYY-MM-DD')
+    FROM emprunt_materiels EM
+    INNER JOIN emprunts E ON E.id_emprunt = EM.id_emprunt
+    WHERE EM.id_materiel = materiels.id_materiel
+      AND E.date_reelle_restitution IS NULL
+      AND EM.date_reelle_restitution IS NULL
+  ) AS date_retour_prevue
 FROM materiels
 ORDER BY id_materiel;
 

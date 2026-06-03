@@ -46,6 +46,13 @@ if (isset($_POST["submit"])) {
 
 $materiels = Materiel::fetchAll($db);
 
-usort($materiels, function($a, $b) {
+usort($materiels, function ($a, $b) {
+    $dispoA = $a->disponible ? 1 : 0;
+    $dispoB = $b->disponible ? 1 : 0;
+
+    if ($dispoA !== $dispoB) {
+        return $dispoB <=> $dispoA;
+    }
+
     return $a->id_materiel <=> $b->id_materiel;
 });

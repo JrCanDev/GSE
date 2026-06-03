@@ -160,6 +160,16 @@ footer {
   color: #ffffff;
 }
 
+.selection-materiel-utilise {
+  background-color: #6b6b6b;
+  color: #ffffff;
+  border-color: #6b6b6b;
+}
+
+.selection-materiel-utilise .txt-materiel {
+  color: #ffffff;
+}
+
 .item-materiel {
   overflow: hidden;
 }
@@ -190,6 +200,12 @@ footer {
 select.etat-ok,
 option.etat-ok {
   color: green;
+  font-weight: bold;
+}
+
+select.etat-reserve,
+option.etat-reserve {
+  color: #0066cc;
   font-weight: bold;
 }
 
