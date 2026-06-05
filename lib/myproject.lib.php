@@ -4,16 +4,16 @@ require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 
 function GETPOST($paramname)
 {
-    if (isset($_POST[$paramname]) && !empty($_POST[$paramname]))
-        return $_POST[$paramname];
-    if (isset($_GET[$paramname]) && !empty($_GET[$paramname]))
-        return $_GET[$paramname];
-    return null;
+  if (isset($_POST[$paramname]) && !empty($_POST[$paramname]))
+    return $_POST[$paramname];
+  if (isset($_GET[$paramname]) && !empty($_GET[$paramname]))
+    return $_GET[$paramname];
+  return null;
 }
 
 function GETPOSTISSET($paramname)
 {
-    return (isset($_POST[$paramname]) || isset($_GET[$paramname]));
+  return (isset($_POST[$paramname]) || isset($_GET[$paramname]));
 }
 
 function toFloat($value)
@@ -139,16 +139,16 @@ function getInputType($type, $pdo = false): string
 
 function formatDisplayDate(?string $date): string
 {
-    if (empty($date)) {
-        return 'En attente';
-    }
+  if (empty($date)) {
+    return 'En attente';
+  }
 
-    $dateTime = DateTime::createFromFormat('Y-m-d', $date);
-    if ($dateTime === false) {
-        return $date;
-    }
+  $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+  if ($dateTime === false) {
+    return $date;
+  }
 
-    return $dateTime->format('d/m/Y');
+  return $dateTime->format('d/m/Y');
 }
 
 function isDebugEnabled(): bool
@@ -174,9 +174,9 @@ function formatUserError(string $message): string
 {
   $message = trim($message);
 
-  // if (isDebugEnabled()) {
-  //   return $message;
-  // }
+  if (isDebugEnabled()) {
+    return $message;
+  }
 
   $dbMessage = formatDatabaseError($message);
   if ($dbMessage !== null) {

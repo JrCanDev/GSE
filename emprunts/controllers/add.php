@@ -7,7 +7,7 @@ require_once(dirname(__FILE__) . '/../../class/lot.class.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 
-if (!isUserAdmin()) {
+if (!isUserLoggedIn()) {
     include dirname(__FILE__) . '/../../login.php';
     exit(1);
 }

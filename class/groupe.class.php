@@ -34,6 +34,11 @@ class Groupe
             $this->$name = $value;
     }
 
+    public function __isset($name): bool
+    {
+        return property_exists($this, $name) && isset($this->$name);
+    }
+
     public function __toString(): string
     {
         return $this->nom_groupe . ' (ID: ' . $this->id_groupe . ')' . ' - Restitution: ' . $this->date_restitution . ' - Affiché: ' . ($this->est_affiche ? 'Oui' : 'Non');

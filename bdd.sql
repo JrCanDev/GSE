@@ -5,7 +5,7 @@ DROP TYPE IF EXISTS etat_materiel, emprunt_caution;
 CREATE TABLE IF NOT EXISTS utilisateurs (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NULL,
     admin BOOLEAN DEFAULT FALSE
 );
 

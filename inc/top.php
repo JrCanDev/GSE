@@ -39,6 +39,7 @@
     <?php } ?>
 
     <?php if ($isLoggedIn && myAuthClass::checkPriviledgeDatabase($_SESSION['user']['username'])) { ?>
+      <a href="index.php?element=utilisateurs" class="w3-bar-item w3-button headButton"><b>Utilisateurs</b></a>
       <a href="index.php?element=database" class="w3-bar-item w3-button headButton"><b>Base de données</b></a>
     <?php } ?>
   </nav>
