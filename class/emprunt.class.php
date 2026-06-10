@@ -18,6 +18,7 @@ class Emprunt
     private ?string $materiels_resume;
     private ?string $materiels_details;
     private array $ids_materiels;
+    private int $entite_id;
 
     public static array $cautions = array('Déposée', 'En attente', 'Non demandée');
 
@@ -44,6 +45,7 @@ class Emprunt
         $this->materiels_resume = null;
         $this->materiels_details = null;
         $this->ids_materiels = [];
+        $this->entite_id = -1;
 
         if (!empty($data)) {
             $this->hydrate($data);
@@ -106,7 +108,7 @@ class Emprunt
             $this->db->beginTransaction();
 
             $sql = 'SELECT create_emprunt(:nom_emprunteur, :prenom_emprunteur,
-                  :id_groupe, :ids_materiels::int[], :date_emprunt, :date_prevue_restitution, :caution, :remarque) AS id_emprunt';
+                  :id_groupe, :ids_materiels::int[], :date_emprunt, :date_prevue_restitution, :caution, :remarque, :entite_id) AS id_emprunt';
             $stmt = $this->db->prepare($sql);
 
             $stmt->bindValue(':nom_emprunteur', $this->nom_emprunteur, PDO::PARAM_STR);
@@ -117,6 +119,7 @@ class Emprunt
             $stmt->bindValue(':date_prevue_restitution', $this->date_prevue_restitution, PDO::PARAM_STR);
             $stmt->bindValue(':caution', $this->caution, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, $this->remarque === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT);
 
             $stmt->execute();
 
@@ -155,7 +158,8 @@ class Emprunt
                 'nombre_materiels',
                 'nombre_materiels_rendus',
                 'materiels_resume',
-                'materiels_details'
+                'materiels_details',
+                'entite_id'
             );
 
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels WHERE id_emprunt = :id_emprunt';
@@ -266,10 +270,27 @@ class Emprunt
                 'nombre_materiels',
                 'nombre_materiels_rendus',
                 'materiels_resume',
-                'materiels_details'
+                'materiels_details',
+                'entite_id' // <-- Correction 1 : Ajouté pour pouvoir hydrater la propriété
             );
-            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels ORDER BY id_emprunt DESC';
-            $stmt = $db->query($sql);
+            
+            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels';
+
+            // --- CLOISONNEMENT PHP ---
+            $isNotAdmin = (empty($_SESSION['user']['admin']) || $_SESSION['user']['admin'] !== true);
+            if ($isNotAdmin) {
+                $sql .= ' WHERE entite_id = :entite_id'; // <-- Correction 2 : On rajoute le filtre manquant
+            }
+
+            $sql .= ' ORDER BY id_emprunt DESC';
+            
+            $stmt = $db->prepare($sql);
+
+            if ($isNotAdmin) {
+                $stmt->bindValue(':entite_id', $_SESSION['user']['entite_id'] ?? 0, PDO::PARAM_INT);
+            }
+
+            $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $emprunts = [];
@@ -301,8 +322,18 @@ class Emprunt
                         etat_restitution 
                     FROM get_emprunts_by_materiel(:id_materiel)';
 
+            $isNotAdmin = (empty($_SESSION['user']['admin']) || $_SESSION['user']['admin'] !== true);
+            if ($isNotAdmin) {
+                $sql .= ' WHERE entite_id = :entite_id';
+            }
+
             $stmt = $db->prepare($sql);
             $stmt->bindValue(':id_materiel', $id_materiel, PDO::PARAM_INT);
+
+            if ($isNotAdmin) {
+                $stmt->bindValue(':entite_id', $_SESSION['user']['entite_id'] ?? 0, PDO::PARAM_INT);
+            }
+
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

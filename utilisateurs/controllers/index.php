@@ -3,6 +3,7 @@ session_start();
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 require_once(dirname(__FILE__) . '/../../class/utilisateur.class.php');
+require_once(dirname(__FILE__) . '/../../class/entite.class.php');
 
 if (!isUserAdmin()) {
     header('location: index.php');

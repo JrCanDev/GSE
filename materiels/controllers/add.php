@@ -58,6 +58,8 @@ if (isset($_POST["submit"])) {
         }
     }
 
+    $data['entite_id'] = intval($_SESSION['user']['entite_id'] ?? 0);
+
     $materiel = new Materiel($db, $data);
     $materiel->create();
 

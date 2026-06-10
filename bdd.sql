@@ -2,10 +2,16 @@ DROP VIEW IF EXISTS vw_emprunt_materiels, vw_emprunts_materiels, vw_materiels, v
 DROP TABLE IF EXISTS emprunt_materiels, utilisateurs, groupes, materiels, emprunts;
 DROP TYPE IF EXISTS etat_materiel, emprunt_caution;
 
+CREATE TABLE IF NOT EXISTS entites (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(50) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS utilisateurs (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NULL,
+    entite_id INT REFERENCES entites(id) ON DELETE CASCADE,
     admin BOOLEAN DEFAULT FALSE
 );
 
@@ -27,7 +33,8 @@ CREATE TABLE IF NOT EXISTS materiels (
     etat etat_materiel NOT NULL DEFAULT 'OK',
     localisation VARCHAR(255) NOT NULL, 
     descriptif TEXT NULL,
-    remarque TEXT NULL
+    remarque TEXT NULL,
+    entite_id INT NOT NULL REFERENCES entites(id) ON DELETE CASCADE
 );
 
 CREATE TYPE emprunt_caution AS ENUM ('Déposée', 'En attente', 'Non demandée');
@@ -36,7 +43,7 @@ CREATE TABLE IF NOT EXISTS emprunts (
     id_emprunt SERIAL PRIMARY KEY,
     nom_emprunteur VARCHAR(255) NOT NULL,
     prenom_emprunteur VARCHAR(255) NOT NULL,
-    id_groupe INT NOT NULL,
+    id_groupe INT NOT NULL REFERENCES groupes(id_groupe) ON DELETE CASCADE,
     date_emprunt DATE NOT NULL,
     date_prevue_restitution DATE NOT NULL,
     date_reelle_restitution DATE NULL,
@@ -44,7 +51,7 @@ CREATE TABLE IF NOT EXISTS emprunts (
     remarque TEXT NULL,
     etat_restitution etat_materiel NULL,
     remarque_restitution TEXT NULL,
-    FOREIGN KEY (id_groupe) REFERENCES groupes(id_groupe)
+    entite_id INT NOT NULL REFERENCES entites(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS emprunt_materiels (
@@ -55,12 +62,13 @@ CREATE TABLE IF NOT EXISTS emprunt_materiels (
     remarque_restitution TEXT NULL,
     PRIMARY KEY (id_emprunt, id_materiel),
     FOREIGN KEY (id_emprunt) REFERENCES emprunts(id_emprunt) ON DELETE CASCADE,
-    FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel)
+    FOREIGN KEY (id_materiel) REFERENCES materiels(id_materiel) ON DELETE CASCADE
 );
 
 CREATE TABLE lots(
     id_lot SERIAL PRIMARY KEY,
-    nom_lot VARCHAR(255) NOT NULL
+    nom_lot VARCHAR(255) NOT NULL,
+    entite_id INT NOT NULL REFERENCES entites(id) ON DELETE CASCADE
 );
 
 CREATE TABLE lot_materiels(
@@ -69,6 +77,7 @@ CREATE TABLE lot_materiels(
     PRIMARY KEY (id_lot, id_materiel)
 );
 
+INSERT INTO entites (nom) VALUES ('INFO'), ('JRCANDEV');
 INSERT INTO utilisateurs (username, password, admin) VALUES ('admin', md5('admin'), true);
 
 -- Vue pour afficher les emprunts avec un résumé de leurs matériels
@@ -86,6 +95,7 @@ SELECT
     E.remarque,
     E.etat_restitution AS etat_restitution,
     E.remarque_restitution AS remarque_restitution,
+    E.entite_id,    
     COUNT(EM.id_materiel) AS nombre_materiels,
     COUNT(EM.id_materiel) FILTER (WHERE EM.date_reelle_restitution IS NOT NULL) AS nombre_materiels_rendus,
     STRING_AGG(M.nom, ', ' ORDER BY M.id_materiel) AS materiels_resume,
@@ -126,7 +136,8 @@ SELECT
     M.etat AS etat_materiel,
     TO_CHAR(EM.date_reelle_restitution, 'YYYY-MM-DD') AS date_reelle_restitution,
     EM.etat_restitution,
-    EM.remarque_restitution
+    EM.remarque_restitution,
+    M.entite_id
 FROM emprunt_materiels AS EM
 INNER JOIN materiels AS M ON M.id_materiel = EM.id_materiel;
 
@@ -165,6 +176,7 @@ SELECT
   etat,
   descriptif,
   remarque,
+  entite_id,
   (etat::text <> 'Réservé' AND is_materiel_disponible(id_materiel)) AS disponible,
   (
     SELECT TO_CHAR(MIN(E.date_prevue_restitution), 'YYYY-MM-DD')
@@ -188,7 +200,7 @@ FROM groupes
 ORDER BY id_groupe;
 
 -- Vue pour afficher les statistiques de prêts par année universitaire et groupe
-CREATE OR REPLACE FUNCTION stats_materiels_filtre(recherche TEXT)
+CREATE OR REPLACE FUNCTION stats_materiels_filtre(recherche TEXT, p_entite_id INT)
 RETURNS TABLE(annee_universitaire TEXT, nom_groupe VARCHAR, nombre_prets BIGINT) AS $$
 BEGIN
     RETURN QUERY
@@ -202,10 +214,10 @@ BEGIN
         COUNT(DISTINCT E.id_emprunt) AS nombre_prets
     FROM emprunts AS E
     INNER JOIN groupes AS G ON E.id_groupe = G.id_groupe
-    -- On passe par la table pivot ici :
     INNER JOIN emprunt_materiels AS EM ON EM.id_emprunt = E.id_emprunt
     INNER JOIN materiels AS M ON EM.id_materiel = M.id_materiel
-    WHERE M.nom ILIKE '%' || recherche || '%' OR M.modele ILIKE '%' || recherche || '%'
+    WHERE (M.nom ILIKE '%' || recherche || '%' OR M.modele ILIKE '%' || recherche || '%')
+      AND (p_entite_id IS NULL OR E.entite_id = p_entite_id)
     GROUP BY annee_universitaire, G.nom_groupe
     ORDER BY annee_universitaire DESC, nombre_prets DESC;
 END;
@@ -220,13 +232,14 @@ CREATE OR REPLACE FUNCTION create_materiel(
     localisation VARCHAR,
     etat etat_materiel,
     descriptif TEXT,
-    remarque TEXT
+    remarque TEXT,
+    p_entite_id INT
 ) RETURNS INTEGER AS $$
 DECLARE
     new_id INTEGER;
 BEGIN
-    INSERT INTO materiels (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque)
-    VALUES (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque)
+    INSERT INTO materiels (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque, entite_id)
+    VALUES (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque, p_entite_id)
     RETURNING id_materiel INTO new_id;
     RETURN new_id;
 END;
@@ -241,14 +254,15 @@ CREATE OR REPLACE FUNCTION create_emprunt(
     date_emprunt DATE,
     date_prevue_restitution DATE,
     caution emprunt_caution,
-    remarque TEXT
+    remarque TEXT, 
+    p_entite_id INT
 ) RETURNS INTEGER AS $$
 DECLARE
     new_id INTEGER;
     id_materiel_courant INT;
 BEGIN
-    INSERT INTO emprunts (nom_emprunteur, prenom_emprunteur, id_groupe, date_emprunt, date_prevue_restitution, caution, remarque)
-    VALUES (nom_emprunteur, prenom_emprunteur, id_groupe, date_emprunt, date_prevue_restitution, caution, remarque)
+    INSERT INTO emprunts (nom_emprunteur, prenom_emprunteur, id_groupe, date_emprunt, date_prevue_restitution, caution, remarque, entite_id)
+    VALUES (nom_emprunteur, prenom_emprunteur, id_groupe, date_emprunt, date_prevue_restitution, caution, remarque, p_entite_id)
     RETURNING id_emprunt INTO new_id;
 
     FOREACH id_materiel_courant IN ARRAY ids_materiels LOOP
@@ -338,46 +352,49 @@ DECLARE
     etat_global etat_materiel;
     remarque_globale TEXT;
 BEGIN
-    IF NEW.date_reelle_restitution IS NOT NULL AND OLD.date_reelle_restitution IS NULL THEN
-        SELECT COUNT(*) INTO materiels_non_rendus
+    -- On met à jour l'état du matériel individuel en premier
+    IF NEW.etat_restitution IS NOT NULL THEN
+        UPDATE materiels SET etat = NEW.etat_restitution WHERE id_materiel = NEW.id_materiel;
+    END IF;
+
+    SELECT COUNT(*) INTO materiels_non_rendus
+    FROM emprunt_materiels
+    WHERE id_emprunt = NEW.id_emprunt
+        AND date_reelle_restitution IS NULL;
+
+    IF materiels_non_rendus = 0 THEN
+        SELECT CASE
+            WHEN BOOL_OR(etat_restitution = 'Disparu') THEN 'Disparu'::etat_materiel
+            WHEN BOOL_OR(etat_restitution = 'Endommagé') THEN 'Endommagé'::etat_materiel
+            WHEN BOOL_OR(etat_restitution = 'En réparation') THEN 'En réparation'::etat_materiel
+            ELSE 'OK'::etat_materiel
+        END INTO etat_global
         FROM emprunt_materiels
-        WHERE id_emprunt = NEW.id_emprunt
-          AND date_reelle_restitution IS NULL;
+        WHERE id_emprunt = NEW.id_emprunt;
 
-        IF materiels_non_rendus = 0 THEN
-            SELECT CASE
-                WHEN BOOL_OR(etat_restitution = 'Disparu') THEN 'Disparu'::etat_materiel
-                WHEN BOOL_OR(etat_restitution = 'Endommagé') THEN 'Endommagé'::etat_materiel
-                WHEN BOOL_OR(etat_restitution = 'En réparation') THEN 'En réparation'::etat_materiel
-                ELSE 'OK'::etat_materiel
-            END INTO etat_global
-            FROM emprunt_materiels
-            WHERE id_emprunt = NEW.id_emprunt;
+        SELECT STRING_AGG(
+            CONCAT(
+                'Matériel #', id_materiel,
+                CASE WHEN remarque_restitution IS NOT NULL AND remarque_restitution <> ''
+                    THEN ' : ' || remarque_restitution
+                    ELSE ''
+                END
+            ),
+            ' | ' ORDER BY id_materiel
+        ) INTO remarque_globale
+        FROM emprunt_materiels
+        WHERE id_emprunt = NEW.id_emprunt;
 
-            SELECT STRING_AGG(
-                CONCAT(
-                    'Matériel #', id_materiel,
-                    CASE WHEN remarque_restitution IS NOT NULL AND remarque_restitution <> ''
-                        THEN ' : ' || remarque_restitution
-                        ELSE ''
-                    END
-                ),
-                ' | ' ORDER BY id_materiel
-            ) INTO remarque_globale
-            FROM emprunt_materiels
-            WHERE id_emprunt = NEW.id_emprunt;
+        UPDATE emprunts
+        SET date_reelle_restitution = COALESCE(NEW.date_reelle_restitution, CURRENT_DATE),
+            etat_restitution = etat_global,
+            remarque_restitution = remarque_globale 
+        WHERE id_emprunt = NEW.id_emprunt;
 
-            UPDATE emprunts
-            SET date_reelle_restitution = COALESCE(NEW.date_reelle_restitution, CURRENT_DATE),
-                etat_restitution = etat_global,
-                remarque_restitution = remarque_globale
-            WHERE id_emprunt = NEW.id_emprunt;
-
-                        UPDATE materiels
-                        SET etat = NEW.etat_restitution
-                        WHERE id_materiel = NEW.id_materiel
-                            AND NEW.etat_restitution IS NOT NULL;
-        END IF;
+        UPDATE materiels
+        SET etat = NEW.etat_restitution
+        WHERE id_materiel = NEW.id_materiel
+            AND NEW.etat_restitution IS NOT NULL;
     END IF;
 
     RETURN NEW;
@@ -449,7 +466,6 @@ BEGIN
     FROM emprunt_materiels EM
     INNER JOIN emprunts E ON E.id_emprunt = EM.id_emprunt
     INNER JOIN groupes G ON G.id_groupe = E.id_groupe
-    WHERE EM.id_materiel = p_id_materiel
-    ORDER BY E.id_emprunt DESC;
+    WHERE EM.id_materiel = p_id_materiel ORDER BY E.id_emprunt DESC;
 END;
 $$ LANGUAGE plpgsql;

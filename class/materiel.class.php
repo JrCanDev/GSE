@@ -12,6 +12,7 @@ class Materiel
     private ?string $remarque;
     private bool $disponible;
     private ?string $date_retour_prevue;
+    private int $entite_id;
 
     public static array $etats = ['OK', 'Réservé', 'En réparation', 'Endommagé', 'Disparu'];
 
@@ -32,6 +33,7 @@ class Materiel
         $this->remarque = null;
         $this->disponible = true;
         $this->date_retour_prevue = null;
+        $this->entite_id = -1; // <-- Initialisation
 
         if (!empty($data))
             $this->hydrate($data);
@@ -75,6 +77,7 @@ class Materiel
             'M.etat',
             'M.descriptif',
             'M.remarque',
+            'M.entite_id', // <-- Ajouté pour qu'il soit récupéré par l'hydratation
             "(M.etat::text <> 'Réservé' AND is_materiel_disponible(M.id_materiel)) AS disponible",
             "(SELECT TO_CHAR(MIN(E.date_prevue_restitution), 'YYYY-MM-DD')
               FROM emprunt_materiels EM
@@ -88,17 +91,18 @@ class Materiel
     public function create(): void
     {
         try {
-            $fields = array('nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque');
+            $fields = array('nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque', 'entite_id');
             $sql = 'SELECT create_materiel(:' . implode(', :', $fields) . ') AS id_materiel';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':nom', $this->nom, PDO::PARAM_STR);
             $stmt->bindValue(':modele', $this->modele, PDO::PARAM_STR);
             $stmt->bindValue(':annee', $this->annee, PDO::PARAM_INT);
             $stmt->bindValue(':etiquette_ulco', $this->etiquette_ulco, PDO::PARAM_STR);
-            $stmt->bindValue(':etat', $this->etat, PDO::PARAM_STR);
             $stmt->bindValue(':localisation', $this->localisation, PDO::PARAM_STR);
+            $stmt->bindValue(':etat', $this->etat, PDO::PARAM_STR);
             $stmt->bindValue(':descriptif', $this->descriptif, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, PDO::PARAM_STR);
+            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT); // <-- Liaison lors de la création
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($result) {
@@ -113,7 +117,9 @@ class Materiel
     public static function fetchByEtiquetteUlco(PDO $db, string $etiquette): ?array
     {
         try {
-            $sql = 'SELECT id_materiel, nom, modele, etiquette_ulco FROM materiels WHERE etiquette_ulco = :etiquette LIMIT 1';
+            // Optionnel : On peut aussi rajouter le filtre d'entité ici si nécessaire,
+            // mais l'étiquette ULCO étant unique, le comportement reste globalement sain.
+            $sql = 'SELECT id_materiel, nom, modele, etiquette_ulco, entite_id FROM materiels WHERE etiquette_ulco = :etiquette LIMIT 1';
             $stmt = $db->prepare($sql);
             $stmt->bindValue(':etiquette', $etiquette, PDO::PARAM_STR);
             $stmt->execute();
@@ -170,8 +176,22 @@ class Materiel
     {
         try {
             $fields = Materiel::fields();
-            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels M';
-            $stmt = $db->query($sql);
+            $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels AS M';
+            
+            $isNotAdmin = (empty($_SESSION['user']['admin']) || $_SESSION['user']['admin'] !== true);
+            if ($isNotAdmin) {
+                $sql .= ' WHERE M.entite_id = :entite_id';
+            }
+            
+            $sql .= ' ORDER BY M.id_materiel';
+            
+            $stmt = $db->prepare($sql);
+            
+            if ($isNotAdmin) {
+                $stmt->bindValue(':entite_id', $_SESSION['user']['entite_id'] ?? 0, PDO::PARAM_INT);
+            }
+            
+            $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $materiels = [];

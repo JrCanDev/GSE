@@ -14,6 +14,20 @@
             </div>
         </div>
 
+        <!-- ID de l'entité -->
+        <div class="w3-row-padding w3-margin-top">
+            <div class="w3-full">
+                <label><b>Entité<span style="color: red;">*</span></b></label>
+                <select class="w3-select w3-border w3-round w3-center" name="entite_id" required>
+                    <option value="" disabled selected>Choisir une entité</option>
+                    <?php
+                    foreach ($entites as $entite): ?>
+                        <option value="<?= $entite->id ?>"><?= sanitize($entite->nom) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
         <!-- Rôle Administrateur -->
         <div class="w3-row-padding w3-margin-top">
             <div class="w3-full">

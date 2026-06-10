@@ -7,7 +7,7 @@ require_once(dirname(__FILE__) . '/myproject.lib.php');
 
 $action = GETPOST('action') ?? 'index';
 $element = GETPOST('element') ?? '';
-$publicReadOnlyElements = ['', '.', 'accueil', 'materiels', 'lots', 'emprunts', 'groupes', 'statistiques'];
+$publicReadOnlyElements = ['', '.', 'accueil'];
 $publicReadOnlyRoute = ($action === 'index' && in_array($element, $publicReadOnlyElements, true));
 
 $authorized = myAuthClass::is_auth($_SESSION);

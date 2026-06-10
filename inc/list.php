@@ -1,1 +1,0 @@
-<div class="dtitle">Page par defaut</div>

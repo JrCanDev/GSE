@@ -4,6 +4,7 @@ $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 require_once(dirname(__FILE__) . '/../../class/myAuthClass.php');
 require_once(dirname(__FILE__) . '/../../class/utilisateur.class.php');
+require_once(dirname(__FILE__) . '/../../class/entite.class.php');
 
 if (!isUserAdmin()) {
     header('location: index.php');
@@ -19,6 +20,7 @@ if (GETPOST('submit')) {
     $username = trim((string) GETPOST('username'));
     $username = sanitize($username);
     $admin = GETPOST('admin') ? true : false;
+    $entite_id = (int) GETPOST('entite_id');
 
     if (empty($username)) {
         $_SESSION['mesgs']['errors'][] = "Le nom d'utilisateur ne peut pas être vide.";
@@ -37,7 +39,8 @@ if (GETPOST('submit')) {
     $data = [
         'username' => $username,
         'password' => '', // Mot de passe vide par défaut pour la première connexion
-        'admin' => $admin
+        'admin' => $admin,
+        'entite_id' => $entite_id
     ];
 
     $user = new Utilisateur($db, $data);
@@ -46,3 +49,5 @@ if (GETPOST('submit')) {
     header("Location: index.php?element=utilisateurs");
     exit(1);
 }
+
+$entites = Entite::fetchAll($db);

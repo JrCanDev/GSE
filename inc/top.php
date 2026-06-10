@@ -32,13 +32,16 @@
       'groupes' => 'Groupes',
       'statistiques' => 'Statistiques',
     );
-
-    foreach ($list_menus as $key => $menu) {
     ?>
-      <a href="index.php?element=<?= $key; ?>" class="w3-bar-item w3-button headButton"><b><?= $menu; ?></b></a>
+
+    <?php if ($isLoggedIn) {
+      foreach ($list_menus as $key => $menu) {
+    ?>
+        <a href="index.php?element=<?= $key; ?>" class="w3-bar-item w3-button headButton"><b><?= $menu; ?></b></a>
+      <?php } ?>
     <?php } ?>
 
-    <?php if ($isLoggedIn && myAuthClass::checkPriviledgeDatabase($_SESSION['user']['username'])) { ?>
+    <?php if ($isLoggedIn && isUserAdmin()) { ?>
       <a href="index.php?element=utilisateurs" class="w3-bar-item w3-button headButton"><b>Utilisateurs</b></a>
       <a href="index.php?element=database" class="w3-bar-item w3-button headButton"><b>Base de données</b></a>
     <?php } ?>

@@ -4,6 +4,7 @@ class Utilisateur
     private int $id;
     private string $username;
     private string $password;
+    private ?int $entite_id;
     private bool $admin;
 
     private PDO $db;
@@ -15,6 +16,7 @@ class Utilisateur
         $this->id = -1;
         $this->username = '';
         $this->password = '';
+        $this->entite_id = -1;
         $this->admin = false;
 
         if (!empty($data)) {
@@ -59,11 +61,12 @@ class Utilisateur
     public function create(): void
     {
         try {
-            $sql = "INSERT INTO utilisateurs (username, password, admin) VALUES (:username, :password, :admin)";
+            $sql = "INSERT INTO utilisateurs (username, password, admin, entite_id) VALUES (:username, :password, :admin, :entite_id)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':username', $this->username, PDO::PARAM_STR);
             $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
             $stmt->bindValue(':admin', $this->admin, PDO::PARAM_BOOL);
+            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT);
             $stmt->execute();
 
             $this->id = (int) $this->db->lastInsertId();
@@ -77,7 +80,7 @@ class Utilisateur
     public function fetch(int $id): void
     {
         try {
-            $sql = "SELECT id, username, password, admin FROM utilisateurs WHERE id = :id";
+            $sql = "SELECT id, username, password, admin, entite_id FROM utilisateurs WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -118,15 +121,17 @@ class Utilisateur
         try {
             // Si le mot de passe est explicitement fourni ou réinitialisé, on l'inclut dans la requête
             if (isset($this->password)) {
-                $sql = "UPDATE utilisateurs SET username = :username, password = :password, admin = :admin WHERE id = :id";
+                $sql = "UPDATE utilisateurs SET username = :username, password = :password, admin = :admin, entite_id = :entite_id WHERE id = :id";
                 $stmt = $this->db->prepare($sql);
                 $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
             } else {
-                $sql = "UPDATE utilisateurs SET username = :username, admin = :admin WHERE id = :id";
+                $sql = "UPDATE utilisateurs SET username = :username, admin = :admin, entite_id = :entite_id WHERE id = :id";
                 $stmt = $this->db->prepare($sql);
             }
+            
             $stmt->bindValue(':username', $this->username, PDO::PARAM_STR);
             $stmt->bindValue(':admin', $this->admin, PDO::PARAM_BOOL);
+            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT);
             $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -139,7 +144,7 @@ class Utilisateur
     public static function fetchAll(PDO $db): array
     {
         try {
-            $sql = "SELECT id, username, password, admin FROM utilisateurs ORDER BY username ASC";
+            $sql = "SELECT id, username, password, admin, entite_id FROM utilisateurs ORDER BY username ASC";
             $stmt = $db->query($sql);
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

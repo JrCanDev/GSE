@@ -38,6 +38,7 @@ if (GETPOST('update')) {
     $new_username = trim((string) GETPOST('username'));
     $new_username = sanitize($new_username);
     $admin = GETPOST('admin') ? true : false;
+    $entite_id = (int) GETPOST('entite_id');
 
     if (empty($new_username)) {
         $_SESSION['mesgs']['errors'][] = "Le nom d'utilisateur ne peut pas être vide.";
@@ -62,17 +63,11 @@ if (GETPOST('update')) {
 
     $user->username = $new_username;
     $user->admin = $admin;
-
+    $user->entite_id = $entite_id;
     // Si on a coché la réinitialisation du mot de passe
     if (GETPOST('reset_password') === '1') {
         $user->password = '';
     } else {
-        // Pour éviter de modifier le mot de passe actuel s'il n'est pas réinitialisé, 
-        // on ne définit pas la propriété password ou on la laisse à sa valeur de fetch.
-        // Dans notre classe Utilisateur::update(), la modification de password n'est faite 
-        // que si isset($this->password) et si elle n'est pas nulle/vide. 
-        // Cependant, le constructeur/hydrate l'a chargée. 
-        // Donc, si reset_password n'est PAS coché, on unset($user->password) avant l'update !
         unset($user->password);
     }
 
@@ -82,6 +77,7 @@ if (GETPOST('update')) {
     if ($isSelf) {
         $_SESSION['user']['username'] = $user->username;
         $_SESSION['user']['admin'] = $user->admin;
+        $_SESSION['user']['entite_id'] = $user->entite_id;
     }
 
     header("Location: index.php?element=utilisateurs");

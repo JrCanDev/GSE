@@ -16,8 +16,7 @@ if (isset($_POST["cancel"])) {
 }
 
 if (isset($_POST["submit"])) {
-    $nom_lot = filter_input(INPUT_POST, "nom_lot", FILTER_UNSAFE_RAW);
-    $nom_lot = sanitize($nom_lot);
+    $nom_lot = sanitize(filter_input(INPUT_POST, "nom_lot", FILTER_UNSAFE_RAW));
 
     $ids_materiels = $_POST['ids_materiels'] ?? [];
     if (!is_array($ids_materiels)) {
@@ -34,9 +33,10 @@ if (isset($_POST["submit"])) {
         exit(1);
     }
 
-    $data = [
-        'nom_lot' => $nom_lot
-    ];
+    $data = array();
+
+    $data['nom_lot'] = $nom_lot;
+    $data['entite_id'] = intval($_SESSION['user']['entite_id'] ?? 0);
 
     $lot = new Lot($db, $data);
     $lot->create($ids_materiels);

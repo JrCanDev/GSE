@@ -62,6 +62,7 @@ if (isset($_POST["submit"])) {
     }
 
     $data['ids_materiels'] = $ids_materiels;
+    $data['entite_id'] = intval($_SESSION['user']['entite_id'] ?? 0);
 
     $emprunt = new Emprunt($db, $data);
     $emprunt->create();

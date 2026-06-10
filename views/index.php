@@ -1,3 +1,8 @@
+<?php
+
+if (isUserLoggedIn()) {
+?>
+
 <div class="w3-row-padding w3-margin-top">
     <div class="w3-third">
         <div class="w3-container w3-red w3-padding-16 w3-round">
@@ -61,3 +66,15 @@
         <?php endif; ?>
     </table>
 </div>
+
+<?php
+} else {
+?>
+
+<div class="w3-container w3-margin-top">
+    <h2>Bienvenue sur le système de gestion de matériel</h2>
+    <p>Veuillez vous connecter pour accéder à vos emprunts et au catalogue de matériel.</p>
+</div>
+
+<?php
+}

@@ -15,6 +15,7 @@ class myAuthClass
             'id',
             'username',
             'admin',
+            'entite_id'
         );
         $sql = 'SELECT ' . implode(', ', $fields) . ' ';
         $sql .= 'FROM utilisateurs ';
@@ -24,31 +25,15 @@ class myAuthClass
         $statement->bindValue(':passhash', md5($password), PDO::PARAM_STR);
         $statement->execute();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
-        return $result;
-    }
 
-    public static function checkPriviledgeDatabase(string $username)
-    {
-        try {
-            $db = require(dirname(__FILE__) . '/../lib/mypdo.php');
-            $sql = "SELECT admin
-					FROM utilisateurs
-					WHERE username = :username";
-            $statement = $db->prepare($sql);
-            $statement->bindValue(':username', $username, PDO::PARAM_STR);
-            $statement->execute();
-            $result = $statement->fetch(PDO::FETCH_ASSOC);
-            return $result ? (bool)$result['admin'] : false;
-        } catch (Error | Exception $e) {
-            echo $e->getMessage() . ' -> file: ' . $e->getFile() . ' - ligne: ' . $e->getLine();
-        }
+        return $result;
     }
 
     public static function getUserByUsername(string $username)
     {
         try {
             $db = require(dirname(__FILE__) . '/../lib/mypdo.php');
-            $sql = 'SELECT id, username, admin, password FROM utilisateurs WHERE username = :username LIMIT 1';
+            $sql = 'SELECT id, username, admin, password, entite_id FROM utilisateurs WHERE username = :username LIMIT 1';
             $statement = $db->prepare($sql);
             $statement->bindValue(':username', $username, PDO::PARAM_STR);
             $statement->execute();

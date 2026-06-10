@@ -18,6 +18,7 @@
         <tr class="w3-blue">
             <th>Nom d'utilisateur <span class="sort-arrow"></span></th>
             <th>Rôle <span class="sort-arrow"></span></th>
+            <th>Entité <span class="sort-arrow"></span></th>
             <th>Statut de connexion <span class="sort-arrow"></span></th>
             <th>Actions</th>
         </tr>
@@ -30,10 +31,15 @@
                 $needsPasswordSetup = (empty($user->password));
                 $statusText = $needsPasswordSetup ? "Première connexion requise" : "Actif";
                 $statusColor = $needsPasswordSetup ? "w3-text-red" : "w3-text-green";
+                $entite = new Entite($db);
+                $entite->fetch($user->entite_id ?? -1);
+                $entiteName = $entite->id !== -1 ? $entite->nom : "Aucune entité pour un administrateur";
                 ?>
+
                 <tr class="item-user">
                     <td><?= sanitize($user->username) ?> <?= $isSelf ? "<b>(Vous)</b>" : "" ?></td>
                     <td><?= $user->admin ? "Administrateur" : "Utilisateur" ?></td>
+                    <td><?= $entiteName ?></td>
                     <td class="<?= $statusColor ?>"><?= $statusText ?></td>
                     <td>
                         <div>
