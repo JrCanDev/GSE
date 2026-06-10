@@ -9,7 +9,7 @@
         type="search"
         id="searchBarEmprunt"
         onkeyup="filtrerEmprunts()"
-        placeholder="Rechercher par nom, par matériel, par date... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
+        placeholder="Rechercher par nom, par matériel, par date... (plusieurs filtres: virgule ou point-virgule)">
 </div>
 
 <?php $totalEmprunts = $emprunts ? count($emprunts) : 0; ?>

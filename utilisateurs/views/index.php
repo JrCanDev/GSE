@@ -1,8 +1,6 @@
-<?php if ($isAdmin): ?>
-    <a href="index.php?element=utilisateurs&action=add" class="w3-margin w3-button w3-border w3-round">
-        <b>Ajouter un nouvel utilisateur</b>
-    </a>
-<?php endif; ?>
+<a href="index.php?element=utilisateurs&action=add" class="w3-margin w3-button w3-border w3-round">
+    <b>Ajouter un nouvel utilisateur</b>
+</a>
 
 <?php $totalUsers = $utilisateurs ? count($utilisateurs) : 0; ?>
 
@@ -21,9 +19,7 @@
             <th>Nom d'utilisateur <span class="sort-arrow"></span></th>
             <th>Rôle <span class="sort-arrow"></span></th>
             <th>Statut de connexion <span class="sort-arrow"></span></th>
-            <?php if ($isAdmin): ?>
-                <th>Actions</th>
-            <?php endif; ?>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -39,31 +35,29 @@
                     <td><?= sanitize($user->username) ?> <?= $isSelf ? "<b>(Vous)</b>" : "" ?></td>
                     <td><?= $user->admin ? "Administrateur" : "Utilisateur" ?></td>
                     <td class="<?= $statusColor ?>"><?= $statusText ?></td>
-                    <?php if ($isAdmin): ?>
-                        <td>
-                            <div style="display: flex; gap: 5px;">
-                                <form action="?element=utilisateurs&action=card" method="post">
-                                    <input type="hidden" name="id_user" value="<?= $user->id ?>">
-                                    <input type="submit" name="edit" class="w3-button w3-small w3-border w3-round" value="✏️">
-                                </form>
+                    <td>
+                        <div>
+                            <form action="?element=utilisateurs&action=card" method="post">
+                                <input type="hidden" name="id_user" value="<?= $user->id ?>">
+                                <input type="submit" name="edit" class="w3-button w3-small w3-border w3-round" value="✏️">
+                            </form>
 
-                                <?php if (!$isSelf): ?>
-                                    <form action="?element=utilisateurs" method="post"
-                                        onsubmit="return confirm('Voulez-vous vraiment supprimer cet utilisateur (<?= sanitize($user->username) ?>) ?');">
-                                        <input type="hidden" name="id" value="<?= $user->id ?>">
-                                        <input type="submit" name="delete" class="w3-button w3-small w3-border w3-round" value="🗑️">
-                                    </form>
-                                <?php else: ?>
-                                    <button class="w3-button w3-small w3-border w3-round w3-disabled" title="Vous ne pouvez pas vous supprimer vous-même" disabled>🗑️</button>
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    <?php endif; ?>
+                            <?php if (!$isSelf): ?>
+                                <form action="?element=utilisateurs" method="post"
+                                    onsubmit="return confirm('Voulez-vous vraiment supprimer cet utilisateur (<?= sanitize($user->username) ?>) ?');">
+                                    <input type="hidden" name="id" value="<?= $user->id ?>">
+                                    <input type="submit" name="delete" class="w3-button w3-small w3-border w3-round" value="🗑️">
+                                </form>
+                            <?php else: ?>
+                                <button class="w3-button w3-small w3-border w3-round w3-disabled" title="Vous ne pouvez pas vous supprimer vous-même" disabled>🗑️</button>
+                            <?php endif; ?>
+                        </div>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="<?= $isAdmin ? 4 : 3 ?>">Aucun utilisateur trouvé.</td>
+                <td colspan="4">Aucun utilisateur trouvé.</td>
             </tr>
         <?php endif ?>
     </tbody>

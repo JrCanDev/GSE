@@ -9,7 +9,7 @@
         type="search"
         id="searchBarMateriel"
         onkeyup="filtrerListeMateriels()"
-        placeholder="Rechercher par nom, identifiant, modèle, état... (pour plusieurs filtres, mettre une virgule (,) ou un point-virgule (;) entre les mots-clés)">
+        placeholder="Rechercher par nom, par identifiant, par état... (plusieurs filtres: virgule ou point-virgule)">
 </div>
 
 <?php $totalMateriels = $materiels ? count($materiels) : 0; ?>

@@ -6,7 +6,7 @@ require_once(dirname(__FILE__) . '/../../class/myAuthClass.php');
 require_once(dirname(__FILE__) . '/../../class/utilisateur.class.php');
 
 if (!isUserAdmin()) {
-    header("Location: index.php");
+    header('location: index.php');
     exit(1);
 }
 

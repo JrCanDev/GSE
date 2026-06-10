@@ -2,6 +2,7 @@
 $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/groupe.class.php');
 
+$isAdmin = isUserLoggedIn();
 $groupes = Groupe::fetchAll($db);
 
 $groupesActifs = [];

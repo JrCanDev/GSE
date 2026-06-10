@@ -1,18 +1,19 @@
 <?php
 $db = require(dirname(__FILE__) . '/../../lib/mypdo.php');
-$listFK = [];
-$listMetadatas = [];
-const DATABASE_PREVIEW_LIMIT = 200;
-
+require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 
 if (!isset($_SESSION)) {
   session_start();
 }
-define('SELECTED_YEAR', $_SESSION['annee']);
 
-if (!myAuthClass::checkPriviledgeDatabase($_SESSION['user']['username'])) {
-  header('location: index');
+if (!isUserAdmin()) {
+  header('location: index.php');
+  exit(1);
 }
+
+$listFK = [];
+$listMetadatas = [];
+const DATABASE_PREVIEW_LIMIT = 200;
 
 function getTables($db)
 {
@@ -75,7 +76,7 @@ function getTableHead($columnMetadata, $tableName)
     <label for='$column_name' class='w3-text-blue w3-left-align'>
     <p style='margin: 0;'><i>$column_name</i></p>
     </label>
-    <input type='text' id='$column_name' class='w3-input w3-border w3-margin-bottom table-input' placeholder='$column_type' " . ($column_name === 'annee_scolaire' ? "value='" . SELECTED_YEAR . "'" : '') . ">
+    <input type='text' id='$column_name' class='w3-input w3-border w3-margin-bottom table-input' placeholder='$column_type' " . ">
     </div>";
     $table_list .= "<th class='w3-border'><button class='w3-button' style='width:100%; height: 100%' onClick='sortTable(\"$tableName\", \"$column_name\", " . sanitize(json_encode($columnMetadata)) . ")'>$column_name</button></th>";
   }

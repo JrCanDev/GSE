@@ -5,11 +5,10 @@ require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 require_once(dirname(__FILE__) . '/../../class/utilisateur.class.php');
 
 if (!isUserAdmin()) {
-    header("Location: index.php");
+    header('location: index.php');
     exit(1);
 }
 
-$isAdmin = true;
 $utilisateurs = Utilisateur::fetchAll($db);
 
 if (GETPOST('delete') && GETPOST('id')) {

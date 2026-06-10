@@ -1,10 +1,9 @@
 <?php
-session_start();
-$db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
+$db = require_once(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../class/groupe.class.php');
 
 if (!isUserLoggedIn()) {
-    include dirname(__FILE__) . '/../../login.php';
+    header('location: index.php');
     exit(1);
 }
 

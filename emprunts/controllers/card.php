@@ -5,7 +5,7 @@ require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
 
 if (!isUserLoggedIn()) {
-    include dirname(__FILE__) . '/../../login.php';
+    header('location: index.php');
     exit(1);
 }
 

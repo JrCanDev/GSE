@@ -1,4 +1,8 @@
 <div class="margin w3-border w3-padding" style="background: white;">
+  <form action="api/export_database.php" method="post">
+    <button class="w3-button w3-blue w3-round" type="submit" name="export_database">Exporter la base de données</button>
+  </form>
+  
   <?php getTables($db); ?>
   <div id="tooltip" style="display:none; position:absolute; background:#fff; border:1px solid #ccc; z-index:1000;"></div>
 </div>

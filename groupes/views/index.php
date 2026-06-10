@@ -63,15 +63,17 @@
                     <td><?= formatDisplayDate(sanitize($groupe->date_restitution)) ?></td>
                     <?php if ($isAdmin): ?>
                         <td>
-                            <form action="?element=groupes&action=card" method="post">
-                                <input type="hidden" name="id_groupe" value="<?= $groupe->id_groupe ?>">
-                                <input type="submit" name="edit" class="w3-button w3-small w3-border w3-round" value="✏️">
-                            </form>
+                            <div>
+                                <form action="?element=groupes&action=card" method="post">
+                                    <input type="hidden" name="id_groupe" value="<?= $groupe->id_groupe ?>">
+                                    <input type="submit" name="edit" class="w3-button w3-small w3-border w3-round" value="✏️">
+                                </form>
 
-                            <form action="?element=groupes" method="post">
-                                <input type="hidden" name="id" value="<?= $groupe->id_groupe ?>">
-                                <input type="submit" name="toggle_state" class="w3-button w3-small w3-border w3-round" value="👁️">
-                            </form>
+                                <form action="?element=groupes" method="post">
+                                    <input type="hidden" name="id" value="<?= $groupe->id_groupe ?>">
+                                    <input type="submit" name="toggle_state" class="w3-button w3-small w3-border w3-round" value="👁️">
+                                </form>
+                            </div>
                         </td>
                     <?php endif; ?>
                 </tr>
