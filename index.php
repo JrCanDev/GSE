@@ -1,7 +1,7 @@
 <?php
+ob_start();
 require_once(dirname(__FILE__) . '/lib/security.lib.php');
 require_once(dirname(__FILE__) . '/lib/myproject.lib.php');
-// require_once(dirname(__FILE__) . '/class/myDbClass.php');
 
 if (GETPOST('debug') == true) {
     ini_set('display_errors', 1);
@@ -9,3 +9,5 @@ if (GETPOST('debug') == true) {
 }
 
 include 'main.inc.php';
+
+ob_end_flush();
