@@ -2,7 +2,7 @@
 
 <div class="col-2 w3-container">
     <form action="<?= $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ?>"
-        method="post" class="w3-container w3-card-4 w3-padding">
+        method="post" enctype="multipart/form-data" class="w3-container w3-card-4 w3-padding">
 
         <!-- Nom, Modèle et Année -->
         <div class="w3-row-padding">
@@ -27,7 +27,7 @@
                 <input placeholder="Armoire S126" class="w3-input w3-border w3-round w3-center" type="text" name="localisation" required>
             </div>
             <div class="w3-third">
-                <label><b>Identifiant</b></label>
+                <label><b>Identifiant<span style="color: red;">*</span></b></label>
                 <input placeholder="10xxx" class="w3-input w3-border w3-round w3-center" type="text" name="etiquette_ulco">
             </div>
             <div class="w3-third">
@@ -63,6 +63,29 @@
                 placeholder="Processeur : Intel Core i5-9500F" rows="3"></textarea>
         </div>
 
+        <!-- Image -->
+        <div class="w3-margin-top">
+            <label style="display:block;"><b>Photo</b></label>
+            <input class="w3-center w3-input" type="file" name="image_materiel" id="imageInput"
+                accept="image/jpeg, image/png, image/webp" onchange="previewImage()">
+
+            <div id="previewContainer" class="w3-center w3-margin-top" style="display: none;">
+                <div style="position: relative; display: inline-block;">
+                    <img src=""
+                        id="imagePreview"
+                        class="w3-round w3-border"
+                        style="max-width: 250px; height: auto;">
+
+                    <button type="button"
+                        class="w3-button w3-red w3-round w3-small"
+                        style="margin-top: 8px; display: block; width: 100%;"
+                        onclick="removeImage()">
+                        Enlever la photo
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="w3-row-padding w3-margin-top">
             <!-- Bouton Créer -->
             <div class="w3-half w3-right">
@@ -79,6 +102,36 @@
 
         <script>
             const champNom = document.querySelector("input[name='nom']").focus();
+
+            function previewImage() {
+                const fileInput = document.getElementById('imageInput');
+                const container = document.getElementById('previewContainer');
+                const preview = document.getElementById('imagePreview');
+
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        container.style.display = 'block';
+                    }
+
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    removeImage();
+                }
+            }
+
+            function removeImage() {
+                const fileInput = document.getElementById('imageInput');
+                const container = document.getElementById('previewContainer');
+                const preview = document.getElementById('imagePreview');
+
+                fileInput.value = "";
+
+                preview.src = "";
+                container.style.display = 'none';
+            }
 
             function changerCouleurSelect(selectElement) {
                 const optionSelectionnee = selectElement.options[selectElement.selectedIndex];

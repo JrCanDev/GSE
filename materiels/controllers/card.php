@@ -36,8 +36,26 @@ if (isset($_POST['update'])) {
     $materiel->etat = isset($_POST['etat']) ? trim($_POST['etat']) : $materiel->etat;
     $materiel->localisation = isset($_POST['localisation']) ? trim($_POST['localisation']) : $materiel->localisation;
     $materiel->descriptif = isset($_POST['descriptif']) ? trim($_POST['descriptif']) : $materiel->descriptif;
-
     $materiel->remarque = (!empty($_POST['remarque'])) ? trim($_POST['remarque']) : null;
+
+    $image_status = $_POST['image_status'] ?? 'keep';
+
+    if ($image_status === 'delete') {
+        $materiel->image_data = null;
+        $materiel->image_type = null;
+    } elseif ($image_status === 'update' || (isset($_FILES['image_materiel']) && $_FILES['image_materiel']['error'] === 0)) {
+        $tmp_name = $_FILES['image_materiel']['tmp_name'];
+
+        $check = getimagesize($tmp_name);
+        if ($check !== false) {
+            $materiel->image_data = file_get_contents($tmp_name);
+            $materiel->image_type = $_FILES['image_materiel']['type'];
+        } else {
+            $_SESSION['mesgs']['errors'][] = "Le fichier téléversé n'est pas une image valide.";
+            header("Location: index.php?element=" . $old_page);
+            exit(1);
+        }
+    }
 
     $materiel->update();
 

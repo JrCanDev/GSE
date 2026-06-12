@@ -34,7 +34,9 @@ CREATE TABLE IF NOT EXISTS materiels (
     localisation VARCHAR(255) NOT NULL, 
     descriptif TEXT NULL,
     remarque TEXT NULL,
-    entite_id INT NOT NULL REFERENCES entites(id) ON DELETE CASCADE
+    entite_id INT NOT NULL REFERENCES entites(id) ON DELETE CASCADE,
+    image_data BYTEA,
+    image_type VARCHAR(50)
 );
 
 CREATE TYPE emprunt_caution AS ENUM ('Déposée', 'En attente', 'Non demandée');
@@ -177,6 +179,8 @@ SELECT
   descriptif,
   remarque,
   entite_id,
+  image_data,
+  image_type,
   (etat::text <> 'Réservé' AND is_materiel_disponible(id_materiel)) AS disponible,
   (
     SELECT TO_CHAR(MIN(E.date_prevue_restitution), 'YYYY-MM-DD')
@@ -233,13 +237,15 @@ CREATE OR REPLACE FUNCTION create_materiel(
     etat etat_materiel,
     descriptif TEXT,
     remarque TEXT,
-    p_entite_id INT
+    p_entite_id INT,
+    image_data BYTEA,
+    image_type VARCHAR
 ) RETURNS INTEGER AS $$
 DECLARE
     new_id INTEGER;
 BEGIN
-    INSERT INTO materiels (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque, entite_id)
-    VALUES (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque, p_entite_id)
+    INSERT INTO materiels (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque, entite_id, image_data, image_type)
+    VALUES (nom, modele, annee, etiquette_ulco, localisation, etat, descriptif, remarque, p_entite_id, image_data, image_type)
     RETURNING id_materiel INTO new_id;
     RETURN new_id;
 END;
@@ -298,7 +304,9 @@ CREATE OR REPLACE FUNCTION update_materiel(
     p_localisation VARCHAR,
     p_etat etat_materiel,
     p_descriptif TEXT,
-    p_remarque TEXT
+    p_remarque TEXT,
+    p_image_data BYTEA,
+    p_image_type VARCHAR
 ) RETURNS VOID AS $$
 BEGIN
     UPDATE materiels
@@ -309,7 +317,9 @@ BEGIN
         localisation = p_localisation,
         etat = p_etat,
         descriptif = p_descriptif,
-        remarque = p_remarque
+        remarque = p_remarque,
+        image_data = p_image_data,
+        image_type = p_image_type
     WHERE id_materiel = p_id_materiel;
 END;
 $$ LANGUAGE plpgsql;
@@ -449,7 +459,8 @@ RETURNS TABLE(
     date_prevue_restitution TEXT,
     date_reelle_restitution TEXT,
     remarque_restitution TEXT,
-    etat_restitution etat_materiel
+    etat_restitution etat_materiel,
+    entite_id INT
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -462,7 +473,8 @@ BEGIN
         TO_CHAR(E.date_prevue_restitution, 'YYYY-MM-DD'),
         TO_CHAR(EM.date_reelle_restitution, 'YYYY-MM-DD'),
         EM.remarque_restitution,
-        EM.etat_restitution
+        EM.etat_restitution,
+        E.entite_id
     FROM emprunt_materiels EM
     INNER JOIN emprunts E ON E.id_emprunt = EM.id_emprunt
     INNER JOIN groupes G ON G.id_groupe = E.id_groupe

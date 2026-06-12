@@ -13,6 +13,8 @@ class Materiel
     private bool $disponible;
     private ?string $date_retour_prevue;
     private int $entite_id;
+    public ?string $image_data;
+    public ?string $image_type;
 
     public static array $etats = ['OK', 'Réservé', 'En réparation', 'Endommagé', 'Disparu'];
 
@@ -33,7 +35,9 @@ class Materiel
         $this->remarque = null;
         $this->disponible = true;
         $this->date_retour_prevue = null;
-        $this->entite_id = -1; // <-- Initialisation
+        $this->entite_id = -1;
+        $this->image_data = null;
+        $this->image_type = null;
 
         if (!empty($data))
             $this->hydrate($data);
@@ -59,9 +63,16 @@ class Materiel
 
     public function hydrate(array $data): void
     {
+        if (isset($data['image_data'])) {
+            $data['image_data'] = is_resource($data['image_data'])
+                ? stream_get_contents($data['image_data'])
+                : $data['image_data'];
+        }
+
         foreach ($data as $key => $value) {
-            if (property_exists($this, $key))
+            if (property_exists($this, $key)) {
                 $this->$key = $value;
+            }
         }
     }
 
@@ -77,7 +88,9 @@ class Materiel
             'M.etat',
             'M.descriptif',
             'M.remarque',
-            'M.entite_id', // <-- Ajouté pour qu'il soit récupéré par l'hydratation
+            'M.entite_id',
+            'M.image_data',
+            'M.image_type',
             "(M.etat::text <> 'Réservé' AND is_materiel_disponible(M.id_materiel)) AS disponible",
             "(SELECT TO_CHAR(MIN(E.date_prevue_restitution), 'YYYY-MM-DD')
               FROM emprunt_materiels EM
@@ -91,7 +104,7 @@ class Materiel
     public function create(): void
     {
         try {
-            $fields = array('nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque', 'entite_id');
+            $fields = array('nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque', 'entite_id', 'image_data', 'image_type');
             $sql = 'SELECT create_materiel(:' . implode(', :', $fields) . ') AS id_materiel';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':nom', $this->nom, PDO::PARAM_STR);
@@ -102,7 +115,9 @@ class Materiel
             $stmt->bindValue(':etat', $this->etat, PDO::PARAM_STR);
             $stmt->bindValue(':descriptif', $this->descriptif, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, PDO::PARAM_STR);
-            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT); // <-- Liaison lors de la création
+            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT);
+            $stmt->bindValue(':image_data', $this->image_data, PDO::PARAM_LOB);
+            $stmt->bindValue(':image_type', $this->image_type, PDO::PARAM_STR);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($result) {
@@ -117,8 +132,6 @@ class Materiel
     public static function fetchByEtiquetteUlco(PDO $db, string $etiquette): ?array
     {
         try {
-            // Optionnel : On peut aussi rajouter le filtre d'entité ici si nécessaire,
-            // mais l'étiquette ULCO étant unique, le comportement reste globalement sain.
             $sql = 'SELECT id_materiel, nom, modele, etiquette_ulco, entite_id FROM materiels WHERE etiquette_ulco = :etiquette LIMIT 1';
             $stmt = $db->prepare($sql);
             $stmt->bindValue(':etiquette', $etiquette, PDO::PARAM_STR);
@@ -143,8 +156,7 @@ class Materiel
             $stmt->execute();
             $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($data)
-                $this->hydrate($data);
+            if ($data) $this->hydrate($data);
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération du matériel : " . $e->getMessage();
         }
@@ -153,7 +165,7 @@ class Materiel
     public function update(): void
     {
         try {
-            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque');
+            $fields = array('id_materiel', 'nom', 'modele', 'annee', 'etiquette_ulco', 'localisation', 'etat', 'descriptif', 'remarque', 'image_data', 'image_type');
             $sql = 'SELECT update_materiel(:' . implode(', :', $fields) . ')';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id_materiel', $this->id_materiel, PDO::PARAM_INT);
@@ -165,6 +177,8 @@ class Materiel
             $stmt->bindValue(':localisation', $this->localisation, PDO::PARAM_STR);
             $stmt->bindValue(':descriptif', $this->descriptif, PDO::PARAM_STR);
             $stmt->bindValue(':remarque', $this->remarque, PDO::PARAM_STR);
+            $stmt->bindValue(':image_data', $this->image_data, PDO::PARAM_LOB);
+            $stmt->bindValue(':image_type', $this->image_type, PDO::PARAM_STR);
             $stmt->execute();
             $_SESSION['mesgs']['confirm'][] = "Matériel mis à jour avec succès.";
         } catch (PDOException $e) {
@@ -177,20 +191,20 @@ class Materiel
         try {
             $fields = Materiel::fields();
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_materiels AS M';
-            
+
             $isNotAdmin = (empty($_SESSION['user']['admin']) || $_SESSION['user']['admin'] !== true);
             if ($isNotAdmin) {
                 $sql .= ' WHERE M.entite_id = :entite_id';
             }
-            
+
             $sql .= ' ORDER BY M.id_materiel';
-            
+
             $stmt = $db->prepare($sql);
-            
+
             if ($isNotAdmin) {
                 $stmt->bindValue(':entite_id', $_SESSION['user']['entite_id'] ?? 0, PDO::PARAM_INT);
             }
-            
+
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

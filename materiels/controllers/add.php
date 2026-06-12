@@ -24,7 +24,7 @@ if (isset($_POST["submit"])) {
         "etat" => FILTER_UNSAFE_RAW,
         "localisation" => FILTER_UNSAFE_RAW,
         "remarque" => FILTER_UNSAFE_RAW,
-        "descriptif" => FILTER_UNSAFE_RAW,
+        "descriptif" => FILTER_UNSAFE_RAW
     ]);
 
     foreach ($data as $key => $value) {
@@ -59,6 +59,23 @@ if (isset($_POST["submit"])) {
     }
 
     $data['entite_id'] = intval($_SESSION['user']['entite_id'] ?? 0);
+
+    $data['image_data'] = null;
+    $data['image_type'] = null;
+
+    if (isset($_FILES['image_materiel']) && $_FILES['image_materiel']['error'] === 0) {
+        $tmp_name = $_FILES['image_materiel']['tmp_name'];
+        
+        $check = getimagesize($tmp_name);
+        if ($check !== false) {
+            $data['image_data'] = file_get_contents($tmp_name);
+            $data['image_type'] = $_FILES['image_materiel']['type'];
+        } else {
+            $_SESSION['mesgs']['errors'][] = "Le fichier téléversé n'est pas une image valide.";
+            header("Location: " . $_SERVER['PHP_SELF'] . "?element=materiels&action=add");
+            exit(1);
+        }
+    }
 
     $materiel = new Materiel($db, $data);
     $materiel->create();

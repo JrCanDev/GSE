@@ -1,7 +1,7 @@
 <h3><b>Fiche Matériel</b></h3>
 
 <div class="col-2 w3-container">
-    <form action="?element=materiels&action=card" method="post" class="w3-container w3-card-4 w3-padding">
+    <form action="?element=materiels&action=card" method="post" enctype="multipart/form-data" class="w3-container w3-card-4 w3-padding">
 
         <input type="hidden" name="id_materiel" value="<?= sanitize($materiel->id_materiel) ?>">
         <input type="hidden" name="old_page" value="<?= sanitize($old_page) ?>">
@@ -68,6 +68,34 @@
             <label><b>Descriptif du matériel</b></label>
             <textarea class="w3-input w3-border w3-round w3-center" name="descriptif"
                 placeholder="Processeur : Intel Core i5-9500F" rows="3"><?= desanitize($materiel->descriptif) ?></textarea>
+        </div>
+
+        <!-- Image -->
+        <div class="w3-margin-top">
+            <label style="display:block;"><b>Photo</b></label>
+            <input class="w3-center w3-input" type="file" name="image_materiel" id="imageInput"
+                accept="image/jpeg, image/png, image/webp" onchange="previewImage()">
+
+            <input type="hidden" name="image_status" id="imageStatus" value="keep">
+
+            <?php
+            $hasImage = !empty($materiel->image_data);
+            $imgSrc = "";
+            if ($hasImage) {
+                $imageData = is_resource($materiel->image_data) ? stream_get_contents($materiel->image_data) : $materiel->image_data;
+                $imgSrc = "data:" . sanitize($materiel->image_type) . ";base64," . base64_encode($imageData);
+            }
+            ?>
+
+            <div id="previewContainer" class="w3-center w3-margin-top" style="display: <?= $hasImage ? 'block' : 'none' ?>;">
+                <div style="position: relative; display: inline-block;">
+                    <img src="<?= $imgSrc ?>" id="imagePreview" class="w3-round w3-border" style="max-width: 250px; height: auto;">
+
+                    <button type="button" class="w3-button w3-red w3-round w3-small" style="margin-top: 8px; display: block; width: 100%;" onclick="removeImage()">
+                        Enlever la photo
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Historique -->
@@ -144,6 +172,35 @@
 
         <script>
             document.querySelector("input[name='nom']").focus();
+
+            function previewImage() {
+                const fileInput = document.getElementById('imageInput');
+                const container = document.getElementById('previewContainer');
+                const preview = document.getElementById('imagePreview');
+                const statusInput = document.getElementById('imageStatus');
+
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        container.style.display = 'block';
+                        statusInput.value = "update";
+                    }
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
+            }
+
+            function removeImage() {
+                const fileInput = document.getElementById('imageInput');
+                const container = document.getElementById('previewContainer');
+                const preview = document.getElementById('imagePreview');
+                const statusInput = document.getElementById('imageStatus');
+
+                fileInput.value = "";
+                preview.src = "";
+                container.style.display = 'none';
+                statusInput.value = "delete";
+            }
 
             function changerCouleurSelect(selectElement) {
                 const optionSelectionnee = selectElement.options[selectElement.selectedIndex];

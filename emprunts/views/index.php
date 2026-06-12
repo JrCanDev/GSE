@@ -114,7 +114,7 @@
                                     </p>
                                     <p>
                                         <?php if ($afficherCompteurLot): ?>
-                                            <b><?= (int) $emprunt->nombre_materiels_rendus ?> / <?= (int) $emprunt->nombre_materiels ?></b> matériel(s) rendu(s)
+                                            <b id="compteur-modal-<?= $emprunt->id_emprunt ?>"><?= (int) $emprunt->nombre_materiels_rendus ?> / <?= (int) $emprunt->nombre_materiels ?></b> matériel(s) rendu(s)
                                         <?php else: ?>
                                             <b>Lot unique</b>
                                         <?php endif; ?>
@@ -290,6 +290,11 @@
                                 let divCompteur = cellules[5].querySelector('b');
                                 if (divCompteur) {
                                     divCompteur.textContent = data.nombre_materiels_rendus + ' / ' + data.nombre_materiels;
+                                }
+
+                                let divCompteurModal = document.getElementById('compteur-modal-' + idEmprunt);
+                                if (divCompteurModal) {
+                                    divCompteurModal.textContent = data.nombre_materiels_rendus + ' / ' + data.nombre_materiels;
                                 }
 
                                 // colonne Date réelle de restitution
