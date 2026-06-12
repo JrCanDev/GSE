@@ -1,8 +1,6 @@
-<?php if ($isAdmin): ?>
-    <a href="index.php?element=materiels&action=add" class="w3-margin w3-button w3-border w3-round">
-        <b>Ajouter un nouveau matériel</b>
-    </a>
-<?php endif; ?>
+<a href="index.php?element=materiels&action=add" class="w3-margin w3-button w3-border w3-round">
+    <b>Ajouter un nouveau matériel</b>
+</a>
 
 <div class="w3-container w3-margin-bottom w3-margin-top">
     <input class="w3-input w3-border w3-round-xxlarge w3-center"
@@ -17,19 +15,16 @@
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
         <tr class="w3-blue">
+            <th style="width: 60px;">Photo</th>
             <th>Nom <span class="sort-arrow"></span></th>
             <th>Modèle <span class="sort-arrow"></span></th>
             <th>Année <span class="sort-arrow"></span></th>
             <th>Identifiant <span class="sort-arrow"></span></th>
-            <?php if ($isAdmin): ?>
-                <th>Localisation <span class="sort-arrow"></span></th>
-            <?php endif; ?>
+            <th>Localisation <span class="sort-arrow"></span></th>
             <th>Emprunt <span class="sort-arrow"></span></th>
             <th>État <span class="sort-arrow"></span></th>
             <th>Remarque <span class="sort-arrow"></span></th>
-            <?php if ($isAdmin): ?>
-                <th>Actions</th>
-            <?php endif; ?>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -60,30 +55,34 @@
                 ?>
 
                 <tr class="item-materiel">
+                    <td>
+                        <?php if (!empty($materiel->image_data)): ?>
+                            <img src="data:<?= sanitize($materiel->image_type) ?>;base64,<?= base64_encode($materiel->image_data) ?>"
+                                alt="<?= "Preview du " . sanitize($materiel->nom) . " (" . sanitize($materiel->etiquette_ulco) . ")" ?>"
+                                class="w3-round w3-border"
+                                style="width: 40px; height: 40px; object-fit: cover;">
+                        <?php endif; ?>
+                    </td>
                     <td><?= sanitize($materiel->nom) ?></td>
                     <td><?= sanitize($materiel->modele) ?></td>
                     <td><?= sanitize($materiel->annee) ?></td>
                     <td><?= sanitize($materiel->etiquette_ulco) ?></td>
-                    <?php if ($isAdmin): ?>
-                        <td><?= sanitize($materiel->localisation) ?></td>
-                    <?php endif; ?>
+                    <td><?= sanitize($materiel->localisation) ?></td>
                     <td class="<?= $emprunt_class ?>"><b><?= $emprunt_label ?></b></td>
                     <td class="<?= $etat_class ?>"><?= sanitize($materiel->etat) ?></td>
                     <td><?= desanitize($materiel->remarque) ?></td>
-                    <?php if ($isAdmin): ?>
-                        <td>
-                            <form action="?element=materiels&action=card" method="post">
-                                <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
-                                <input type="hidden" name="old_page" value="materiels">
-                                <input type="submit" name="submit" class="w3-button w3-small w3-border w3-round" value="✏️">
-                            </form>
-                        </td>
-                    <?php endif; ?>
+                    <td>
+                        <form action="?element=materiels&action=card" method="post">
+                            <input type="hidden" name="id_materiel" value="<?= $materiel->id_materiel ?>">
+                            <input type="hidden" name="old_page" value="materiels">
+                            <input type="submit" name="submit" class="w3-button w3-small w3-border w3-round" value="✏️">
+                        </form>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="<?= $isAdmin ? 9 : 7 ?>">Aucun matériel trouvé.</td>
+                <td colspan="9">Aucun matériel trouvé.</td>
             </tr>
         <?php endif ?>
     </tbody>
@@ -96,7 +95,7 @@
         let input = document.getElementById('searchBarMateriel').value.toLowerCase();
         let rows = document.getElementsByClassName('item-materiel');
         let compteurMateriels = document.getElementById('compteurMateriels');
-        let actionColumns = <?= $isAdmin ? 1 : 0 ?>;
+        let actionColumns = 1;
 
         let motsCles = input.split(/[,;]/).map(mot => mot.trim()).filter(Boolean);
         let materielsVisibles = 0;
