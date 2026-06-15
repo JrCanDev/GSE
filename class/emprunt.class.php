@@ -271,15 +271,14 @@ class Emprunt
                 'nombre_materiels_rendus',
                 'materiels_resume',
                 'materiels_details',
-                'entite_id' // <-- Correction 1 : Ajouté pour pouvoir hydrater la propriété
+                'entite_id'
             );
             
             $sql = 'SELECT ' . implode(', ', $fields) . ' FROM vw_emprunts_materiels';
 
-            // --- CLOISONNEMENT PHP ---
             $isNotAdmin = (empty($_SESSION['user']['admin']) || $_SESSION['user']['admin'] !== true);
             if ($isNotAdmin) {
-                $sql .= ' WHERE entite_id = :entite_id'; // <-- Correction 2 : On rajoute le filtre manquant
+                $sql .= ' WHERE entite_id = :entite_id';
             }
 
             $sql .= ' ORDER BY id_emprunt DESC';

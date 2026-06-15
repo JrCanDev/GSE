@@ -1,7 +1,5 @@
 <?php
 session_start(); // Démarrage de la session
-// print_r($_SESSION);
-// exit();
 error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
 $db = require(dirname(__FILE__) . '/lib/mypdo.php');

@@ -4,7 +4,7 @@ if (isUserLoggedIn()) {
 ?>
 
 <div class="w3-row-padding w3-margin-top">
-    <div class="w3-third">
+    <div class="w3-half">
         <div class="w3-container w3-red w3-padding-16 w3-round">
             <div class="w3-left"><i class="fa fa-exclamation-triangle w3-xxxlarge"></i></div>
             <div class="w3-right"><h3><?=sanitize($retards) ?></h3></div>
@@ -13,7 +13,7 @@ if (isUserLoggedIn()) {
         </div>
     </div>
     
-    <div class="w3-third">
+    <div class="w3-half">
         <div class="w3-container w3-blue w3-padding-16 w3-round">
             <div class="w3-left"><i class="fa fa-share w3-xxxlarge"></i></div>
             <div class="w3-right"><h3><?=sanitize($en_cours) ?></h3></div>
@@ -21,15 +21,7 @@ if (isUserLoggedIn()) {
             <h4>En cours</h4>
         </div>
     </div>
-    
-    <div class="w3-third">
-        <div class="w3-container w3-teal w3-padding-16 w3-round">
-            <div class="w3-left"><i class="fa fa-check-circle w3-xxxlarge"></i></div>
-            <div class="w3-right"><h3><?= sanitize($dispo_pct) . '%' ?></h3></div>
-            <div class="w3-clear"></div>
-            <h4>Disponibilité</h4>
-        </div>
-    </div>
+
 </div>
 
 <div class="w3-container w3-margin-top">

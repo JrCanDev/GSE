@@ -1,10 +1,5 @@
 <?php
-// if (isset($_POST['cancel']))
-//     header("location:index.php");
-
-if (!isset($authorized)) {
-    $authorized = false;
-}
+if (!isset($authorized)) $authorized = false;
 ?>
 <!doctype html>
 <html lang="fr">

@@ -14,7 +14,7 @@ class Lot
 
         $this->id_lot = -1;
         $this->nom_lot = '';
-        $this->entite_id = -1; // <-- Initialisation
+        $this->entite_id = -1;
 
         if (!empty($data))
             $this->hydrate($data);
@@ -51,11 +51,10 @@ class Lot
         try {
             $this->db->beginTransaction();
 
-            // Inclusion du champ entite_id lors de l'insertion
             $sql = "INSERT INTO lots (nom_lot, entite_id) VALUES (:nom_lot, :entite_id)";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':nom_lot', $this->nom_lot, PDO::PARAM_STR);
-            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT); // <-- Liaison ici
+            $stmt->bindValue(':entite_id', $this->entite_id, PDO::PARAM_INT);
             $stmt->execute();
 
             $this->id_lot = (int) $this->db->lastInsertId();
@@ -74,7 +73,7 @@ class Lot
     public function fetch(int $id_lot): void
     {
         try {
-            $fields = array('id_lot', 'nom_lot', 'entite_id'); // <-- Ajout de entite_id
+            $fields = array('id_lot', 'nom_lot', 'entite_id');
             $sql = "SELECT " . implode(', ', $fields) . " FROM lots WHERE id_lot = :id_lot";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id_lot', $id_lot, PDO::PARAM_INT);
@@ -156,9 +155,8 @@ class Lot
     public static function fetchAll(PDO $db): array
     {
         try {
-            $sql = "SELECT id_lot, nom_lot, entite_id FROM lots"; // <-- Récupération de entite_id
+            $sql = "SELECT id_lot, nom_lot, entite_id FROM lots";
             
-            // --- CLOISONNEMENT PHP : Filtre sur l'entité si l'utilisateur n'est pas admin ---
             $isNotAdmin = (empty($_SESSION['user']['admin']) || $_SESSION['user']['admin'] !== true);
             if ($isNotAdmin) {
                 $sql .= ' WHERE entite_id = :entite_id';

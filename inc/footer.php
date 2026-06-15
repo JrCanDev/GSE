@@ -71,7 +71,7 @@ if (isset($db) && $db) {
 <footer class="w3-container w3-padding-16 w3-center w3-text-white main-background-color w3-xlarge">
     <a href="https://github.com/JrCanDev/GSE" target="_blank"><i class="fab fa-github w3-hover-opacity" aria-hidden="true"></i></a>
     <p class="w3-medium">Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
-    <p class="w3-medium">Hébergé par <a href="https://github.com/JrCanDev" target="_blank">JrCanDev</a></p>
+    <p class="w3-medium">Hébergé par <a href="https://jrcan.dev" target="_blank">JrCanDev</a></p>
 </footer>
 
 </body>

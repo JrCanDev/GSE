@@ -134,7 +134,7 @@
             // focus sur champ Nom
             document.querySelector("input[name='nom_emprunteur']").focus();
 
-            // applique date de restitution prévue selon l'année choisie
+            // on applique la date de restitution prévue selon l'année choisie
             function appliquerDateSelonAnnee() {
                 const select = document.querySelector("select[name='id_groupe']");
                 const inputDate = document.getElementById('date_prevue_restitution');
@@ -162,16 +162,16 @@
 
             appliquerDateSelonAnnee();
 
-            // Coche automatiquement les matériels du lot sélectionné
+            // on coche automatiquement les matériels du lot sélectionné
             function appliquerLotMateriels(selectElement) {
                 const optionSelectionnee = selectElement.options[selectElement.selectedIndex];
                 if (!optionSelectionnee || !optionSelectionnee.value) return;
 
                 try {
-                    // On extrait le tableau d'IDs JSON stocké dans le data attribute de l'option
+                    // on extrait le tableau d'IDs stocké dans le data attribute de l'option
                     const idsMateriels = JSON.parse(optionSelectionnee.dataset.materiels || '[]');
 
-                    // 1. On décoche tout avant d'appliquer le lot pour partir sur une base propre
+                    // on décoche tout avant d'appliquer le lot pour partir sur une base propre
                     document.querySelectorAll('.materiel-checkbox').forEach(cb => {
                         if (!cb.disabled && cb.checked) {
                             cb.checked = false;
@@ -179,7 +179,7 @@
                         }
                     });
 
-                    // 2. On coche chaque matériel présent dans le lot s'il est disponible
+                    // on coche chaque matériel présent dans le lot s'il est disponible
                     let nombreMaterielsIndisponibles = 0;
                     idsMateriels.forEach(id => {
                         const checkbox = document.getElementById('materiel-' + id);
@@ -193,7 +193,7 @@
                         }
                     });
 
-                    // Petit avertissement si un ou plusieurs éléments du lot sont déjà loués ailleurs
+                    // avertissement si un ou plusieurs éléments du lot sont déjà loués ailleurs
                     if (nombreMaterielsIndisponibles > 0) {
                         alert("Attention : " + nombreMaterielsIndisponibles + " matériel(s) de ce lot sont actuellement indisponibles et n'ont pas pu être sélectionnés.");
                     }

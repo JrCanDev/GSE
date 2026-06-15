@@ -119,7 +119,6 @@ class Utilisateur
         }
 
         try {
-            // Si le mot de passe est explicitement fourni ou réinitialisé, on l'inclut dans la requête
             if (isset($this->password)) {
                 $sql = "UPDATE utilisateurs SET username = :username, password = :password, admin = :admin, entite_id = :entite_id WHERE id = :id";
                 $stmt = $this->db->prepare($sql);

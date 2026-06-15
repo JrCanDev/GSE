@@ -4,6 +4,7 @@ $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 require_once(dirname(__FILE__) . '/../../class/myAuthClass.php');
 require_once(dirname(__FILE__) . '/../../class/utilisateur.class.php');
+require_once(dirname(__FILE__) . '/../../class/entite.class.php');
 
 if (!isUserAdmin()) {
     header('location: index.php');
@@ -40,13 +41,14 @@ if (GETPOST('update')) {
     $admin = GETPOST('admin') ? true : false;
     $entite_id = (int) GETPOST('entite_id');
 
+    // on est obligé d'avoir un nom d'utilisateur
     if (empty($new_username)) {
         $_SESSION['mesgs']['errors'][] = "Le nom d'utilisateur ne peut pas être vide.";
         header("Location: index.php?element=utilisateurs&action=card&id_user=" . $user->id);
         exit(1);
     }
 
-    // Vérifier si le nouveau username est déjà utilisé par un AUTRE utilisateur
+    // on vérifie si le nouveau username est déjà utilisé par un AUTRE utilisateur
     if (strtolower($new_username) !== strtolower($user->username)) {
         $existing = myAuthClass::getUserByUsername($new_username);
         if ($existing) {
@@ -56,30 +58,24 @@ if (GETPOST('update')) {
         }
     }
 
-    // Sécurité : on ne peut pas enlever ses propres droits administrateur
-    if ($isSelf) {
-        $admin = true;
-    }
+    // on ne peut pas enlever ses propres droits administrateur
+    if ($isSelf) $admin = true;
+
+    // si l'utilisateur est admin, il n'est pas rattaché à une entité spécifique, on le met donc dans l'entité "Non défini"
+    if ($admin) $entite_id = 0;
 
     $user->username = $new_username;
     $user->admin = $admin;
     $user->entite_id = $entite_id;
-    // Si on a coché la réinitialisation du mot de passe
+    
     if (GETPOST('reset_password') === '1') {
         $user->password = '';
-    } else {
-        unset($user->password);
     }
 
     $user->update();
 
-    // Mettre à jour la session de l'admin lui-même s'il vient de modifier ses propres infos (comme son username)
-    if ($isSelf) {
-        $_SESSION['user']['username'] = $user->username;
-        $_SESSION['user']['admin'] = $user->admin;
-        $_SESSION['user']['entite_id'] = $user->entite_id;
-    }
-
     header("Location: index.php?element=utilisateurs");
     exit(1);
 }
+
+$entites = Entite::fetchAll($db);

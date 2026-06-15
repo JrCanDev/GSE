@@ -68,10 +68,10 @@
 </div>
 
 <script>
-    // Configuration et Palette de couleurs
+    // les différentes couleurs pour les courbes (s'il n'y a pas assez de couleurs, elles seront réutilisées en boucle)
     const paletteCouleurs = ['#ffeb3b', '#f44336', '#03a9f4', '#4caf50', '#ff9800', '#009688'];
 
-    // Initialisation Chart.js avec les données initiales de PHP
+    // initialisation de Chart.js avec les données de PHP
     const ctx = document.getElementById('chart');
     let myChart = new Chart(ctx, {
         type: 'line',
@@ -222,7 +222,7 @@
         myChart.update();
     }
 
-    // ANTI-REBOND pour éviter de faire trop de requêtes lors de la saisie dans la barre de recherche
+    // éviter de faire trop de requêtes lors de la saisie dans la barre de recherche
     function debounce(func, timeout = 300) {
         let timer;
         return (...args) => {

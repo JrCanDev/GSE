@@ -179,7 +179,6 @@ try {
     ");
     while ($view = $viewsStmt->fetch(PDO::FETCH_ASSOC)) {
         echo "DROP VIEW IF EXISTS " . quoteIdentifier($view['view_name']) . " CASCADE;\n";
-        // view_definition contient déjà le SELECT complet de la vue, terminé par un point-virgule
         echo "CREATE VIEW " . quoteIdentifier($view['view_name']) . " AS\n" . rtrim($view['view_definition'], ';') . ";\n\n";
     }
 

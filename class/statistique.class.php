@@ -9,7 +9,6 @@ class Statistique
             
             $stmt = $db->prepare($sql);
             
-            // On lie la recherche textuelle
             $stmt->bindValue(':search', $recherche, PDO::PARAM_STR);
             
             $isSuperAdmin = (!empty($_SESSION['user']['admin']) && $_SESSION['user']['admin'] === true);

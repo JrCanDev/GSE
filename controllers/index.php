@@ -23,7 +23,7 @@ foreach ($emprunts as $e) {
         
         if ($date_prevue && $date_prevue->format('Y-m-d') < $now->format('Y-m-d')) {
             $retards++;
-            // Construire un objet léger pour la vue contenant le nom du matériel
+
             $materielsLot = $e->fetchMateriels();
             $nomMateriel = '';
             if ($materielsLot && isset($materielsLot[0]['nom_materiel'])) {
@@ -32,6 +32,7 @@ foreach ($emprunts as $e) {
                 $nomMateriel = $e->materiels_resume;
             }
 
+            // on construit un objet léger pour la vue contenant les infos de l'emprunteur et le nom du matériel
             $obj = new stdClass();
             $obj->nom_emprunteur = $e->nom_emprunteur;
             $obj->prenom_emprunteur = $e->prenom_emprunteur;
@@ -43,9 +44,19 @@ foreach ($emprunts as $e) {
     }
 }
 
-$totalMateriels = count($materiels);
-$dispo = 0;
-foreach ($materiels as $m) {
-	if (Materiel::estDisponible($db, $m->id_materiel)) $dispo++;
-}
-$dispo_pct = $totalMateriels > 0 ? round(($dispo / $totalMateriels) * 100) : 0;
+usort($overdues, function ($a, $b) {
+    // on trie par date prévue de restitution
+    $compDate = $a->date_prevue_restitution <=> $b->date_prevue_restitution;
+    if ($compDate !== 0) {
+        return $compDate;
+    }
+
+    // on trie par ordre alphabétique par NOM
+    $compNom = strcasecmp($a->nom_emprunteur, $b->nom_emprunteur);
+    if ($compNom !== 0) {
+        return $compNom;
+    }
+
+    // on trie par ordre alphabétique par PRÉNOM
+    return strcasecmp($a->prenom_emprunteur, $b->prenom_emprunteur);
+});
