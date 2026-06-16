@@ -59,7 +59,7 @@
                 else $etat_class = 'w3-text-blue';
                 ?>
 
-                <tr class="item-emprunt" style="<?= $row_style ?>" data-materiels-details="<?= sanitize($emprunt->materiels_details) ?>">
+                <tr class="item-emprunt" style="<?= $row_style ?>" data-materiels-details="<?= sanitize($emprunt->materiels_details) ?>" data-rendu="<?= ($toutEstRendu || !empty($emprunt->date_reelle_restitution)) ? '1' : '0' ?>">
                     <td><?= sanitize($emprunt->nom_emprunteur) ?></td>
                     <td><?= sanitize($emprunt->prenom_emprunteur) ?></td>
                     <td><?= sanitize($emprunt->nom_groupe) ?></td>
@@ -277,6 +277,25 @@
             }
         }
 
+        // Tri des lignes : les emprunts non rendus (data-rendu="0") d'abord, les rendus (data-rendu="1") à la fin.
+        let tbody = document.querySelector('table.w3-table tbody');
+        if (tbody) {
+            let rowsArray = Array.from(rows);
+            // Tri stable pour conserver l'ordre initial ou celui du tri par colonne
+            let mapped = rowsArray.map((el, i) => ({ index: i, value: el }));
+            mapped.sort((a, b) => {
+                let aRendu = a.value.getAttribute('data-rendu') === '1' ? 1 : 0;
+                let bRendu = b.value.getAttribute('data-rendu') === '1' ? 1 : 0;
+                if (aRendu !== bRendu) {
+                    return aRendu - bRendu; // 0 avant 1 (non rendu d'abord)
+                }
+                return a.index - b.index;
+            });
+            mapped.forEach(item => {
+                tbody.appendChild(item.value);
+            });
+        }
+
         if (compteurEmprunts) {
             compteurEmprunts.textContent = empruntsVisibles + ' / <?= $totalEmprunts ?> emprunt(s) trouvé(s)';
         }
@@ -365,6 +384,10 @@
                                 if (data.remarque_restitution) {
                                     cellules[9].textContent = data.remarque_restitution;
                                 }
+
+                                let isRendu = (data.date_reelle_restitution && data.date_reelle_restitution !== 'En attente');
+                                rowPrincipale.setAttribute('data-rendu', isRendu ? '1' : '0');
+                                filtrerEmprunts();
                             }
 
                         } else {

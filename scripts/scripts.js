@@ -51,6 +51,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rows = Array.from(tbody.rows);
 
                 rows.sort((rowA, rowB) => {
+                    const aRenduAttr = rowA.getAttribute('data-rendu');
+                    const bRenduAttr = rowB.getAttribute('data-rendu');
+                    if (aRenduAttr !== null && bRenduAttr !== null) {
+                        const aRendu = aRenduAttr === '1' ? 1 : 0;
+                        const bRendu = bRenduAttr === '1' ? 1 : 0;
+                        if (aRendu !== bRendu) {
+                            return aRendu - bRendu; // Non-rendu (0) avant rendu (1)
+                        }
+                    }
+
                     if (!rowA.children[columnIndex] || !rowB.children[columnIndex]) return 0;
 
                     let cellA = rowA.children[columnIndex].textContent.trim();
