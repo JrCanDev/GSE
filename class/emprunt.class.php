@@ -17,6 +17,7 @@ class Emprunt
     private int $nombre_materiels_rendus;
     private ?string $materiels_resume;
     private ?string $materiels_details;
+    private ?string $materiels_assoc;
     private array $ids_materiels;
     private int $entite_id;
 
@@ -44,6 +45,7 @@ class Emprunt
         $this->nombre_materiels_rendus = 0;
         $this->materiels_resume = null;
         $this->materiels_details = null;
+        $this->materiels_assoc = null;
         $this->ids_materiels = [];
         $this->entite_id = -1;
 
@@ -159,6 +161,7 @@ class Emprunt
                 'nombre_materiels_rendus',
                 'materiels_resume',
                 'materiels_details',
+                'materiels_assoc',
                 'entite_id'
             );
 
@@ -244,7 +247,7 @@ class Emprunt
             $stmt->bindValue(':id_emprunt', $this->id_emprunt, PDO::PARAM_INT);
             $stmt->execute();
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération des matériaux de l'emprunt " . $this->id_emprunt . " : " . $e->getMessage();
             return [];
@@ -271,6 +274,7 @@ class Emprunt
                 'nombre_materiels_rendus',
                 'materiels_resume',
                 'materiels_details',
+                'materiels_assoc',
                 'entite_id'
             );
             
@@ -347,5 +351,20 @@ class Emprunt
             $_SESSION['mesgs']['errors'][] = "ERREUR lors de la récupération des emprunts par matériel " . $id_materiel . " : " . $e->getMessage();
             return [];
         }
+    }
+
+    public function getMaterielsAssoc(): array
+    {
+        $materiels = [];
+        if (!empty($this->materiels_assoc)) {
+            $parts = explode('||', $this->materiels_assoc);
+            foreach ($parts as $part) {
+                $subparts = explode(':', $part, 2);
+                if (count($subparts) === 2) {
+                    $materiels[(int)$subparts[0]] = $subparts[1];
+                }
+            }
+        }
+        return $materiels;
     }
 }

@@ -133,20 +133,6 @@
                 container.style.display = 'none';
             }
 
-            function changerCouleurSelect(selectElement) {
-                const optionSelectionnee = selectElement.options[selectElement.selectedIndex];
-
-                selectElement.classList.remove('etat-ok', 'etat-reserve', 'etat-reparation', 'etat-endommage', 'etat-disparu');
-
-                if (optionSelectionnee.className) {
-                    selectElement.classList.add(optionSelectionnee.className);
-                }
-            }
-
-            const selectEtat = document.querySelector("select[name='etat']");
-            if (selectEtat) {
-                changerCouleurSelect(selectEtat);
-            }
 
             function filtrerMateriel() {
                 let input = document.getElementById('searchBar').value.toLowerCase();

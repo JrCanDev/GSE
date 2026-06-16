@@ -121,10 +121,17 @@
                                 <form action="?element=emprunts&action=card" method="post" class="w3-container w3-padding-0">
                                     <input type="hidden" name="id_emprunt" value="<?= $emprunt->id_emprunt ?>">
                                     <input type="hidden" name="id_materiel" value="<?= $materiel['id_materiel'] ?>">
-                                    <select class="w3-select w3-border w3-round w3-margin-bottom" name="etat_restitution" required>
+                                    <select class="w3-select w3-border w3-round w3-margin-bottom" name="etat_restitution" onchange="changerCouleurSelect(this)" required>
                                         <option value="" disabled selected>État</option>
-                                        <?php foreach (Materiel::$etats as $etat): ?>
-                                            <option value="<?= sanitize($etat) ?>"><?= sanitize($etat) ?></option>
+                                        <?php foreach (Materiel::$etats as $etat):
+                                            $classEtat = '';
+                                            if ($etat === 'OK') $classEtat = 'etat-ok';
+                                            elseif ($etat === 'Réservé') $classEtat = 'etat-reserve';
+                                            elseif ($etat === 'En réparation') $classEtat = 'etat-reparation';
+                                            elseif ($etat === 'Endommagé') $classEtat = 'etat-endommage';
+                                            elseif ($etat === 'Disparu') $classEtat = 'etat-disparu';
+                                        ?>
+                                            <option class="<?= $classEtat ?>" value="<?= sanitize($etat) ?>"><?= sanitize($etat) ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <input class="w3-input w3-border w3-round w3-margin-bottom" type="text" name="remarque_restitution" placeholder="Remarque de restitution">

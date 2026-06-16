@@ -39,7 +39,7 @@
             </div>
             <div class="w3-third">
                 <label><b>État<span style="color: red;">*</span></b></label>
-                <select id="etat" onchange="changerCouleurSelect(this)" class="w3-select w3-border w3-round w3-center" name="etat"
+                <select id="etat" class="w3-select w3-border w3-round w3-center" name="etat"
                     onchange="changerCouleurSelect(this)" required>
                     <?php foreach (Materiel::$etats as $etat):
                         $classEtat = '';
@@ -202,20 +202,6 @@
                 statusInput.value = "delete";
             }
 
-            function changerCouleurSelect(selectElement) {
-                const optionSelectionnee = selectElement.options[selectElement.selectedIndex];
-
-                selectElement.classList.remove('etat-ok', 'etat-reserve', 'etat-reparation', 'etat-endommage', 'etat-disparu');
-
-                if (optionSelectionnee.className) {
-                    selectElement.classList.add(optionSelectionnee.className);
-                }
-            }
-
-            const selectEtat = document.querySelector("select[name='etat']");
-            if (selectEtat) {
-                changerCouleurSelect(selectEtat);
-            }
 
             function filtrerMateriel() {
                 let input = document.getElementById('searchBar').value.toLowerCase();

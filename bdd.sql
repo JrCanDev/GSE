@@ -108,7 +108,8 @@ SELECT
             ELSE '[en cours]'
         END,
         ' | ' ORDER BY M.id_materiel
-    ) AS materiels_details
+    ) AS materiels_details,
+    STRING_AGG(M.id_materiel || ':' || M.nom, '||' ORDER BY M.id_materiel) AS materiels_assoc
 FROM emprunts AS E
 INNER JOIN groupes AS G ON G.id_groupe = E.id_groupe
 LEFT JOIN emprunt_materiels AS EM ON EM.id_emprunt = E.id_emprunt

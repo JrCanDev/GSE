@@ -15,9 +15,9 @@ usort($emprunts, function($a, $b) {
     if (!$aReturned && $bReturned) return -1;
 
     // trier par nom du groupe
-    $cmp = strcmp($a->nom_groupe, $b->nom_groupe);
+    $cmp = strcasecmp($a->nom_groupe, $b->nom_groupe);
     if ($cmp !== 0) return $cmp;
 
     // enfin par nom de l'emprunteur
-    return strcmp($a->nom_emprunteur, $b->nom_emprunteur);
+    return strcasecmp($a->nom_emprunteur, $b->nom_emprunteur);
 });

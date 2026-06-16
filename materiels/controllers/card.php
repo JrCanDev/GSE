@@ -9,20 +9,19 @@ if (!isUserLoggedIn()) {
     exit(1);
 }
 
-$old_page = $_POST['old_page'] ?? 'materiels';
+$old_page = GETPOST('old_page') ?? 'materiels';
 
 if (isset($_POST["cancel"])) {
     header("Location: index.php?element=" . $old_page);
     exit(1);
 }
 
-if (!isset($_POST['id_materiel']) || empty($_POST['id_materiel'])) {
+$id_materiel = GETPOST('id_materiel');
+if (empty($id_materiel)) {
     $_SESSION['mesgs']['errors'][] = "ID du matériel non spécifié.";
     header("Location: " . $_SERVER['PHP_SELF'] . "?element=" . $old_page);
     exit(-1);
 }
-
-$id_materiel = $_POST['id_materiel'];
 $materiel = new Materiel($db);
 $materiel->fetch($id_materiel);
 
