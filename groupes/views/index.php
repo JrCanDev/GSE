@@ -14,9 +14,16 @@
     <tbody>
         <?php if ($groupesActifs): ?>
             <?php foreach ($groupesActifs as $groupe): ?>
+                <?php
+                    $date_restitution = new DateTime($groupe->date_restitution);
+                    $now = new DateTime();
+                    $is_late = $date_restitution < $now;
+                ?>
                 <tr>
                     <td><?= sanitize($groupe->nom_groupe) ?></td>
-                    <td><?= formatDisplayDate(sanitize($groupe->date_restitution)) ?></td>
+                    <td style="<?= $is_late ? 'color: red; font-weight: bold;' : '' ?>">
+                        <?= formatDisplayDate(sanitize($groupe->date_restitution)) ?>
+                    </td>
                     <td>
                         <form action="?element=groupes&action=card" method="post">
                             <input type="hidden" name="id_groupe" value="<?= $groupe->id_groupe ?>">
