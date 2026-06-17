@@ -16,13 +16,8 @@
                 <label><b>Entité<span style="color: red;">*</span></b></label>
                 <select class="w3-select w3-border w3-round w3-center" name="entite_id" id="entiteSelect" required>
                     <option value="" disabled selected>Choisir une entité</option>
-                    
-                    <option value="0">Non défini</option>
-                    
                     <?php foreach ($entites as $entite): ?>
-                        <?php if (intval($entite->id) !== 0): ?>
-                            <option value="<?= $entite->id ?>"><?= sanitize($entite->nom) ?></option>
-                        <?php endif; ?>
+                        <option value="<?= $entite->id ?>"><?= sanitize($entite->nom) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

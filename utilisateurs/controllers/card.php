@@ -61,7 +61,6 @@ if (GETPOST('update')) {
     // on ne peut pas enlever ses propres droits administrateur
     if ($isSelf) $admin = true;
 
-    // si l'utilisateur est admin, il n'est pas rattaché à une entité spécifique, on le met donc dans l'entité "Non défini"
     if ($admin) $entite_id = 0;
 
     $user->username = $new_username;

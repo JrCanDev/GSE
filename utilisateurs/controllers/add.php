@@ -36,7 +36,6 @@ if (GETPOST('submit')) {
         exit(1);
     }
 
-    // si l'utilisateur est admin, il n'est pas rattaché à une entité spécifique, on le met donc dans l'entité "Non défini"
     if ($admin) $entite_id = 0;
 
     $data = [

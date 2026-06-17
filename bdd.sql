@@ -79,7 +79,7 @@ CREATE TABLE lot_materiels(
     PRIMARY KEY (id_lot, id_materiel)
 );
 
-INSERT INTO entites (nom) VALUES ('INFO'), ('JRCANDEV');
+INSERT INTO entites (id, nom) VALUES (0, 'TOUS'), (1, 'INFO'), (2, 'JRCANDEV');
 INSERT INTO utilisateurs (username, password, admin) VALUES ('admin', md5('admin'), true);
 
 -- Vue pour afficher les emprunts avec un résumé de leurs matériels
