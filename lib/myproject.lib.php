@@ -52,6 +52,9 @@ function desanitize($value)
 
 function validateTypeInbound($value, $type)
 {
+  if (is_resource($value)) {
+    return "[Pour voir l'image, allez sur la page des matériels]";
+  } 
   $value = trim($value ?? '');
   if ($type === 'boolean' && $value === "") {
     $value = false;

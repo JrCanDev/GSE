@@ -3,6 +3,7 @@ $db = include(dirname(__FILE__) . '/../../lib/mypdo.php');
 require_once(dirname(__FILE__) . '/../../lib/myproject.lib.php');
 require_once(dirname(__FILE__) . '/../../class/emprunt.class.php');
 require_once(dirname(__FILE__) . '/../../class/materiel.class.php');
+require_once(dirname(__FILE__) . '/../../class/groupe.class.php');
 
 if (!isUserLoggedIn()) {
     header('location: index.php');
@@ -24,6 +25,8 @@ $id_emprunt = $_POST['id_emprunt'];
 $emprunt = new Emprunt($db);
 $emprunt->fetch($id_emprunt);
 $materiels = $emprunt->fetchMateriels();
+
+$years = Groupe::fetchAll($db);
 
 if (isset($_POST['return_material'])) {
     $id_materiel = filter_input(INPUT_POST, 'id_materiel', FILTER_VALIDATE_INT);
@@ -70,14 +73,26 @@ if (isset($_POST['return_material'])) {
     }
 }
 
-if (isset($_POST['update'])) {
-    $emprunt->date_prevue_restitution = sanitize($_POST['date_prevue_restitution']) ?? $emprunt->date_prevue_restitution;
+if (isset($_POST['update_date_rendu'])) {
+    $id_materiel = filter_input(INPUT_POST, 'id_materiel', FILTER_VALIDATE_INT);
+    $new_date = sanitize(filter_input(INPUT_POST, 'new_date_rendu'));
 
-    $caution = sanitize($_POST['caution'] ?? null);
-    if (in_array($caution, Emprunt::$cautions, true)) {
-        $emprunt->caution = $caution;
+    if (!$id_materiel || empty($new_date)) {
+        $_SESSION['mesgs']['errors'][] = "Données manquantes pour modifier la date de rendu.";
+    } else {
+        $emprunt->updateDateRestitution($id_materiel, $new_date);
     }
 
+    $materiels = $emprunt->fetchMateriels();
+}
+
+if (isset($_POST['update'])) {
+    $emprunt->nom_emprunteur = sanitize(filter_input(INPUT_POST, 'nom_emprunteur')) ?? $emprunt->nom_emprunteur;
+    $emprunt->prenom_emprunteur = sanitize(filter_input(INPUT_POST, 'prenom_emprunteur')) ?? $emprunt->prenom_emprunteur;
+    $emprunt->id_groupe = sanitize(filter_input(INPUT_POST, 'id_groupe', FILTER_VALIDATE_INT)) ?? $emprunt->id_groupe;
+    $emprunt->date_emprunt = sanitize(filter_input(INPUT_POST, 'date_emprunt')) ?? $emprunt->date_emprunt;
+    $emprunt->date_prevue_restitution = sanitize(filter_input(INPUT_POST, 'date_prevue_restitution')) ?? $emprunt->date_prevue_restitution;
+    $emprunt->caution = sanitize(filter_input(INPUT_POST, 'caution')) ?? $emprunt->caution;
     $emprunt->remarque = html_entity_decode($_POST['remarque'], ENT_QUOTES, 'UTF-8') ?? $emprunt->remarque;
 
     $emprunt->update();

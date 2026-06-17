@@ -11,6 +11,7 @@
 </div>
 
 <?php $totalEmprunts = $emprunts ? count($emprunts) : 0; ?>
+<h2 id="compteurEmprunts"><?= $totalEmprunts ?> / <?= $totalEmprunts ?> emprunt(s) trouvé(s)</h2>
 
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
@@ -238,8 +239,6 @@
         <?php endif ?>
     </tbody>
 </table>
-
-<h2 id="compteurEmprunts"><?= $totalEmprunts ?> / <?= $totalEmprunts ?> emprunt(s) trouvé(s)</h2>
 
 <script>
     function filtrerEmprunts() {

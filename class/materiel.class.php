@@ -4,7 +4,7 @@ class Materiel
     private int $id_materiel;
     private string $nom;
     private string $modele;
-    private string $annee;
+    private ?string $annee;
     private string $etiquette_ulco;
     private string $localisation;
     private string $etat;
@@ -27,7 +27,7 @@ class Materiel
         $this->id_materiel = -1;
         $this->nom = '';
         $this->modele = '';
-        $this->annee = '';
+        $this->annee = null;
         $this->etiquette_ulco = '';
         $this->etat = '';
         $this->localisation = '';

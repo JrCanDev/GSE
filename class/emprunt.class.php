@@ -353,6 +353,59 @@ class Emprunt
         }
     }
 
+    public function updateDateRestitution(int $id_materiel, string $new_date): void
+    {
+        try {
+            $this->db->beginTransaction();
+
+            // Met à jour la date de restitution du matériel dans emprunt_materiels
+            $sql = 'UPDATE emprunt_materiels 
+                    SET date_reelle_restitution = :new_date 
+                    WHERE id_emprunt = :id_emprunt 
+                      AND id_materiel = :id_materiel 
+                      AND date_reelle_restitution IS NOT NULL';
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':new_date', $new_date, PDO::PARAM_STR);
+            $stmt->bindValue(':id_emprunt', $this->id_emprunt, PDO::PARAM_INT);
+            $stmt->bindValue(':id_materiel', $id_materiel, PDO::PARAM_INT);
+            $stmt->execute();
+
+            if ($stmt->rowCount() === 0) {
+                throw new RuntimeException("Ce matériel n'a pas encore été rendu ou n'appartient pas à cet emprunt.");
+            }
+
+            // Recalculer la date de restitution globale de l'emprunt
+            // = la date la plus récente parmi les matériels rendus (si tous rendus)
+            $sql2 = 'SELECT COUNT(*) FILTER (WHERE date_reelle_restitution IS NULL) AS non_rendus,
+                            MAX(date_reelle_restitution) AS derniere_date
+                     FROM emprunt_materiels 
+                     WHERE id_emprunt = :id_emprunt';
+            $stmt2 = $this->db->prepare($sql2);
+            $stmt2->bindValue(':id_emprunt', $this->id_emprunt, PDO::PARAM_INT);
+            $stmt2->execute();
+            $result = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+            if ((int)$result['non_rendus'] === 0 && $result['derniere_date'] !== null) {
+                $sql3 = 'UPDATE emprunts SET date_reelle_restitution = :derniere_date WHERE id_emprunt = :id_emprunt';
+                $stmt3 = $this->db->prepare($sql3);
+                $stmt3->bindValue(':derniere_date', $result['derniere_date'], PDO::PARAM_STR);
+                $stmt3->bindValue(':id_emprunt', $this->id_emprunt, PDO::PARAM_INT);
+                $stmt3->execute();
+            }
+
+            $this->db->commit();
+
+            $this->fetch($this->id_emprunt);
+
+            $_SESSION['mesgs']['confirm'][] = "Date de rendu modifiée avec succès.";
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $_SESSION['mesgs']['errors'][] = "ERREUR lors de la modification de la date de rendu : " . $e->getMessage();
+        }
+    }
+
     public function getMaterielsAssoc(): array
     {
         $materiels = [];

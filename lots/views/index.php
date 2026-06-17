@@ -12,6 +12,8 @@
         placeholder="Rechercher par nom de lot ou matériel... (plusieurs filtres: virgule ou point-virgule)">
 </div>
 
+<h2 id="compteurLots"><?= $totalLots ?> / <?= $totalLots ?> lot(s) trouvé(s)</h2>
+
 <h2><b>Lots</b></h2>
 <table class="w3-table w3-striped w3-small w3-bordered w3-border">
     <thead>
@@ -61,8 +63,6 @@
         <?php endif ?>
     </tbody>
 </table>
-
-<h2 id="compteurLots"><?= $totalLots ?> / <?= $totalLots ?> lot(s) trouvé(s)</h2>
 
 <script>
     function filtrerLots() {

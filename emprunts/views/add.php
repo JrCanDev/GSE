@@ -4,6 +4,7 @@
     <form action="<?= $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ?>"
         method="post" class="w3-container w3-card-4 w3-padding">
 
+        <!-- Prénom, Nom et Année BUT -->
         <div class="w3-row-padding">
             <div class="w3-third">
                 <label><b>Nom<span style="color: red;">*</span></b></label>

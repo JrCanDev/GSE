@@ -11,6 +11,7 @@
 </div>
 
 <?php $totalMateriels = $materiels ? count($materiels) : 0; ?>
+<h2 id="compteurMateriels"><?= $totalMateriels ?> / <?= $totalMateriels ?> matériel(s) trouvé(s)</h2>
 
 <table class="w3-table w3-striped w3-bordered w3-small w3-border">
     <thead>
@@ -57,10 +58,12 @@
                 <tr class="item-materiel">
                     <td>
                         <?php if (!empty($materiel->image_data)): ?>
-                            <img src="data:<?= sanitize($materiel->image_type) ?>;base64,<?= base64_encode($materiel->image_data) ?>"
+                            <?php $imgSrc = 'data:' . sanitize($materiel->image_type) . ';base64,' . base64_encode($materiel->image_data); ?>
+                            <img src="<?= $imgSrc ?>"
                                 alt="<?= "Preview du " . sanitize($materiel->nom) . " (" . sanitize($materiel->etiquette_ulco) . ")" ?>"
-                                class="w3-round w3-border"
-                                style="width: 40px; height: 40px; object-fit: cover;">
+                                class="w3-round w3-border img-preview-thumb"
+                                style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;"
+                                onclick="ouvrirPreview('<?= $imgSrc ?>', '<?= sanitize($materiel->nom) ?>')">
                         <?php endif; ?>
                     </td>
                     <td><?= sanitize($materiel->nom) ?></td>
@@ -87,8 +90,6 @@
         <?php endif ?>
     </tbody>
 </table>
-
-<h2 id="compteurMateriels"><?= $totalMateriels ?> / <?= $totalMateriels ?> matériel(s) trouvé(s)</h2>
 
 <script>
     function filtrerListeMateriels() {
@@ -133,4 +134,33 @@
     }
 
     filtrerListeMateriels();
+</script>
+
+<!-- Modal de prévisualisation d'image -->
+<div id="modalPreviewImage" class="w3-modal" onclick="if(event.target===this)fermerPreview()">
+    <div class="w3-modal-content w3-animate-zoom" style="max-width: 600px;">
+        <div class="w3-container">
+            <span onclick="fermerPreview()" class="w3-button w3-display-topright w3-large">&times;</span>
+            <h3 id="modalPreviewTitre" class="w3-margin-top"></h3>
+        </div>
+        <div class="w3-container w3-center w3-padding">
+            <img id="modalPreviewImg" src="" alt="Preview" style="max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px;">
+        </div>
+    </div>
+</div>
+
+<script>
+    function ouvrirPreview(src, nom) {
+        document.getElementById('modalPreviewImg').src = src;
+        document.getElementById('modalPreviewTitre').textContent = nom;
+        document.getElementById('modalPreviewImage').style.display = 'block';
+    }
+
+    function fermerPreview() {
+        document.getElementById('modalPreviewImage').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') fermerPreview();
+    });
 </script>
