@@ -3,6 +3,15 @@ $root = dirname(__FILE__) . '/../../..';
 include_once $root . '/vendor/autoload.php';
 require_once $root . '/lib/myproject.lib.php';
 
+if (!isset($_SESSION)) {
+  session_start();
+}
+
+if (!isUserAdmin()) {
+  http_response_code(403);
+  die(json_encode(['error' => 'Accès refusé.']));
+}
+
 $tableName = GETPOST('tableName');
 $nbRow = GETPOST('row');
 $tableValues = GETPOST('values');
@@ -10,10 +19,16 @@ $columnMetadata = GETPOST('columnMetadata');
 $listFK = GETPOST('listFK');
 
 $table_values = '';
+$value_list = []; // Initialisation propre du tableau
 foreach ($columnMetadata as $column) {
   $column_name = $column['name'];
   $column_type = $column['type'];
-  $column_value = $tableValues[$column_name];
+  $column_value = $tableValues[$column_name] ?? null;
+
+  if (is_resource($column_value)) {
+    $column_value = null;
+  }
+
   $value_list[$column_name] = $column_value;
 
   $table_values .= "<td class='w3-border' id='". $column_name . "'>" . validateTypeInbound($column_value, $column_type) . "</td>";

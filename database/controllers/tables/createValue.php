@@ -4,9 +4,20 @@ include_once $root . '/vendor/autoload.php';
 require_once $root . '/lib/myproject.lib.php';
 $db = require $root . '/lib/mypdo.php';
 
+if (!isset($_SESSION)) {
+  session_start();
+}
+
+if (!isUserAdmin()) {
+  http_response_code(403);
+  die(json_encode(['error' => 'Accès refusé.']));
+}
+
 $tableName = GETPOST('tableName');
 $values = GETPOST('values');
 $columnMetadata = GETPOST('columnMetadata');
+
+$tableName = preg_replace('/[^a-zA-Z0-9_]/', '', $tableName);
 
 try {
   $columnNames = [];
@@ -15,7 +26,12 @@ try {
   $i = 0;
 
   foreach ($columnMetadata as $column) {
-    $key = $column['name'];
+    $key = preg_replace('/[^a-zA-Z0-9_]/', '', $column['name']);
+    
+    if (isset($column['type']) && $column['type'] === 'bytea') {
+      continue;
+    }
+
     $value = isset($values[$key]) ? $values[$key] : null;
     $validated_value = validateTypeOutbound($value, $column['type']);
     $columnNames[] = $key;
@@ -27,6 +43,10 @@ try {
       $prepared[] = ["param$i", $validated_value, getInputType($column['type'], true)];
     }
     $i++;
+  }
+
+  if (empty($columnNames)) {
+    die(json_encode(['error' => "Aucune colonne valide à insérer."]));
   }
 
   $query = "INSERT INTO $tableName ";
@@ -49,7 +69,7 @@ try {
   }
 
   $db->commit();
-  echo json_encode(['success' => "Valeurs insérées avec succés"]);
+  echo json_encode(['success' => "Valeurs insérées avec succès"]);
 } catch (Throwable $e) {
   if ($db instanceof PDO && $db->inTransaction()) {
     $db->rollBack();

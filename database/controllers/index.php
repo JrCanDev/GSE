@@ -115,9 +115,14 @@ function getTableValue($db, $tableName, $columnMetadata, $limit = DATABASE_PREVI
         $column_name = $column['name'];
         $column_type = $column['type'];
         $column_value = $row[$column_name];
+        
+        if (is_resource($column_value)) {
+          $column_value = null;
+        }
+
         $value_list[$column_name] = $column_value;
 
-        $table_values .= "<td class='w3-border' id='" . $column['name'] . "-$i'>" . validateTypeInbound($column_value, $column_type) . "</td>";
+        $table_values .= "<td class='w3-border' id='" . $column['name'] . "-$i'>" . validateTypeInbound($row[$column['name']], $column_type) . "</td>";
       }
       $table_values .= "<td class='w3-blue-grey w3-border-blue-grey' style='width: 5%'><button id='modify-value-$tableName-$i' class='clickable w3-light-green' onClick=\"modifyValue('$tableName', " . sanitize(json_encode($columnMetadata)) . ", $i, " . sanitize(json_encode($value_list)) . ")\"><i class='material-icons' style='padding-top: 5px;'>&#xe254;</i></button></td>";
       $table_values .= "<td class='w3-blue-grey w3-border-blue-grey' style='width: 5%'><button id='delete-value-$tableName-$i' class='clickable w3-red' onClick=\"deleteValue('$tableName', " . sanitize(json_encode($columnMetadata)) . ", " . sanitize(json_encode($listFK)) . ", $i, " . sanitize(json_encode($value_list)) . ")\"><i class='material-icons' style='padding-top: 5px;'>&#xe92b;</i></button></td>";
